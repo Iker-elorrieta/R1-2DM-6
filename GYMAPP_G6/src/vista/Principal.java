@@ -27,11 +27,12 @@ public class Principal extends JFrame {
 		
 		visualizarPaneles(enumPaneles.PANEL_LOGIN);
 
+		visualizarPaneles(enumPaneles.PANEL_LOGIN);
 	}
 
 	private void crearPanelContenedor() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 600);
+		setBounds(0, 0, 900, 600);
 		panelContenedor = new JPanel();
 		panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(panelContenedor);
@@ -40,14 +41,22 @@ public class Principal extends JFrame {
 
 	private void crearPanelRegistro() {
 		panelRegistro = new PanelRegistro();
+<<<<<<< HEAD
 		panelRegistro.setBounds(0, 0, 900, 600);
+=======
+		panelRegistro.setBounds(0, 0, 880, 560);
+>>>>>>> branch 'Sprint1' of https://github.com/Iker-elorrieta/R1-2DM-6.git
 		panelContenedor.add(panelRegistro);
 		panelRegistro.setVisible(false);
 	}
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
+<<<<<<< HEAD
 		panelLogin.setBounds(0, 0, 900, 600);
+=======
+		panelLogin.setBounds(0, 0, 880, 560);
+>>>>>>> branch 'Sprint1' of https://github.com/Iker-elorrieta/R1-2DM-6.git
 		panelContenedor.add(panelLogin);
 		panelLogin.setVisible(false);
 	}
