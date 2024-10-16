@@ -19,7 +19,6 @@ public class PanelLogin extends JPanel {
 	private JPasswordField TFContrasena;
 
 	public PanelLogin() {
-<<<<<<< HEAD
 		setBounds(0, 0, 900, 600);
 		setLayout(null);
 		
@@ -47,9 +46,7 @@ public class PanelLogin extends JPanel {
 		btnLogin.setBackground(new Color(255, 255, 255));
 		btnLogin.setBounds(411, 306, 218, 30);
 		add(btnLogin);
-=======
 		setBounds(0, 0, 880, 560);
->>>>>>> branch 'Sprint1' of https://github.com/Iker-elorrieta/R1-2DM-6.git
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setLayout(null);

@@ -41,22 +41,16 @@ public class Principal extends JFrame {
 
 	private void crearPanelRegistro() {
 		panelRegistro = new PanelRegistro();
-<<<<<<< HEAD
 		panelRegistro.setBounds(0, 0, 900, 600);
-=======
 		panelRegistro.setBounds(0, 0, 880, 560);
->>>>>>> branch 'Sprint1' of https://github.com/Iker-elorrieta/R1-2DM-6.git
 		panelContenedor.add(panelRegistro);
 		panelRegistro.setVisible(false);
 	}
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
-<<<<<<< HEAD
 		panelLogin.setBounds(0, 0, 900, 600);
-=======
 		panelLogin.setBounds(0, 0, 880, 560);
->>>>>>> branch 'Sprint1' of https://github.com/Iker-elorrieta/R1-2DM-6.git
 		panelContenedor.add(panelLogin);
 		panelLogin.setVisible(false);
 	}
