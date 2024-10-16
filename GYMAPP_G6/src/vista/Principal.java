@@ -24,6 +24,8 @@ public class Principal extends JFrame {
 		crearPanelRegistro();
 
 		crearPanelLogin();
+		
+		visualizarPaneles(enumPaneles.PANEL_LOGIN);
 
 	}
 
@@ -38,19 +40,19 @@ public class Principal extends JFrame {
 
 	private void crearPanelRegistro() {
 		panelRegistro = new PanelRegistro();
-		panelRegistro.setBounds(100, 100, 900, 600);
+		panelRegistro.setBounds(0, 0, 900, 600);
 		panelContenedor.add(panelRegistro);
 		panelRegistro.setVisible(false);
 	}
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
-		panelLogin.setBounds(100, 100, 900, 600);
+		panelLogin.setBounds(0, 0, 900, 600);
 		panelContenedor.add(panelLogin);
 		panelLogin.setVisible(false);
 	}
 
-	public void mVisualizarPaneles(enumPaneles panel) {
+	public void visualizarPaneles(enumPaneles panel) {
 		panelRegistro.setVisible(false);
 		panelLogin.setVisible(false);
 
