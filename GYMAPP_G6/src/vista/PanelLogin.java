@@ -42,7 +42,7 @@ public class PanelLogin extends JPanel {
 		
 		JButton btnLogin = new JButton("Iniciar sesión");
 		btnLogin.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		btnLogin.setBackground(new Color(0, 0, 0));
+		btnLogin.setBackground(new Color(255, 255, 255));
 		btnLogin.setBounds(411, 306, 218, 30);
 		add(btnLogin);
 		contentPane = new JPanel();
