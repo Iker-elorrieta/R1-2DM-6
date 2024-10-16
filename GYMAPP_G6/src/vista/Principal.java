@@ -4,71 +4,70 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-
 public class Principal extends JFrame {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static enum enumPaneles {
-		PANEL_REGISTRO, PANEL_LOGIN
-	}
+    public static enum enumAcciones {
+        PANEL_REGISTRO, PANEL_LOGIN
+    }
 
-	private JPanel panelContenedor;
-	private PanelRegistro panelRegistro;
-	private PanelLogin panelLogin;
+    private JPanel panelContenedor;
+    private PanelRegistro panelRegistro;
+    private PanelLogin panelLogin;
 
-	public Principal() {
+    public Principal() {
 
-		crearPanelContenedor();
+        crearPanelContenedor();
+        crearPanelLogin();
+        crearPanelRegistro();
 
-		crearPanelRegistro();
+        // Mostrar el panel de login al inicio.
+        visualizarPaneles(enumAcciones.PANEL_LOGIN);
+    }
 
-		crearPanelLogin();
-		
-		visualizarPaneles(enumPaneles.PANEL_LOGIN);
+    private void crearPanelContenedor() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(0, 0, 900, 600);
+        panelContenedor = new JPanel();
+        panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
+        setContentPane(panelContenedor);
+        panelContenedor.setLayout(null);
+    }
 
-		visualizarPaneles(enumPaneles.PANEL_LOGIN);
-	}
+    private void crearPanelLogin() {
+        panelLogin = new PanelLogin();
+        panelContenedor.add(panelLogin);
+        panelLogin.setVisible(false); // Ocultar inicialmente
+    }
 
-	private void crearPanelContenedor() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(0, 0, 900, 600);
-		panelContenedor = new JPanel();
-		panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(panelContenedor);
-		panelContenedor.setLayout(null);
-	}
+    private void crearPanelRegistro() {
+        panelRegistro = new PanelRegistro();
+        panelContenedor.add(panelRegistro);
+        panelRegistro.setVisible(false); // Ocultar inicialmente
+    }
 
-	private void crearPanelRegistro() {
-		panelRegistro = new PanelRegistro();
-		panelRegistro.setBounds(0, 0, 900, 600);
-		panelRegistro.setBounds(0, 0, 880, 560);
-		panelContenedor.add(panelRegistro);
-		panelRegistro.setVisible(false);
-	}
+    public void visualizarPaneles(enumAcciones panel) {
+        // Ocultar ambos paneles primero.
+        panelLogin.setVisible(false);
+        panelRegistro.setVisible(false);
 
-	private void crearPanelLogin() {
-		panelLogin = new PanelLogin();
-		panelLogin.setBounds(0, 0, 900, 600);
-		panelLogin.setBounds(0, 0, 880, 560);
-		panelContenedor.add(panelLogin);
-		panelLogin.setVisible(false);
-	}
+        switch (panel) {
+            case PANEL_LOGIN:
+                panelLogin.setVisible(true);
+                break;
+            case PANEL_REGISTRO:
+                panelRegistro.setVisible(true);
+                break;
+        }
+    }
 
-	public void visualizarPaneles(enumPaneles panel) {
-		panelRegistro.setVisible(false);
-		panelLogin.setVisible(false);
+    // Getters para los paneles
+    public PanelRegistro getPanelRegistro() {
+        return panelRegistro;
+    }
 
-		switch (panel) {
-		case PANEL_REGISTRO:
-			panelRegistro.setVisible(true);
-			break;
-		case PANEL_LOGIN:
-			panelLogin.setVisible(true);
-			break;
-
-		default:
-			break;
-		}
-	}
+    public PanelLogin getPanelLogin() {
+        return panelLogin;
+    }
 }

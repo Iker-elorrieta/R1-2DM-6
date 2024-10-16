@@ -8,19 +8,22 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import java.awt.Color;
+import javax.swing.SwingConstants;
 
 public class PanelLogin extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JPanel contentPane;
 	private JTextField tFUsuario;
 	private JPasswordField TFContrasena;
+	private JButton btnLogin, btnSignUp;
 
 	public PanelLogin() {
 		setBounds(0, 0, 900, 600);
 		setLayout(null);
+		
 		
 		JLabel lblUsuario = new JLabel("Usuario:");
 		lblUsuario.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -41,19 +44,54 @@ public class PanelLogin extends JPanel {
 		TFContrasena.setBounds(507, 189, 206, 30);
 		add(TFContrasena);
 		
-		JButton btnLogin = new JButton("Iniciar sesión");
-		btnLogin.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		btnLogin = new JButton("Iniciar sesión");
+		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnLogin.setBackground(new Color(255, 255, 255));
-		btnLogin.setBounds(411, 306, 218, 30);
+		btnLogin.setBounds(416, 257, 218, 30);
 		add(btnLogin);
-		setBounds(0, 0, 880, 560);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setLayout(null);
 
-		JLabel lblNewLabel = new JLabel("LOGIN");
-		lblNewLabel.setBounds(400, 5, 100, 37);
-		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
-		add(lblNewLabel);
+		JLabel lblLogin = new JLabel("INICIO DE SESIÓN");
+		lblLogin.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLogin.setBounds(380, 10, 313, 66);
+		lblLogin.setFont(new Font("Tahoma", Font.BOLD, 30));
+		add(lblLogin);
+		
+		btnSignUp = new JButton("Crear cuenta");
+		btnSignUp.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnSignUp.setBounds(416, 315, 218, 30);
+		add(btnSignUp);
+	}
+
+
+	public JTextField gettFUsuario() {
+		return tFUsuario;
+	}
+
+	public void settFUsuario(JTextField tFUsuario) {
+		this.tFUsuario = tFUsuario;
+	}
+
+	public JPasswordField getTFContrasena() {
+		return TFContrasena;
+	}
+
+	public void setTFContrasena(JPasswordField tFContrasena) {
+		TFContrasena = tFContrasena;
+	}
+
+	public JButton getBtnLogin() {
+		return btnLogin;
+	}
+
+	public void setBtnLogin(JButton btnLogin) {
+		this.btnLogin = btnLogin;
+	}
+
+	public JButton getBtnSignUp() {
+		return btnSignUp;
+	}
+
+	public void setBtnSignUp(JButton btnSignUp) {
+		this.btnSignUp = btnSignUp;
 	}
 }
