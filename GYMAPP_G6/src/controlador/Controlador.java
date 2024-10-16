@@ -16,21 +16,20 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		this.inicializarControlador();
 
 	}
-	
-	private void inicializarControlador() {
-		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		// TODO Auto-generated method stub
+	private void inicializarControlador() {
 		
+
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public void valueChanged(ListSelectionEvent e) {
+		System.out.println("Cambiar valor");
 	}
 }

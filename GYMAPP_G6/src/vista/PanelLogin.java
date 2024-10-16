@@ -1,6 +1,7 @@
 package vista;
 
-import javax.swing.JFrame;
+import java.awt.Font;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -10,9 +11,14 @@ public class PanelLogin extends JPanel {
 	private JPanel contentPane;
 
 	public PanelLogin() {
-		setBounds(100, 100, 900, 600);
+		setBounds(0, 0, 880, 560);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLayout(null);
 
+		JLabel lblNewLabel = new JLabel("LOGIN");
+		lblNewLabel.setBounds(400, 5, 100, 37);
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		add(lblNewLabel);
 	}
 }

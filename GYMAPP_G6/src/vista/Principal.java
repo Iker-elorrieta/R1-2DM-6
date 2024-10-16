@@ -25,11 +25,12 @@ public class Principal extends JFrame {
 
 		crearPanelLogin();
 
+		visualizarPaneles(enumPaneles.PANEL_LOGIN);
 	}
 
 	private void crearPanelContenedor() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 900, 600);
+		setBounds(0, 0, 900, 600);
 		panelContenedor = new JPanel();
 		panelContenedor.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(panelContenedor);
@@ -38,19 +39,19 @@ public class Principal extends JFrame {
 
 	private void crearPanelRegistro() {
 		panelRegistro = new PanelRegistro();
-		panelRegistro.setBounds(100, 100, 900, 600);
+		panelRegistro.setBounds(0, 0, 880, 560);
 		panelContenedor.add(panelRegistro);
 		panelRegistro.setVisible(false);
 	}
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
-		panelLogin.setBounds(100, 100, 900, 600);
+		panelLogin.setBounds(0, 0, 880, 560);
 		panelContenedor.add(panelLogin);
 		panelLogin.setVisible(false);
 	}
 
-	public void mVisualizarPaneles(enumPaneles panel) {
+	public void visualizarPaneles(enumPaneles panel) {
 		panelRegistro.setVisible(false);
 		panelLogin.setVisible(false);
 
