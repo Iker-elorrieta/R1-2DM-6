@@ -9,7 +9,6 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.FirestoreOptions;
 
 public class Conexion {
-
 	private static String nombreJSON = "seguridad.json";
 	private static String projectID = "hola-4874b";
 

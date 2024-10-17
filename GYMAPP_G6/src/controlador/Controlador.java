@@ -3,7 +3,7 @@ package controlador;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
-
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -30,12 +30,14 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		this.vistaLogin.getBtnSignUp().addActionListener(this);
 		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
 
+		this.vistaLogin.getBtnLogin().addActionListener(this);
+		this.vistaLogin.getBtnLogin().setActionCommand(Principal.enumAcciones.INICIAR_SESION.toString());
+
 		this.vistaRegistro.getBtnRegistroSignUp().addActionListener(this);
 		this.vistaRegistro.getBtnRegistroSignUp().setActionCommand(Principal.enumAcciones.REGISTRAR_USUARIO.toString());
 
 		this.vistaRegistro.getBtnReturn().addActionListener(this);
 		this.vistaRegistro.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
-
 	}
 
 	@Override
@@ -52,10 +54,44 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		case REGISTRAR_USUARIO:
 			this.registrarUsuario();
 			break;
+		case INICIAR_SESION:
+			this.login();
+			break;
 		}
 	}
 
 	// METODOS
+
+	private void login() {
+		String usuario = this.vistaLogin.gettFUsuario().getText();
+		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
+
+		// Compruebo si los datos están vacíos
+		if (usuario.isEmpty() || password.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Introduce el usuario y contraseña.", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// Obtener el usuario desde Firestore
+		Usuario user = new Usuario().ObtenerContacto(usuario);
+
+		// Comprobar si el usuario existe
+		if (user != null) {
+			// Comparar la contraseña
+			if (user.getPassword().equals(password)) {
+				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
+						"Información", JOptionPane.INFORMATION_MESSAGE);
+
+				// Aquí puedes continuar con el flujo del programa
+			} else {
+				JOptionPane.showMessageDialog(null, "Contraseña incorrecta.", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+
+		} else {
+			JOptionPane.showMessageDialog(null, "El usuario no existe.", "Error", JOptionPane.ERROR_MESSAGE);
+		}
+	}
 
 	// REGISTRO DE NUEVO USUARIO EN LA BBDD (Crear el objeto para posteriormente
 	// pasarselo a la clase Usuario)
@@ -92,4 +128,5 @@ public class Controlador implements ActionListener, ListSelectionListener {
 	public void valueChanged(ListSelectionEvent e) {
 		System.out.println("Cambiar valor");
 	}
+
 }
