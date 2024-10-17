@@ -5,9 +5,9 @@ import java.awt.Image;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Color;
@@ -17,14 +17,14 @@ public class PanelLogin extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 	private JTextField tFUsuario;
-	private JPasswordField TFContrasena;
+	private JPasswordField tFContrasena;
 	private JButton btnLogin, btnSignUp;
 	private JLabel lblImg;
 
 	public PanelLogin() {
+		
 		setBounds(0, 0, 900, 600);
 		setLayout(null);
-		
 		
 		JLabel lblUsuario = new JLabel("Usuario:");
 		lblUsuario.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -41,9 +41,9 @@ public class PanelLogin extends JPanel {
 		lblContrasena.setBounds(347, 187, 150, 30);
 		add(lblContrasena);
 		
-		TFContrasena = new JPasswordField();
-		TFContrasena.setBounds(507, 189, 206, 30);
-		add(TFContrasena);
+		tFContrasena = new JPasswordField();
+		tFContrasena.setBounds(507, 189, 206, 30);
+		add(tFContrasena);
 		
 		btnLogin = new JButton("Iniciar sesión");
 		btnLogin.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -94,12 +94,12 @@ public class PanelLogin extends JPanel {
 		this.tFUsuario = tFUsuario;
 	}
 
-	public JPasswordField getTFContrasena() {
-		return TFContrasena;
+	public JPasswordField gettFContrasena() {
+		return tFContrasena;
 	}
 
-	public void setTFContrasena(JPasswordField tFContrasena) {
-		TFContrasena = tFContrasena;
+	public void settFContrasena(JPasswordField tFContrasena) {
+		this.tFContrasena = tFContrasena;
 	}
 
 	public JButton getBtnLogin() {
