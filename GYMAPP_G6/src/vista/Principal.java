@@ -9,7 +9,7 @@ public class Principal extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	public static enum enumPaneles {
+	public static enum enumAcciones {
 		PANEL_REGISTRO, PANEL_LOGIN
 	}
 
@@ -25,9 +25,8 @@ public class Principal extends JFrame {
 
 		crearPanelLogin();
 		
-		visualizarPaneles(enumPaneles.PANEL_LOGIN);
+		//visualizarPaneles(enumAcciones.PANEL_LOGIN);
 
-		visualizarPaneles(enumPaneles.PANEL_LOGIN);
 	}
 
 	private void crearPanelContenedor() {
@@ -41,7 +40,6 @@ public class Principal extends JFrame {
 
 	private void crearPanelRegistro() {
 		panelRegistro = new PanelRegistro();
-		panelRegistro.setBounds(0, 0, 900, 600);
 		panelRegistro.setBounds(0, 0, 880, 560);
 		panelContenedor.add(panelRegistro);
 		panelRegistro.setVisible(false);
@@ -49,13 +47,12 @@ public class Principal extends JFrame {
 
 	private void crearPanelLogin() {
 		panelLogin = new PanelLogin();
-		panelLogin.setBounds(0, 0, 900, 600);
 		panelLogin.setBounds(0, 0, 880, 560);
 		panelContenedor.add(panelLogin);
-		panelLogin.setVisible(false);
+		panelLogin.setVisible(true	);
 	}
 
-	public void visualizarPaneles(enumPaneles panel) {
+	public void visualizarPaneles(enumAcciones panel) {
 		panelRegistro.setVisible(false);
 		panelLogin.setVisible(false);
 
