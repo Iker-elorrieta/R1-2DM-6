@@ -1,14 +1,14 @@
 package vista;
 
 import java.awt.Font;
+import java.awt.Image;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import java.awt.Font;
+
 import javax.swing.JTextField;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.Color;
 import javax.swing.SwingConstants;
@@ -19,6 +19,7 @@ public class PanelLogin extends JPanel {
 	private JTextField tFUsuario;
 	private JPasswordField TFContrasena;
 	private JButton btnLogin, btnSignUp;
+	private JLabel lblImg;
 
 	public PanelLogin() {
 		setBounds(0, 0, 900, 600);
@@ -60,6 +61,14 @@ public class PanelLogin extends JPanel {
 		btnSignUp.setFont(new Font("Tahoma", Font.BOLD, 12));
 		btnSignUp.setBounds(416, 315, 218, 30);
 		add(btnSignUp);
+		
+		lblImg = new JLabel();
+		lblImg.setHorizontalAlignment(SwingConstants.CENTER);
+		lblImg.setIcon(new ImageIcon (new ImageIcon(("../media/logo.jpg")).getImage().getScaledInstance(200, 200, Image.SCALE_DEFAULT)));
+		add(lblImg);
+		
+		
+	
 	}
 
 
@@ -94,4 +103,16 @@ public class PanelLogin extends JPanel {
 	public void setBtnSignUp(JButton btnSignUp) {
 		this.btnSignUp = btnSignUp;
 	}
+
+
+	public JLabel getLblImg() {
+		return lblImg;
+	}
+
+
+	public void setLblImg(JLabel lblImg) {
+		this.lblImg = lblImg;
+	}
+	
+	
 }

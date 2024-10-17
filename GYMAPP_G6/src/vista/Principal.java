@@ -1,7 +1,12 @@
 package vista;
 
+import java.awt.Image;
+
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 public class Principal extends JFrame {
@@ -9,7 +14,7 @@ public class Principal extends JFrame {
     private static final long serialVersionUID = 1L;
 
     public static enum enumAcciones {
-        PANEL_REGISTRO, PANEL_LOGIN
+        PANEL_REGISTRO, PANEL_LOGIN, INICIAR_SESION
     }
 
     private JPanel panelContenedor;
@@ -39,6 +44,7 @@ public class Principal extends JFrame {
         panelLogin = new PanelLogin();
         panelContenedor.add(panelLogin);
         panelLogin.setVisible(false); // Ocultar inicialmente
+        
     }
 
     private void crearPanelRegistro() {
@@ -59,6 +65,9 @@ public class Principal extends JFrame {
             case PANEL_REGISTRO:
                 panelRegistro.setVisible(true);
                 break;
+		default:
+			break;
+            
         }
     }
 
@@ -70,4 +79,7 @@ public class Principal extends JFrame {
     public PanelLogin getPanelLogin() {
         return panelLogin;
     }
+    
+    
+   
 }
