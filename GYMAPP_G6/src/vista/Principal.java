@@ -80,6 +80,5 @@ public class Principal extends JFrame {
         return panelLogin;
     }
     
-    
-   
+ 
 }

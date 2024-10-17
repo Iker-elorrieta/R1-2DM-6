@@ -104,7 +104,6 @@ public class PanelLogin extends JPanel {
 		this.btnSignUp = btnSignUp;
 	}
 
-
 	public JLabel getLblImg() {
 		return lblImg;
 	}
@@ -113,6 +112,5 @@ public class PanelLogin extends JPanel {
 	public void setLblImg(JLabel lblImg) {
 		this.lblImg = lblImg;
 	}
-	
-	
 }
+
