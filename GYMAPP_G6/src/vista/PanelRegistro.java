@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
 import java.awt.Font;
+import javax.swing.SwingConstants;
 
 public class PanelRegistro extends JPanel {
 
@@ -17,8 +18,9 @@ public class PanelRegistro extends JPanel {
 		setLayout(null);
 		
 		JLabel lblNewLabel = new JLabel("REGISTRO");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
-		lblNewLabel.setBounds(370, 62, 159, 86);
+		lblNewLabel.setBounds(264, 62, 265, 84);
 		add(lblNewLabel);
 		
 	}
