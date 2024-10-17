@@ -1,22 +1,21 @@
 package modelo;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
+import javax.swing.JOptionPane;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import java.util.List;
-
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import conexion.Conexion;
+import vista.Principal;
 
 public class Usuario {
 
@@ -45,6 +44,7 @@ public class Usuario {
 		CLIENTE, ENTRENADOR
 	};
 
+	// NOMBRE DE LOS CAMPOS
 	private static String usersCollection = "Usuarios";
 	private static String fieldNombre = "nombre";
 	private static String fieldApellido = "apellido";
@@ -58,7 +58,6 @@ public class Usuario {
 	private static String fieldTipoUsuario = "tipoUsuario";
 
 	// CONSTRUCTORES
-
 	public Usuario() {
 
 	}
@@ -190,7 +189,7 @@ public class Usuario {
 
 			// Realiza una consulta para buscar el documento donde el campo 'usuario'
 			// coincida con 'userName'
-			Query query = fs.collection("Usuarios").whereEqualTo("usuario", userName);
+			Query query = fs.collection(usersCollection).whereEqualTo(fieldUsuario, userName);
 			ApiFuture<QuerySnapshot> querySnapshot = query.get();
 
 			// Obtener el resultado de la consulta
@@ -203,7 +202,7 @@ public class Usuario {
 				userExists.setId(usuarioDoc.getId());
 				userExists.setNombre(usuarioDoc.getString(fieldNombre));
 				userExists.setEmail(usuarioDoc.getString(fieldEmail));
-				userExists.setUsuario(usuarioDoc.getString("usuario")); // Asegúrate de que este campo esté correcto
+				userExists.setUsuario(usuarioDoc.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
 				userExists.setPassword(usuarioDoc.getString(fieldPassword));
 			}
 		} catch (Exception e) {
@@ -264,8 +263,7 @@ public class Usuario {
 			userData.put(fieldNivel, this.nivelUsuario);
 
 			newUserRef.set(userData);
-
-			System.out.println("Registro correcto en la DB");
+			
 			try {
 				co.close();
 			} catch (Exception e) {
@@ -273,7 +271,8 @@ public class Usuario {
 			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "No se ha podido registrar el usuario.", "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 	}

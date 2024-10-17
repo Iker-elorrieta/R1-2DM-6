@@ -98,8 +98,8 @@ public class Controlador implements ActionListener, ListSelectionListener {
 	private void registrarUsuario() {
 
 		Usuario nuevoUsuario = new Usuario();
-		// Recojo los datos de los TextFields del panelInsertar y los guardo en
-		// variables
+
+		// RECOGER DATOS
 		String nombre = this.vistaRegistro.gettFRegistroNombre().getText();
 		String apellido = this.vistaRegistro.gettFRegistroApellido().getText();
 		String email = this.vistaRegistro.gettFRegistroEmail().getText();
@@ -112,6 +112,19 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
 		Date fechaNacimiento = this.vistaRegistro.getFechaNacimientoCalendar().getDate();
 
+		// COMPROBACIÓN DE CAMPOS VACIOS
+		if (nombre.isEmpty() || email.isEmpty() || user.isEmpty() || password.isEmpty() || fechaNacimiento == null) {
+			JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios.", "Error",
+					JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		// COMPROBACIÓN DE USUARIO EXISTENTE
+		if (nuevoUsuario.ObtenerContacto(user) != null) {
+			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		nuevoUsuario.setNombre(nombre);
 		nuevoUsuario.setApellido(apellido);
 		nuevoUsuario.setEmail(email);
@@ -121,7 +134,17 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		nuevoUsuario.setTemaPreferido(tema);
 		nuevoUsuario.setFechaNacimiento(fechaNacimiento);
 
+		this.vistaRegistro.gettFRegistroNombre().setText("");
+		this.vistaRegistro.gettFRegistroApellido().setText("");
+		this.vistaRegistro.gettFRegistroEmail().setText("");
+		this.vistaRegistro.gettFRegistroUser().setText("");
+		this.vistaRegistro.getpFRegistroPassword().setText("");
+		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
+
 		nuevoUsuario.crearUsuario();
+		
+		JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Información",
+				JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	@Override

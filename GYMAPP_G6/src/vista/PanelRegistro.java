@@ -38,7 +38,7 @@ public class PanelRegistro extends JPanel {
 	public PanelRegistro() {
 		setBounds(0, 0, 880, 560);
 		setLayout(null);
-
+		
 		JLabel lblNewLabel = new JLabel("REGISTRO");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
