@@ -1,20 +1,16 @@
 package controlador;
 
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
 
-import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
-import javax.swing.JLabel;
 import vista.Principal;
 
 public class Controlador implements ActionListener, ListSelectionListener {
@@ -22,11 +18,13 @@ public class Controlador implements ActionListener, ListSelectionListener {
 	private vista.Principal vistaPrincipal;
 	private vista.PanelLogin vistaLogin;
 	private vista.PanelRegistro vistaRegistro;
+	private vista.PanelWorkouts vistaWorkouts;
 
-	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro) {
+	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro, vista.PanelWorkouts vistaWorkouts) {
 		this.vistaPrincipal = vistaPrincipal;
 		this.vistaLogin = vistaLogin;
 		this.vistaRegistro = vistaRegistro;
+		this.vistaWorkouts = vistaWorkouts;
 
 		this.inicializarControlador();
 	}
@@ -43,6 +41,11 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
 		this.vistaRegistro.getBtnReturn().addActionListener(this);
 		this.vistaRegistro.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
+		
+		this.vistaWorkouts.getBtnReturn().addActionListener(this);
+		this.vistaWorkouts.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
+		
+		
 	}
 
 	@Override
@@ -88,6 +91,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			if (user.getPassword().equals(password)) {
 				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
 						"Información", JOptionPane.INFORMATION_MESSAGE);
+				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
 
 				// Aquí puedes continuar con el flujo del programa
 			} else {
@@ -151,6 +155,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		
 		JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Información",
 				JOptionPane.INFORMATION_MESSAGE);
+		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_LOGIN);
 	}
 	
 	

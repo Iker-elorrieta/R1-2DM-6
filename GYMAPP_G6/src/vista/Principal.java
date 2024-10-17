@@ -95,6 +95,10 @@ public class Principal extends JFrame {
 	        return panelLogin;
 	    }
 	    
+	    public PanelWorkouts getPanelWorkouts() {
+	    	return panelWorkouts;
+	    }
+	    
 	    
 	    public void colocarImg(JLabel lbl, String imgPath, JPanel panel) {
 	    	ImageIcon icon = new ImageIcon(imgPath);

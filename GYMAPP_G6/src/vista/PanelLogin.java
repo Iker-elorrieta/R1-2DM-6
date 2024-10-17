@@ -68,25 +68,7 @@ public class PanelLogin extends JPanel {
         lblImg.setLocation(53, 87);
         lblImg.setSize(200, 200);
 
-        
-        /*// Carga la imagen
-        ImageIcon icon = new ImageIcon("media/logo.jpg"); // Cambia la ruta si es necesario
 
-        // Verifica si la imagen fue cargada correctamente
-        if (icon.getIconWidth() > 0) {
-            // Escala la imagen
-            Image img = icon.getImage().getScaledInstance(lblImg.getWidth(), lblImg.getHeight(), Image.SCALE_DEFAULT);
-            lblImg.setIcon(new ImageIcon(img));
-            lblImg.setText(""); // Limpia el texto si la imagen se carga
-        } else {
-            lblImg.setText("Imagen no encontrada");
-        }
-
-        add(lblImg);*/
-        
-      
-	    
-	
 	}
 
 
