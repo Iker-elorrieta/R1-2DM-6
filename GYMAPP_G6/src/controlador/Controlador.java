@@ -1,15 +1,20 @@
 package controlador;
 
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Date;
+
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
+import javax.swing.JLabel;
 import vista.Principal;
 
 public class Controlador implements ActionListener, ListSelectionListener {
@@ -53,6 +58,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			break;
 		case REGISTRAR_USUARIO:
 			this.registrarUsuario();
+			
 			break;
 		case INICIAR_SESION:
 			this.login();
@@ -123,6 +129,9 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
 		nuevoUsuario.crearUsuario();
 	}
+	
+	
+	
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {

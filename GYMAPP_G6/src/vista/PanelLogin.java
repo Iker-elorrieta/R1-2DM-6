@@ -21,6 +21,7 @@ public class PanelLogin extends JPanel {
 	private JButton btnLogin, btnSignUp;
 	private JLabel lblImg;
 
+
 	public PanelLogin() {
 		
 		setBounds(0, 0, 900, 600);
@@ -62,25 +63,28 @@ public class PanelLogin extends JPanel {
 		btnSignUp.setBounds(416, 315, 218, 30);
 		add(btnSignUp);
 		
-		lblImg = new JLabel();
-		lblImg.setLocation(53, 87);
-		lblImg.setSize(200, 200);
+		// Crea un JLabel
+        lblImg = new JLabel();
+        lblImg.setLocation(53, 87);
+        lblImg.setSize(200, 200);
 
-	        // Carga la imagen
-	        ImageIcon icon = new ImageIcon("media/logo.jpg"); // Cambia la ruta si es necesario
-	        lblImg.setIcon(icon);
-	      //lblImg.setIcon(new ImageIcon(new ImageIcon(imgPath).getImage().getScaledInstance(lblImg.getWidth(), lblImg.getHeight(), Image.SCALE_DEFAULT)));
+        
+        /*// Carga la imagen
+        ImageIcon icon = new ImageIcon("media/logo.jpg"); // Cambia la ruta si es necesario
 
-	        // Verifica si la imagen fue cargada correctamente
-	        if (icon.getIconWidth() > 0) {
-	            lblImg.setIcon(icon);
-	            lblImg.setText(""); // Limpia el texto si la imagen se carga
-	        } else {
-	            lblImg.setText("Imagen no encontrada");
-	        }
+        // Verifica si la imagen fue cargada correctamente
+        if (icon.getIconWidth() > 0) {
+            // Escala la imagen
+            Image img = icon.getImage().getScaledInstance(lblImg.getWidth(), lblImg.getHeight(), Image.SCALE_DEFAULT);
+            lblImg.setIcon(new ImageIcon(img));
+            lblImg.setText(""); // Limpia el texto si la imagen se carga
+        } else {
+            lblImg.setText("Imagen no encontrada");
+        }
 
-	        add(lblImg);
-
+        add(lblImg);*/
+        
+      
 	    
 	
 	}
