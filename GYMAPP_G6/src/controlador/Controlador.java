@@ -2,15 +2,18 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import modelo.Contacto;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
+import modelo.Workout;
 import vista.Principal;
 
 public class Controlador implements ActionListener, ListSelectionListener {
@@ -61,7 +64,6 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			break;
 		case REGISTRAR_USUARIO:
 			this.registrarUsuario();
-			
 			break;
 		case INICIAR_SESION:
 			this.login();
@@ -83,7 +85,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		}
 
 		// Obtener el usuario desde Firestore
-		Usuario user = new Usuario().ObtenerContacto(usuario);
+		Usuario user = new Usuario().ObtenerUsuario(usuario);
 
 		// Comprobar si el usuario existe
 		if (user != null) {
@@ -91,7 +93,9 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			if (user.getPassword().equals(password)) {
 				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
 						"Información", JOptionPane.INFORMATION_MESSAGE);
+				cargarWorkouts(Principal.enumAcciones.PANEL_WORKOUTS); 
 				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
+				
 
 				// Aquí puedes continuar con el flujo del programa
 			} else {
@@ -130,7 +134,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		}
 
 		// COMPROBACIÓN DE USUARIO EXISTENTE
-		if (nuevoUsuario.ObtenerContacto(user) != null) {
+		if (nuevoUsuario.ObtenerUsuario(user) != null) {
 			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -156,6 +160,22 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Información",
 				JOptionPane.INFORMATION_MESSAGE);
 		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_LOGIN);
+	}
+	
+	
+	
+	private void cargarWorkouts(Principal.enumAcciones accion) {
+	    Workout workouts = new Workout();
+	    ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts();
+
+	    // Limpiamos la lista antes de añadir los nuevos workouts
+	    vistaWorkouts.getWorkoutListModel().clear();
+
+	    // Iteramos sobre los workouts y los añadimos al modelo de la lista
+	    for (Workout workout : listaWorkouts) {
+	        String workoutInfo = workout.getId() + ": " + workout.getNombre();
+	        vistaWorkouts.addWorkout(workoutInfo);  // Añadimos al modelo de la vista
+	    }
 	}
 	
 	

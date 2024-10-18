@@ -44,11 +44,6 @@ public class PanelWorkouts extends JPanel {
 		// Inicializar el modelo de la lista
 		workoutListModel = new DefaultListModel<>();
 
-		// Agregar algunos elementos de ejemplo al modelo (puedes añadir dinámicamente más tarde)
-		workoutListModel.addElement("Workout 1: Full Body");
-		workoutListModel.addElement("Workout 2: Upper Body");
-		workoutListModel.addElement("Workout 3: Cardio Session");
-
 		// Inicializar la JList con el modelo
 		workoutList = new JList<>(workoutListModel);
 		workoutList.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -70,9 +65,10 @@ public class PanelWorkouts extends JPanel {
 	
 	
 	
-	// Método para añadir un workout a la lista
 	public void addWorkout(String workout) {
-		workoutListModel.addElement(workout);
+	    if (workout != null && !workout.trim().isEmpty()) {
+	        workoutListModel.addElement(workout);
+	    }
 	}
 
 
@@ -82,6 +78,42 @@ public class PanelWorkouts extends JPanel {
 
 	public void setBtnReturn(JButton btnReturn) {
 		this.btnReturn = btnReturn;
+	}
+
+
+
+	public DefaultListModel<String> getWorkoutListModel() {
+		return workoutListModel;
+	}
+
+
+
+	public void setWorkoutListModel(DefaultListModel<String> workoutListModel) {
+		this.workoutListModel = workoutListModel;
+	}
+
+
+
+	public JList<String> getWorkoutList() {
+		return workoutList;
+	}
+
+
+
+	public void setWorkoutList(JList<String> workoutList) {
+		this.workoutList = workoutList;
+	}
+
+
+
+	public JButton getBtnSelectWorkouts() {
+		return btnSelectWorkouts;
+	}
+
+
+
+	public void setBtnSelectWorkouts(JButton btnSelectWorkouts) {
+		this.btnSelectWorkouts = btnSelectWorkouts;
 	}
 	
 	

@@ -15,7 +15,6 @@ import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import conexion.Conexion;
-import vista.Principal;
 
 public class Usuario {
 
@@ -65,7 +64,6 @@ public class Usuario {
 	public Usuario(String nombre, String apellido, String email, String user, String password, String usuario,
 			int nivelUsuario, Date fechaNacimiento, IdiomaPreferido idiomaPreferido, TemaPreferido temaPreferido,
 			TipoUsuario tipoUsuario) {
-		super();
 
 		this.nombre = nombre;
 		this.apellido = apellido;
@@ -180,7 +178,7 @@ public class Usuario {
 
 	// *** MÉTODOS CRUD ***
 
-	public Usuario ObtenerContacto(String userName) {
+	public Usuario ObtenerUsuario(String userName) {
 		Firestore fs = null;
 		Usuario userExists = null;
 
@@ -212,7 +210,7 @@ public class Usuario {
 		return userExists;
 	}
 
-	public ArrayList<Usuario> ObtenerContactos() {
+	public ArrayList<Usuario> ObtenerMultiplesUsuarios() {
 		Firestore fs = null;
 
 		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();
