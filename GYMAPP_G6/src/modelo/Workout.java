@@ -12,99 +12,103 @@ import conexion.Conexion;
 
 public class Workout {
 
-    private String nombre, videoUrl, id;
-    private int nivel, numEjers;
+	private String nombre, videoUrl, id;
+	private int nivel, numEjers;
 
-    // NOMBRE DE LOS CAMPOS
-    private static String workoutsCollection = "Workouts";
-    private static String fieldNombre = "nombre";
-    private static String fieldNivel = "nivel";
-    private static String fieldNumEjers = "numEjers";
-    private static String fieldVideoUrl = "video";
+	// NOMBRE DE LOS CAMPOS
+	private static String workoutsCollection = "Workouts";
+	private static String fieldNombre = "nombre";
+	private static String fieldNivel = "nivel";
+	private static String fieldNumEjers = "numEjers";
+	private static String fieldVideoUrl = "video";
 
-    
-    //Constructor
-    public Workout() {
+	// Constructor
+	public Workout() {
 
-    }
+	}
 
-    public Workout(String nombre, String videoUrl, int nivel, int numEjers) {
-        this.nombre = nombre;
-        this.videoUrl = videoUrl;
-        this.nivel = nivel;
-        this.numEjers = numEjers;
-    }
-    
-    
-    
+	public Workout(String nombre, String videoUrl, int nivel, int numEjers) {
+		this.nombre = nombre;
+		this.videoUrl = videoUrl;
+		this.nivel = nivel;
+		this.numEjers = numEjers;
+	}
+
 //Getters y setters
-    public String getId() {
-        return id;
-    }
+	public String getId() {
+		return id;
+	}
 
-    public void setId(String id) {
-        this.id = id;
-    }
+	public void setId(String id) {
+		this.id = id;
+	}
 
-    public String getNombre() {
-        return nombre;
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-    public String getVideoUrl() {
-        return videoUrl;
-    }
+	public String getVideoUrl() {
+		return videoUrl;
+	}
 
-    public void setVideoUrl(String videoUrl) {
-        this.videoUrl = videoUrl;
-    }
+	public void setVideoUrl(String videoUrl) {
+		this.videoUrl = videoUrl;
+	}
 
-    public int getNivel() {
-        return nivel;
-    }
+	public int getNivel() {
+		return nivel;
+	}
 
-    public void setNivel(int nivel) {
-        this.nivel = nivel;
-    }
+	public void setNivel(int nivel) {
+		this.nivel = nivel;
+	}
 
-    public int getNumEjers() {
-        return numEjers;
-    }
+	public int getNumEjers() {
+		return numEjers;
+	}
 
-    public void setNumEjers(int numEjers) {
-        this.numEjers = numEjers;
-    }
+	public void setNumEjers(int numEjers) {
+		this.numEjers = numEjers;
+	}
 
-    public ArrayList<Workout> obtenerWorkouts() {
-        Firestore fs = null;
+	public ArrayList<Workout> obtenerWorkouts() {
+		Firestore fs = null;
+		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
-        ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
+		try {
+			fs = Conexion.conectar();
+			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).get();
+			QuerySnapshot querySnapshot = query.get();
+			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
 
-        try {
-            fs = Conexion.conectar();
+			for (QueryDocumentSnapshot workout : workouts) {
+				Workout w = new Workout();
+				w.setId(workout.getId());
+				w.setNombre(workout.getString(fieldNombre));
 
-            ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).get();
+				// Cambiar de getString a getLong para los campos numéricos
+				Long nivel = workout.getLong(fieldNivel);
+				Long numEjers = workout.getLong(fieldNumEjers);
 
-            QuerySnapshot querySnapshot = query.get();
-            List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
-            for (QueryDocumentSnapshot workout : workouts) {
-                Workout w = new Workout();
-                w.setId(workout.getId());
-                w.setNombre(workout.getString(fieldNombre));
-                w.setNivel(Integer.parseInt(workout.getString(fieldNivel)));
-                w.setNumEjers(Integer.parseInt(workout.getString(fieldNumEjers)));
-                w.setVideoUrl(workout.getString(fieldVideoUrl));
+				// Evitar el error de casting si el valor es null
+				if (nivel != null) {
+					w.setNivel(nivel.intValue()); // Convertir de Long a int
+				}
+				if (numEjers != null) {
+					w.setNumEjers(numEjers.intValue()); // Convertir de Long a int
+				}
 
-                listaWorkouts.add(w);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+				w.setVideoUrl(workout.getString(fieldVideoUrl));
+				listaWorkouts.add(w);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-        return listaWorkouts;
-    }
-
+		return listaWorkouts;
+	}
 }

@@ -59,13 +59,10 @@ public class PanelWorkouts extends JPanel {
 		add(btnSelectWorkouts);
 	}
 	
-	// Método para añadir un workout a la lista
 	public void addWorkout(String workout) {
-		workoutListModel.addElement(workout);
-	}
-
-	public DefaultListModel<String> getWorkoutListModel() {
-		return workoutListModel;
+	    if (workout != null && !workout.trim().isEmpty()) {
+	        workoutListModel.addElement(workout);
+	    }
 	}
 
 	public void setWorkoutListModel(DefaultListModel<String> workoutListModel) {
@@ -78,6 +75,34 @@ public class PanelWorkouts extends JPanel {
 
 	public void setBtnReturn(JButton btnReturn) {
 		this.btnReturn = btnReturn;
+	}
+
+
+
+	public DefaultListModel<String> getWorkoutListModel() {
+		return workoutListModel;
+	}
+
+	public JList<String> getWorkoutList() {
+		return workoutList;
+	}
+
+
+
+	public void setWorkoutList(JList<String> workoutList) {
+		this.workoutList = workoutList;
+	}
+
+
+
+	public JButton getBtnSelectWorkouts() {
+		return btnSelectWorkouts;
+	}
+
+
+
+	public void setBtnSelectWorkouts(JButton btnSelectWorkouts) {
+		this.btnSelectWorkouts = btnSelectWorkouts;
 	}
 	
 	

@@ -64,7 +64,6 @@ public class Usuario {
 	public Usuario(String nombre, String apellido, String email, String user, String password, String usuario,
 			int nivelUsuario, Date fechaNacimiento, IdiomaPreferido idiomaPreferido, TemaPreferido temaPreferido,
 			TipoUsuario tipoUsuario) {
-		super();
 
 		this.nombre = nombre;
 		this.apellido = apellido;
@@ -262,7 +261,7 @@ public class Usuario {
 			userData.put(fieldNivel, this.nivelUsuario);
 
 			newUserRef.set(userData);
-			
+
 			try {
 				co.close();
 			} catch (Exception e) {

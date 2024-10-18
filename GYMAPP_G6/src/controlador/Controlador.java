@@ -66,7 +66,6 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			this.login();
 			break;
 		case PANEL_WORKOUTS:
-			this.addWorkouts();
 			this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
 		default:
 
@@ -96,6 +95,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			if (user.getPassword().equals(password)) {
 				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
 						"Información", JOptionPane.INFORMATION_MESSAGE);
+				cargarWorkouts(Principal.enumAcciones.PANEL_WORKOUTS);
 				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
 
 				// Aquí puedes continuar con el flujo del programa
@@ -142,6 +142,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		}
 
 		// COMPROBACIÓN DE USUARIO EXISTENTE
+
 		if (nuevoUsuario.obtenerUsuario(user) != null) {
 			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
@@ -170,17 +171,18 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_LOGIN);
 	}
 
-	private void addWorkouts() {
+	private void cargarWorkouts(Principal.enumAcciones accion) {
 		Workout workouts = new Workout();
-		
 		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts();
 
+		// Limpiamos la lista antes de añadir los nuevos workouts
 		vistaWorkouts.getWorkoutListModel().clear();
 
+		// Iteramos sobre los workouts y los añadimos al modelo de la lista
 		for (Workout workout : listaWorkouts) {
-			vistaWorkouts.addWorkout(workout.getNombre());
+			String workoutInfo = workout.getId() + ": " + workout.getNombre();
+			vistaWorkouts.addWorkout(workoutInfo); // Añadimos al modelo de la vista
 		}
-
 	}
 
 	@Override
