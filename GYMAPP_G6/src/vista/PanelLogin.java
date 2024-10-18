@@ -23,6 +23,7 @@ public class PanelLogin extends JPanel {
 
 
 	public PanelLogin() {
+		setBackground(new Color(141, 204, 235));
 		
 		setBounds(0, 0, 900, 600);
 		setLayout(null);
