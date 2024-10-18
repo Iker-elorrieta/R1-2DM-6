@@ -78,7 +78,7 @@ public class Workout {
 	public ArrayList<Workout> obtenerWorkouts() {
 		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
-
+		//añadir filtro de usuario
 		try {
 			fs = Conexion.conectar();
 			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).get();

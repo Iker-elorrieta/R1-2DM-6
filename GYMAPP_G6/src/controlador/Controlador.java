@@ -98,7 +98,6 @@ public class Controlador implements ActionListener, ListSelectionListener {
 				cargarWorkouts(Principal.enumAcciones.PANEL_WORKOUTS);
 				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
 
-				// Aquí puedes continuar con el flujo del programa
 			} else {
 				JOptionPane.showMessageDialog(null, "Contraseña incorrecta.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
