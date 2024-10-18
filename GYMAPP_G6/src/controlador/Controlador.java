@@ -4,12 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
-
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import modelo.Contacto;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
@@ -23,7 +20,8 @@ public class Controlador implements ActionListener, ListSelectionListener {
 	private vista.PanelRegistro vistaRegistro;
 	private vista.PanelWorkouts vistaWorkouts;
 
-	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro, vista.PanelWorkouts vistaWorkouts) {
+	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro,
+			vista.PanelWorkouts vistaWorkouts) {
 		this.vistaPrincipal = vistaPrincipal;
 		this.vistaLogin = vistaLogin;
 		this.vistaRegistro = vistaRegistro;
@@ -44,11 +42,10 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
 		this.vistaRegistro.getBtnReturn().addActionListener(this);
 		this.vistaRegistro.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
-		
+
 		this.vistaWorkouts.getBtnReturn().addActionListener(this);
 		this.vistaWorkouts.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
-		
-		
+
 	}
 
 	@Override
@@ -68,6 +65,11 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		case INICIAR_SESION:
 			this.login();
 			break;
+		case PANEL_WORKOUTS:
+			this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
+		default:
+
+			break;
 		}
 	}
 
@@ -85,7 +87,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		}
 
 		// Obtener el usuario desde Firestore
-		Usuario user = new Usuario().ObtenerUsuario(usuario);
+		Usuario user = new Usuario().obtenerUsuario(usuario);
 
 		// Comprobar si el usuario existe
 		if (user != null) {
@@ -93,9 +95,8 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			if (user.getPassword().equals(password)) {
 				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
 						"Información", JOptionPane.INFORMATION_MESSAGE);
-				cargarWorkouts(Principal.enumAcciones.PANEL_WORKOUTS); 
+				cargarWorkouts(Principal.enumAcciones.PANEL_WORKOUTS);
 				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
-				
 
 				// Aquí puedes continuar con el flujo del programa
 			} else {
@@ -133,8 +134,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			return;
 		}
 
+		// COMPROBACIÓN DE FORMATO EMAIL
+		String emailFormato = "^[\\w-](?!.*\\.\\.)[\\w-\\.]+@[\\w-\\.]+\\.[a-zA-Z]{2,7}$";
+		if (!email.matches(emailFormato)) {
+			JOptionPane.showMessageDialog(null, "Formato de email incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		// COMPROBACIÓN DE USUARIO EXISTENTE
-		if (nuevoUsuario.ObtenerUsuario(user) != null) {
+
+		if (nuevoUsuario.obtenerUsuario(user) != null) {
 			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -156,30 +165,25 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 
 		nuevoUsuario.crearUsuario();
-		
+
 		JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Información",
 				JOptionPane.INFORMATION_MESSAGE);
 		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_LOGIN);
 	}
-	
-	
-	
+
 	private void cargarWorkouts(Principal.enumAcciones accion) {
-	    Workout workouts = new Workout();
-	    ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts();
+		Workout workouts = new Workout();
+		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts();
 
-	    // Limpiamos la lista antes de añadir los nuevos workouts
-	    vistaWorkouts.getWorkoutListModel().clear();
+		// Limpiamos la lista antes de añadir los nuevos workouts
+		vistaWorkouts.getWorkoutListModel().clear();
 
-	    // Iteramos sobre los workouts y los añadimos al modelo de la lista
-	    for (Workout workout : listaWorkouts) {
-	        String workoutInfo = workout.getId() + ": " + workout.getNombre();
-	        vistaWorkouts.addWorkout(workoutInfo);  // Añadimos al modelo de la vista
-	    }
+		// Iteramos sobre los workouts y los añadimos al modelo de la lista
+		for (Workout workout : listaWorkouts) {
+			String workoutInfo = workout.getId() + ": " + workout.getNombre();
+			vistaWorkouts.addWorkout(workoutInfo); // Añadimos al modelo de la vista
+		}
 	}
-	
-	
-	
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {

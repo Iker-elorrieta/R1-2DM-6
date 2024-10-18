@@ -178,7 +178,7 @@ public class Usuario {
 
 	// *** MÉTODOS CRUD ***
 
-	public Usuario ObtenerUsuario(String userName) {
+	public Usuario obtenerUsuario(String userName) {
 		Firestore fs = null;
 		Usuario userExists = null;
 
@@ -210,7 +210,7 @@ public class Usuario {
 		return userExists;
 	}
 
-	public ArrayList<Usuario> ObtenerMultiplesUsuarios() {
+	public ArrayList<Usuario> obtenerMultiplesUsuarios() {
 		Firestore fs = null;
 
 		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();
@@ -261,7 +261,7 @@ public class Usuario {
 			userData.put(fieldNivel, this.nivelUsuario);
 
 			newUserRef.set(userData);
-			
+
 			try {
 				co.close();
 			} catch (Exception e) {

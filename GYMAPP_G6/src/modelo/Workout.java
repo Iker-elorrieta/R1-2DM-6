@@ -22,8 +22,7 @@ public class Workout {
 	private static String fieldNumEjers = "numEjers";
 	private static String fieldVideoUrl = "video";
 
-	
-	//Constructor
+	// Constructor
 	public Workout() {
 
 	}
@@ -34,9 +33,7 @@ public class Workout {
 		this.nivel = nivel;
 		this.numEjers = numEjers;
 	}
-	
-	
-	
+
 //Getters y setters
 	public String getId() {
 		return id;
@@ -79,40 +76,39 @@ public class Workout {
 	}
 
 	public ArrayList<Workout> obtenerWorkouts() {
-	    Firestore fs = null;
-	    ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
+		Firestore fs = null;
+		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
-	    try {
-	        fs = Conexion.conectar();
-	        ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).get();
-	        QuerySnapshot querySnapshot = query.get();
-	        List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
+		try {
+			fs = Conexion.conectar();
+			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).get();
+			QuerySnapshot querySnapshot = query.get();
+			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
 
-	        for (QueryDocumentSnapshot workout : workouts) {
-	            Workout w = new Workout();
-	            w.setId(workout.getId());
-	            w.setNombre(workout.getString(fieldNombre));
-	            
-	            // Cambiar de getString a getLong para los campos numéricos
-	            Long nivel = workout.getLong(fieldNivel);
-	            Long numEjers = workout.getLong(fieldNumEjers);
+			for (QueryDocumentSnapshot workout : workouts) {
+				Workout w = new Workout();
+				w.setId(workout.getId());
+				w.setNombre(workout.getString(fieldNombre));
 
-	            // Evitar el error de casting si el valor es null
-	            if (nivel != null) {
-	                w.setNivel(nivel.intValue());  // Convertir de Long a int
-	            }
-	            if (numEjers != null) {
-	                w.setNumEjers(numEjers.intValue());  // Convertir de Long a int
-	            }
+				// Cambiar de getString a getLong para los campos numéricos
+				Long nivel = workout.getLong(fieldNivel);
+				Long numEjers = workout.getLong(fieldNumEjers);
 
-	            w.setVideoUrl(workout.getString(fieldVideoUrl));
-	            listaWorkouts.add(w);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+				// Evitar el error de casting si el valor es null
+				if (nivel != null) {
+					w.setNivel(nivel.intValue()); // Convertir de Long a int
+				}
+				if (numEjers != null) {
+					w.setNumEjers(numEjers.intValue()); // Convertir de Long a int
+				}
 
-	    return listaWorkouts;
+				w.setVideoUrl(workout.getString(fieldVideoUrl));
+				listaWorkouts.add(w);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return listaWorkouts;
 	}
-
 }

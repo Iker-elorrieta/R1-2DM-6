@@ -1,10 +1,6 @@
 package vista;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -87,12 +83,13 @@ public class PanelWorkouts extends JPanel {
 		add(btnReturn);
 
 	}
-
+	
 	public void addWorkout(String workout) {
-		if (workout != null && !workout.trim().isEmpty()) {
-			workoutListModel.addElement(workout);
-		}
+	    if (workout != null && !workout.trim().isEmpty()) {
+	        workoutListModel.addElement(workout);
+	    }
 	}
+
 
 	public JButton getBtnReturn() {
 		return btnReturn;
