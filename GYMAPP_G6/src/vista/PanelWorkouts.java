@@ -1,10 +1,6 @@
 package vista;
 
-import java.awt.BorderLayout;
-import java.util.ArrayList;
-
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -44,11 +40,6 @@ public class PanelWorkouts extends JPanel {
 		// Inicializar el modelo de la lista
 		workoutListModel = new DefaultListModel<>();
 
-		// Agregar algunos elementos de ejemplo al modelo (puedes añadir dinámicamente más tarde)
-		workoutListModel.addElement("Workout 1: Full Body");
-		workoutListModel.addElement("Workout 2: Upper Body");
-		workoutListModel.addElement("Workout 3: Cardio Session");
-
 		// Inicializar la JList con el modelo
 		workoutList = new JList<>(workoutListModel);
 		workoutList.setFont(new Font("Tahoma", Font.BOLD, 14));
@@ -68,13 +59,18 @@ public class PanelWorkouts extends JPanel {
 		add(btnSelectWorkouts);
 	}
 	
-	
-	
 	// Método para añadir un workout a la lista
 	public void addWorkout(String workout) {
 		workoutListModel.addElement(workout);
 	}
 
+	public DefaultListModel<String> getWorkoutListModel() {
+		return workoutListModel;
+	}
+
+	public void setWorkoutListModel(DefaultListModel<String> workoutListModel) {
+		this.workoutListModel = workoutListModel;
+	}
 
 	public JButton getBtnReturn() {
 		return btnReturn;

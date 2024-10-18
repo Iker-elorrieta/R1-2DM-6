@@ -2,15 +2,15 @@ package controlador;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Date;
-
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
+import modelo.Workout;
 import vista.Principal;
 
 public class Controlador implements ActionListener, ListSelectionListener {
@@ -20,7 +20,8 @@ public class Controlador implements ActionListener, ListSelectionListener {
 	private vista.PanelRegistro vistaRegistro;
 	private vista.PanelWorkouts vistaWorkouts;
 
-	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro, vista.PanelWorkouts vistaWorkouts) {
+	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro,
+			vista.PanelWorkouts vistaWorkouts) {
 		this.vistaPrincipal = vistaPrincipal;
 		this.vistaLogin = vistaLogin;
 		this.vistaRegistro = vistaRegistro;
@@ -41,11 +42,10 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
 		this.vistaRegistro.getBtnReturn().addActionListener(this);
 		this.vistaRegistro.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
-		
+
 		this.vistaWorkouts.getBtnReturn().addActionListener(this);
 		this.vistaWorkouts.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
-		
-		
+
 	}
 
 	@Override
@@ -61,10 +61,15 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			break;
 		case REGISTRAR_USUARIO:
 			this.registrarUsuario();
-			
 			break;
 		case INICIAR_SESION:
 			this.login();
+			break;
+		case PANEL_WORKOUTS:
+			this.addWorkouts();
+			this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
+		default:
+
 			break;
 		}
 	}
@@ -83,7 +88,7 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		}
 
 		// Obtener el usuario desde Firestore
-		Usuario user = new Usuario().ObtenerContacto(usuario);
+		Usuario user = new Usuario().obtenerUsuario(usuario);
 
 		// Comprobar si el usuario existe
 		if (user != null) {
@@ -129,8 +134,15 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			return;
 		}
 
+		// COMPROBACIÓN DE FORMATO EMAIL
+		String emailFormato = "^[\\w-](?!.*\\.\\.)[\\w-\\.]+@[\\w-\\.]+\\.[a-zA-Z]{2,7}$";
+		if (!email.matches(emailFormato)) {
+			JOptionPane.showMessageDialog(null, "Formato de email incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		// COMPROBACIÓN DE USUARIO EXISTENTE
-		if (nuevoUsuario.ObtenerContacto(user) != null) {
+		if (nuevoUsuario.obtenerUsuario(user) != null) {
 			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
@@ -152,14 +164,24 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 
 		nuevoUsuario.crearUsuario();
-		
+
 		JOptionPane.showMessageDialog(null, "Usuario registrado correctamente.", "Información",
 				JOptionPane.INFORMATION_MESSAGE);
 		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_LOGIN);
 	}
-	
-	
-	
+
+	private void addWorkouts() {
+		Workout workouts = new Workout();
+		
+		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts();
+
+		vistaWorkouts.getWorkoutListModel().clear();
+
+		for (Workout workout : listaWorkouts) {
+			vistaWorkouts.addWorkout(workout.getNombre());
+		}
+
+	}
 
 	@Override
 	public void valueChanged(ListSelectionEvent e) {
