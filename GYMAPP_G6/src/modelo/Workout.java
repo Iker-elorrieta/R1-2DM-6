@@ -75,13 +75,14 @@ public class Workout {
 		this.numEjers = numEjers;
 	}
 
-	public ArrayList<Workout> obtenerWorkouts() {
+	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario) {
 		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
 		try {
 			fs = Conexion.conectar();
-			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).get();
+			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).whereEqualTo(fieldNivel, nivelUsuario)
+					.get();
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
 

@@ -108,7 +108,9 @@ public class PanelWorkouts extends JPanel {
 		this.workoutListModel = workoutListModel;
 	}
 
-	public JList<String> getWorkoutsList() {
+
+
+	public JList<String> getWorkoutList() {
 		return workoutsList;
 	}
 
@@ -135,3 +137,4 @@ public class PanelWorkouts extends JPanel {
 	
 	
 }
+
