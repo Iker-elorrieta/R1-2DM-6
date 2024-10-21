@@ -8,49 +8,80 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
+import java.awt.Color;
 
 public class PanelWorkouts extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
+	// Modelo de la lista workouts
 	private DefaultListModel<String> workoutListModel;
 
-	private JList<String> workoutList;
-	
+	// Lista que mostrará los workouts
+	private JList<String> workoutsList;
+
+	// Modelo de la lista ejercicios
+	private DefaultListModel<String> ejersListModel;
+
+	// Lista que mostrará los ejercicios
+	private JList<String> ejersList;
+
 	private JButton btnReturn;
-	private JButton btnSelectWorkouts;
 
 	/**
 	 * Create the panel.
 	 */
 	public PanelWorkouts() {
+		setBackground(new Color(141, 204, 235));
 
 		setBounds(0, 0, 880, 560);
 		setLayout(null);
 
+		// Etiqueta de título
 		JLabel lblWorkouts = new JLabel("Workouts");
 		lblWorkouts.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWorkouts.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblWorkouts.setBounds(274, 55, 271, 36);
 		add(lblWorkouts);
 
+		// Inicializar el modelo de la lista workouts
 		workoutListModel = new DefaultListModel<>();
+		// Inicializar la JList con el modelo
+		workoutsList = new JList<>(workoutListModel);
+		workoutsList.setBackground(new Color(208, 239, 249));
+		workoutsList.setFont(new Font("Tahoma", Font.BOLD, 14));
+		// Agregar la lista de workouts dentro de un JScrollPane
+		JScrollPane scrollPaneWorkouts = new JScrollPane(workoutsList);
+		scrollPaneWorkouts.setBounds(50, 150, 350, 300); // Ajusta el tamaño y la posición del scroll
+		add(scrollPaneWorkouts);
+		
+		JLabel lblSelecWorkout = new JLabel("Selecciona un Workout:");
+		lblSelecWorkout.setBackground(new Color(156, 210, 239));
+		scrollPaneWorkouts.setColumnHeaderView(lblSelecWorkout);
+		lblSelecWorkout.setFont(new Font("Tahoma", Font.BOLD, 14));
 
-		workoutList = new JList<>(workoutListModel);
-		workoutList.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
-		JScrollPane scrollPane = new JScrollPane(workoutList);
-		scrollPane.setBounds(217, 120, 400, 300); // Ajusta el tamaño y la posición del scroll
-		add(scrollPane);
 		
+		// Inicializar el modelo de la lista ejercicios
+		ejersListModel = new DefaultListModel<>();
+		// Inicializar la JList de ejercicios con el modelo
+		ejersList = new JList<>(ejersListModel);
+		ejersList.setBackground(new Color(211, 235, 248));
+		ejersList.setFont(new Font("Tahoma", Font.BOLD, 14));
+		// Agregar la lista de ejercicios dentro de un JScrollPane
+		JScrollPane scrollPaneEjers = new JScrollPane(ejersList);
+		scrollPaneEjers.setBounds(450, 150, 350, 300); // Ajusta el tamaño y la posición del scroll
+		add(scrollPaneEjers);
+		
+		JLabel lblSelecEjer = new JLabel("Selecciona un ejercicio:");
+		lblSelecEjer.setBackground(new Color(156, 210, 239));
+		lblSelecEjer.setFont(new Font("Tahoma", Font.BOLD, 14));
+		scrollPaneEjers.setColumnHeaderView(lblSelecEjer);
+
 		btnReturn = new JButton("Atrás");
 		btnReturn.setBounds(10, 513, 102, 36);
 		add(btnReturn);
-		
-		btnSelectWorkouts = new JButton("Seleccionar Workout");
-		btnSelectWorkouts.setFont(new Font("Tahoma", Font.BOLD, 12));
-		btnSelectWorkouts.setBounds(309, 431, 216, 36);
-		add(btnSelectWorkouts);
+
 	}
 	
 	public void addWorkout(String workout) {
@@ -59,9 +90,6 @@ public class PanelWorkouts extends JPanel {
 	    }
 	}
 
-	public void setWorkoutListModel(DefaultListModel<String> workoutListModel) {
-		this.workoutListModel = workoutListModel;
-	}
 
 	public JButton getBtnReturn() {
 		return btnReturn;
@@ -75,20 +103,15 @@ public class PanelWorkouts extends JPanel {
 		return workoutListModel;
 	}
 
+	public void setWorkoutListModel(DefaultListModel<String> workoutListModel) {
+		this.workoutListModel = workoutListModel;
+	}
+
 	public JList<String> getWorkoutList() {
-		return workoutList;
+		return workoutsList;
 	}
 
 	public void setWorkoutList(JList<String> workoutList) {
-		this.workoutList = workoutList;
+		this.workoutsList = workoutList;
 	}
-
-	public JButton getBtnSelectWorkouts() {
-		return btnSelectWorkouts;
-	}
-
-	public void setBtnSelectWorkouts(JButton btnSelectWorkouts) {
-		this.btnSelectWorkouts = btnSelectWorkouts;
-	}
-	
 }
