@@ -86,17 +86,18 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			return;
 		}
 
-		// Obtener el usuario desde Firestore
 		Usuario user = new Usuario().obtenerUsuario(usuario);
 
-		// Comprobar si el usuario existe
 		if (user != null) {
-			// Comparar la contraseña
 			if (user.getPassword().equals(password)) {
 				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
 						"Información", JOptionPane.INFORMATION_MESSAGE);
-				cargarWorkouts(Principal.enumAcciones.PANEL_WORKOUTS);
+
+				cargarWorkouts(user, Principal.enumAcciones.PANEL_WORKOUTS);
+
 				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
+				this.vistaLogin.gettFUsuario().setText("");
+				this.vistaLogin.gettFContrasena().setText("");
 
 			} else {
 				JOptionPane.showMessageDialog(null, "Contraseña incorrecta.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -107,8 +108,6 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		}
 	}
 
-	// REGISTRO DE NUEVO USUARIO EN LA BBDD (Crear el objeto para posteriormente
-	// pasarselo a la clase Usuario)
 	private void registrarUsuario() {
 
 		Usuario nuevoUsuario = new Usuario();
@@ -170,17 +169,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
 		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_LOGIN);
 	}
 
-	private void cargarWorkouts(Principal.enumAcciones accion) {
-		Workout workouts = new Workout();
-		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts();
+	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
 
-		// Limpiamos la lista antes de añadir los nuevos workouts
+		Workout workouts = new Workout();
+		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario());
+
 		vistaWorkouts.getWorkoutListModel().clear();
 
-		// Iteramos sobre los workouts y los añadimos al modelo de la lista
 		for (Workout workout : listaWorkouts) {
 			String workoutInfo = workout.getId() + ": " + workout.getNombre();
-			vistaWorkouts.addWorkout(workoutInfo); // Añadimos al modelo de la vista
+			vistaWorkouts.addWorkout(workoutInfo); 
 		}
 	}
 

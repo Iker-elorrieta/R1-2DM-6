@@ -25,7 +25,7 @@ public class Usuario {
 	private String user;
 	private String password;
 	private String usuario;
-	private int nivelUsuario;
+	private Long nivelUsuario;
 	private Date fechaNacimiento;
 	private IdiomaPreferido idiomaPreferido;
 	private TemaPreferido temaPreferido;
@@ -71,7 +71,7 @@ public class Usuario {
 		this.user = user;
 		this.password = password;
 		this.usuario = usuario;
-		this.nivelUsuario = 0;
+		this.nivelUsuario = (long) 0;
 		this.fechaNacimiento = fechaNacimiento;
 		this.idiomaPreferido = idiomaPreferido;
 		this.temaPreferido = temaPreferido;
@@ -168,11 +168,11 @@ public class Usuario {
 		this.usuario = usuario;
 	}
 
-	public int getNivelUsuario() {
+	public long getNivelUsuario() {
 		return nivelUsuario;
 	}
 
-	public void setNivelUsuario(int nivelUsuario) {
+	public void setNivelUsuario(long nivelUsuario) {
 		this.nivelUsuario = nivelUsuario;
 	}
 
@@ -199,9 +199,14 @@ public class Usuario {
 				userExists = new Usuario();
 				userExists.setId(usuarioDoc.getId());
 				userExists.setNombre(usuarioDoc.getString(fieldNombre));
+				userExists.setApellido(usuarioDoc.getString(fieldApellido));
 				userExists.setEmail(usuarioDoc.getString(fieldEmail));
 				userExists.setUsuario(usuarioDoc.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
 				userExists.setPassword(usuarioDoc.getString(fieldPassword));
+				userExists.setFechaNacimiento(usuarioDoc.getDate(fieldFecNac));
+				userExists.setNivelUsuario(usuarioDoc.getLong(fieldNivel));
+				
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -65,9 +65,7 @@ public class PanelLogin extends JPanel {
         lblImg.setLocation(53, 87);
         lblImg.setSize(200, 200);
 
-
 	}
-
 
 	public JTextField gettFUsuario() {
 		return tFUsuario;
@@ -104,7 +102,6 @@ public class PanelLogin extends JPanel {
 	public JLabel getLblImg() {
 		return lblImg;
 	}
-
 
 	public void setLblImg(JLabel lblImg) {
 		this.lblImg = lblImg;

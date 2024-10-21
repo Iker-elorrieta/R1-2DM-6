@@ -71,7 +71,6 @@ public class PanelEjercicios extends JPanel {
 		ejerListModel.addElement(workout);
 	}
 
-
 	public JButton getBtnReturn() {
 		return btnReturn;
 	}
@@ -79,6 +78,5 @@ public class PanelEjercicios extends JPanel {
 	public void setBtnReturn(JButton btnReturn) {
 		this.btnReturn = btnReturn;
 	}
-	
-	
+		
 }

@@ -13,10 +13,8 @@ public class PanelWorkouts extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	// Modelo de la lista
 	private DefaultListModel<String> workoutListModel;
 
-	// Lista que mostrará los workouts
 	private JList<String> workoutList;
 	
 	private JButton btnReturn;
@@ -30,21 +28,17 @@ public class PanelWorkouts extends JPanel {
 		setBounds(0, 0, 880, 560);
 		setLayout(null);
 
-		// Etiqueta de título
 		JLabel lblWorkouts = new JLabel("Workouts");
 		lblWorkouts.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWorkouts.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblWorkouts.setBounds(274, 55, 271, 36);
 		add(lblWorkouts);
 
-		// Inicializar el modelo de la lista
 		workoutListModel = new DefaultListModel<>();
 
-		// Inicializar la JList con el modelo
 		workoutList = new JList<>(workoutListModel);
 		workoutList.setFont(new Font("Tahoma", Font.BOLD, 14));
 		
-		// Agregar la lista dentro de un JScrollPane
 		JScrollPane scrollPane = new JScrollPane(workoutList);
 		scrollPane.setBounds(217, 120, 400, 300); // Ajusta el tamaño y la posición del scroll
 		add(scrollPane);
@@ -77,8 +71,6 @@ public class PanelWorkouts extends JPanel {
 		this.btnReturn = btnReturn;
 	}
 
-
-
 	public DefaultListModel<String> getWorkoutListModel() {
 		return workoutListModel;
 	}
@@ -87,23 +79,16 @@ public class PanelWorkouts extends JPanel {
 		return workoutList;
 	}
 
-
-
 	public void setWorkoutList(JList<String> workoutList) {
 		this.workoutList = workoutList;
 	}
-
-
 
 	public JButton getBtnSelectWorkouts() {
 		return btnSelectWorkouts;
 	}
 
-
-
 	public void setBtnSelectWorkouts(JButton btnSelectWorkouts) {
 		this.btnSelectWorkouts = btnSelectWorkouts;
 	}
-	
 	
 }
