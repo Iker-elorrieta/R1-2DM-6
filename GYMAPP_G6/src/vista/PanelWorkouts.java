@@ -14,7 +14,6 @@ public class PanelWorkouts extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	// Modelo de la lista workouts
 	private DefaultListModel<String> workoutListModel;
 
 	// Lista que mostrará los workouts
