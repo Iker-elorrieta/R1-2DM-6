@@ -5,15 +5,18 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import modelo.Ejercicio;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
 import modelo.Workout;
 import vista.Principal;
 
-public class Controlador implements ActionListener, ListSelectionListener {
+public class Controlador implements ActionListener {
 
 	private vista.Principal vistaPrincipal;
 	private vista.PanelLogin vistaLogin;
@@ -45,6 +48,16 @@ public class Controlador implements ActionListener, ListSelectionListener {
 
 		this.vistaWorkouts.getBtnReturn().addActionListener(this);
 		this.vistaWorkouts.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
+		
+		this.vistaWorkouts.getWorkoutList().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) { // Para evitar llamadas dobles
+                    obtenerEjercicios();
+                }
+            }
+        });
+		
 
 	}
 
@@ -181,10 +194,29 @@ public class Controlador implements ActionListener, ListSelectionListener {
 			vistaWorkouts.addWorkout(workoutInfo); 
 		}
 	}
+	
+	
+	private void obtenerEjercicios() {
+        String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+        
+        if (workoutSeleccionado != null) {
+            // Extraer el ID del workout (asumiendo que el ID está antes de ": " en el string)
+            String workoutId = workoutSeleccionado.split(":")[0];
 
-	@Override
-	public void valueChanged(ListSelectionEvent e) {
-		System.out.println("Cambiar valor");
-	}
+            // Limpiar la lista de ejercicios actual
+            vistaWorkouts.getEjersListModel().clear();
+
+            // Obtener los ejercicios para el workout seleccionado
+            Ejercicio ejercicioModel = new Ejercicio();
+            ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId);
+
+            // Añadir los ejercicios al modelo de la lista de ejercicios
+            for (Ejercicio ejercicio : listaEjercicios) {
+                String ejercicioInfo = ejercicio.getNombre();
+                vistaWorkouts.getEjersListModel().addElement(ejercicioInfo);
+            }
+        }
+    }
+	
 
 }

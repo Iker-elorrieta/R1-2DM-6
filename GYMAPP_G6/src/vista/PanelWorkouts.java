@@ -44,15 +44,15 @@ public class PanelWorkouts extends JPanel {
 		add(lblWorkouts);
 
 		// Inicializar el modelo de la lista workouts
-		workoutListModel = new DefaultListModel<>();
-		// Inicializar la JList con el modelo
-		workoutsList = new JList<>(workoutListModel);
-		workoutsList.setBackground(new Color(208, 239, 249));
-		workoutsList.setFont(new Font("Tahoma", Font.BOLD, 14));
-		// Agregar la lista de workouts dentro de un JScrollPane
-		JScrollPane scrollPaneWorkouts = new JScrollPane(workoutsList);
-		scrollPaneWorkouts.setBounds(50, 150, 350, 300); // Ajusta el tamaño y la posición del scroll
-		add(scrollPaneWorkouts);
+	    workoutListModel = new DefaultListModel<>();
+	    // Inicializar la JList con el modelo
+	    workoutsList = new JList<>(workoutListModel);
+	    workoutsList.setBackground(new Color(208, 239, 249));
+	    workoutsList.setFont(new Font("Tahoma", Font.BOLD, 14));
+	    // Agregar la lista de workouts dentro de un JScrollPane
+	    JScrollPane scrollPaneWorkouts = new JScrollPane(workoutsList);
+	    scrollPaneWorkouts.setBounds(50, 150, 350, 300);
+	    add(scrollPaneWorkouts);
 		
 		JLabel lblSelecWorkout = new JLabel("Selecciona un Workout:");
 		lblSelecWorkout.setBackground(new Color(156, 210, 239));
@@ -98,6 +98,7 @@ public class PanelWorkouts extends JPanel {
 		this.btnReturn = btnReturn;
 	}
 
+
 	public DefaultListModel<String> getWorkoutListModel() {
 		return workoutListModel;
 	}
@@ -106,11 +107,33 @@ public class PanelWorkouts extends JPanel {
 		this.workoutListModel = workoutListModel;
 	}
 
+
+
 	public JList<String> getWorkoutList() {
 		return workoutsList;
 	}
 
-	public void setWorkoutList(JList<String> workoutList) {
-		this.workoutsList = workoutList;
+	public void setWorkoutsList(JList<String> workoutsList) {
+		this.workoutsList = workoutsList;
 	}
+
+	public DefaultListModel<String> getEjersListModel() {
+		return ejersListModel;
+	}
+
+	public void setEjersListModel(DefaultListModel<String> ejersListModel) {
+		this.ejersListModel = ejersListModel;
+	}
+
+	public JList<String> getEjersList() {
+		return ejersList;
+	}
+
+	public void setEjersList(JList<String> ejersList) {
+		this.ejersList = ejersList;
+	}
+	
+	
+	
 }
+
