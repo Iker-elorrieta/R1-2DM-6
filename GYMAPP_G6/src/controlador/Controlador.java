@@ -1,11 +1,12 @@
 package controlador;
 
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
-import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -48,16 +49,16 @@ public class Controlador implements ActionListener {
 
 		this.vistaWorkouts.getBtnReturn().addActionListener(this);
 		this.vistaWorkouts.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_LOGIN.toString());
-		
+
 		this.vistaWorkouts.getWorkoutList().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                if (!e.getValueIsAdjusting()) { // Para evitar llamadas dobles
-                    obtenerEjercicios();
-                }
-            }
-        });
-		
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()) { // Para evitar llamadas dobles
+					obtenerEjercicios();
+					cargarInfoWorkout();
+				}
+			}
+		});
 
 	}
 
@@ -101,24 +102,24 @@ public class Controlador implements ActionListener {
 
 		Usuario user = new Usuario().obtenerUsuario(usuario);
 
-		if (user != null) {
-			if (user.getPassword().equals(password)) {
-				JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
-						"Información", JOptionPane.INFORMATION_MESSAGE);
-
-				cargarWorkouts(user, Principal.enumAcciones.PANEL_WORKOUTS);
-
-				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
-				this.vistaLogin.gettFUsuario().setText("");
-				this.vistaLogin.gettFContrasena().setText("");
-
-			} else {
-				JOptionPane.showMessageDialog(null, "Contraseña incorrecta.", "Error", JOptionPane.ERROR_MESSAGE);
-			}
-
-		} else {
+		if (user == null) {
 			JOptionPane.showMessageDialog(null, "El usuario no existe.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
 		}
+
+		if (!user.getPassword().equals(password)) {
+			JOptionPane.showMessageDialog(null, "Contraseña incorrecta.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
+		JOptionPane.showMessageDialog(null, "Inicio de sesión correcto. \nBienvenid@ " + user.getUsuario(),
+				"Información", JOptionPane.INFORMATION_MESSAGE);
+
+		cargarWorkouts(user, Principal.enumAcciones.PANEL_WORKOUTS);
+
+		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
+		this.vistaLogin.gettFUsuario().setText("");
+		this.vistaLogin.gettFContrasena().setText("");
 	}
 
 	private void registrarUsuario() {
@@ -145,17 +146,16 @@ public class Controlador implements ActionListener {
 			return;
 		}
 
+		// COMPROBACIÓN DE USUARIO EXISTENTE
+		if (nuevoUsuario.obtenerUsuario(user) != null) {
+			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		// COMPROBACIÓN DE FORMATO EMAIL
 		String emailFormato = "^[\\w-](?!.*\\.\\.)[\\w-\\.]+@[\\w-\\.]+\\.[a-zA-Z]{2,7}$";
 		if (!email.matches(emailFormato)) {
 			JOptionPane.showMessageDialog(null, "Formato de email incorrecto.", "Error", JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-
-		// COMPROBACIÓN DE USUARIO EXISTENTE
-
-		if (nuevoUsuario.obtenerUsuario(user) != null) {
-			JOptionPane.showMessageDialog(null, "El usuario ya existe.", "Error", JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
@@ -183,40 +183,108 @@ public class Controlador implements ActionListener {
 	}
 
 	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
-
 		Workout workouts = new Workout();
 		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario());
 
 		vistaWorkouts.getWorkoutListModel().clear();
 
 		for (Workout workout : listaWorkouts) {
-			String workoutInfo = workout.getId() + ": " + workout.getNombre();
-			vistaWorkouts.addWorkout(workoutInfo); 
+			String workoutInfo = workout.getId() + ": " + workout.getNombre() + " (Nivel " + workout.getNivel() + ")";
+			String url = workout.getVideoUrl();
+			String descripcion = workout.getDescripcion();
+			vistaWorkouts.addWorkout(workoutInfo, url, descripcion);
 		}
 	}
-	
-	
+
+	private void cargarInfoWorkout() {
+		String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado);
+		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado);
+
+		if (workoutSeleccionado == null)
+			return;
+
+		// CARGAR URL
+
+		if (urlWorkout == null || urlWorkout.isEmpty()) {
+			vistaWorkouts.getBtnVideo().setEnabled(false);
+			return;
+		}
+
+		for (ActionListener al : vistaWorkouts.getBtnVideo().getActionListeners()) {
+			vistaWorkouts.getBtnVideo().removeActionListener(al);
+		}
+
+		vistaWorkouts.getBtnVideo().setEnabled(true);
+
+		vistaWorkouts.getBtnVideo().addActionListener(event -> {
+			try {
+				Desktop.getDesktop().browse(new URI(urlWorkout));
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		});
+
+		// CARGAR DESCRIPCIÓN
+
+		if (descripcionWorkout == null || descripcionWorkout.isEmpty()) {
+			vistaWorkouts.getBtnDescripcion().setEnabled(false);
+			return;
+		}
+
+		for (ActionListener al : vistaWorkouts.getBtnDescripcion().getActionListeners()) {
+			vistaWorkouts.getBtnDescripcion().removeActionListener(al);
+		}
+
+		vistaWorkouts.getBtnDescripcion().setEnabled(true);
+
+		int max = 50;
+
+		StringBuilder resultado = new StringBuilder(descripcionWorkout);
+
+		if (max > resultado.length())
+			max = resultado.length();
+
+		for (int i = max; i < resultado.length(); i += max) {
+
+			while (i > 0 && resultado.charAt(i - 1) != ' ') {
+				i--;
+			}
+
+			if (i > 0 && i < resultado.length()) {
+				resultado.replace(i, i + 1, "\n");
+			}
+		}
+
+		String a = resultado.toString();
+		vistaWorkouts.getBtnDescripcion().addActionListener(event -> {
+			JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
+		});
+	}
+
 	private void obtenerEjercicios() {
-        String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
-        
-        if (workoutSeleccionado != null) {
-            // Extraer el ID del workout (asumiendo que el ID está antes de ": " en el string)
-            String workoutId = workoutSeleccionado.split(":")[0];
+		String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
 
-            // Limpiar la lista de ejercicios actual
-            vistaWorkouts.getEjersListModel().clear();
+		if (workoutSeleccionado == null)
+			return;
 
-            // Obtener los ejercicios para el workout seleccionado
-            Ejercicio ejercicioModel = new Ejercicio();
-            ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId);
+		// Extraer el ID del workout (asumiendo que el ID está antes de ": " en el
+		// string)
+		String workoutId = workoutSeleccionado.split(":")[0];
 
-            // Añadir los ejercicios al modelo de la lista de ejercicios
-            for (Ejercicio ejercicio : listaEjercicios) {
-                String ejercicioInfo = ejercicio.getNombre();
-                vistaWorkouts.getEjersListModel().addElement(ejercicioInfo);
-            }
-        }
-    }
-	
+		// Limpiar la lista de ejercicios actual
+		vistaWorkouts.getEjersListModel().clear();
+
+		// Obtener los ejercicios para el workout seleccionado
+		Ejercicio ejercicioModel = new Ejercicio();
+		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId);
+
+		// Añadir los ejercicios al modelo de la lista de ejercicios
+		for (Ejercicio ejercicio : listaEjercicios) {
+			String ejercicioInfo = ejercicio.getNombre();
+			vistaWorkouts.getEjersListModel().addElement(ejercicioInfo);
+		}
+
+	}
 
 }

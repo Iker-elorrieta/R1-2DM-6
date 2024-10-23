@@ -4,6 +4,8 @@ import javax.swing.JPanel;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 import javax.swing.JLabel;
+
+import java.awt.Color;
 import java.awt.Font;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
@@ -36,6 +38,8 @@ public class PanelRegistro extends JPanel {
 	String maxString = ano + "-" + mes + "-" + dia;
 
 	public PanelRegistro() {
+		setBackground(new Color(141, 204, 235));
+		
 		setBounds(0, 0, 880, 560);
 		setLayout(null);
 		

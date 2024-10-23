@@ -12,7 +12,7 @@ import conexion.Conexion;
 
 public class Workout {
 
-	private String nombre, videoUrl, id;
+	private String nombre, videoUrl, id, descripcion;
 	private int nivel, numEjers;
 
 	// NOMBRE DE LOS CAMPOS
@@ -21,17 +21,19 @@ public class Workout {
 	private static String fieldNivel = "nivel";
 	private static String fieldNumEjers = "numEjers";
 	private static String fieldVideoUrl = "video";
+	private static String fieldDescripcion = "descripcion";
 
 	// Constructor
 	public Workout() {
 
 	}
 
-	public Workout(String nombre, String videoUrl, int nivel, int numEjers) {
+	public Workout(String nombre, String videoUrl, String descripcion, int nivel, int numEjers) {
 		this.nombre = nombre;
 		this.videoUrl = videoUrl;
 		this.nivel = nivel;
 		this.numEjers = numEjers;
+		this.descripcion = descripcion;
 	}
 
 //Getters y setters
@@ -75,6 +77,14 @@ public class Workout {
 		this.numEjers = numEjers;
 	}
 
+	public String getDescripcion() {
+		return descripcion;
+	}
+
+	public void setDescripcion(String descripcion) {
+		this.descripcion = descripcion;
+	}
+
 	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario) {
 		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
@@ -96,16 +106,18 @@ public class Workout {
 				Long numEjers = workout.getLong(fieldNumEjers);
 
 				// Evitar el error de casting si el valor es null
-				if (nivel != null) {
+				if (nivel != null)
 					w.setNivel(nivel.intValue()); // Convertir de Long a int
-				}
-				if (numEjers != null) {
+
+				if (numEjers != null)
 					w.setNumEjers(numEjers.intValue()); // Convertir de Long a int
-				}
 
 				w.setVideoUrl(workout.getString(fieldVideoUrl));
+				w.setDescripcion(workout.getString(fieldDescripcion));
 				listaWorkouts.add(w);
+
 			}
+			fs.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

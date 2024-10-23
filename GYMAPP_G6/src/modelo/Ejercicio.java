@@ -126,6 +126,8 @@ public class Ejercicio {
 
 	                // Agregar el ejercicio a la lista
 	                listaEjercicios.add(e);
+	                
+	                fs.close();
 	            }
 	        } catch (Exception e) {
 	            e.printStackTrace();

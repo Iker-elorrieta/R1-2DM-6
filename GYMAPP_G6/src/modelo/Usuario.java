@@ -205,9 +205,9 @@ public class Usuario {
 				userExists.setPassword(usuarioDoc.getString(fieldPassword));
 				userExists.setFechaNacimiento(usuarioDoc.getDate(fieldFecNac));
 				userExists.setNivelUsuario(usuarioDoc.getLong(fieldNivel));
-				
 
 			}
+			fs.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -239,6 +239,7 @@ public class Usuario {
 
 				listaUsers.add(u);
 			}
+			fs.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -247,11 +248,11 @@ public class Usuario {
 	}
 
 	public void crearUsuario() {
-		Firestore co = null;
+		Firestore fs = null;
 
 		try {
-			co = Conexion.conectar();
-			DocumentReference newUserRef = co.collection(usersCollection).document();
+			fs = Conexion.conectar();
+			DocumentReference newUserRef = fs.collection(usersCollection).document();
 
 			Map<String, Object> userData = new HashMap<>();
 			userData.put(fieldNombre, this.nombre);
@@ -268,7 +269,7 @@ public class Usuario {
 			newUserRef.set(userData);
 
 			try {
-				co.close();
+				fs.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
