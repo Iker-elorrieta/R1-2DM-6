@@ -1,5 +1,6 @@
 package modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
 
-public class Ejercicio {
+public class Ejercicio implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private String nombre, descripcion, foto;
 	private long numReps, numSeries, tiempoDescanso;
 

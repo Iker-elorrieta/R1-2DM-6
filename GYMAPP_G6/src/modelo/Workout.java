@@ -1,5 +1,6 @@
 package modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +11,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
 
-public class Workout {
+public class Workout implements Serializable {
 
+	private static final long serialVersionUID = 1L;
 	private String nombre, videoUrl, id, descripcion;
 	private int nivel, numEjers;
 
@@ -91,7 +93,7 @@ public class Workout {
 
 		try {
 			fs = Conexion.conectar();
-			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).whereEqualTo(fieldNivel, nivelUsuario)
+			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).whereLessThanOrEqualTo(fieldNivel, nivelUsuario)
 					.get();
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();

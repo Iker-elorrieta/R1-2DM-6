@@ -3,6 +3,7 @@ package controlador;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -15,6 +16,7 @@ import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
 import modelo.Workout;
+import modelo.Backup;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -60,6 +62,7 @@ public class Controlador implements ActionListener {
 	 * Acciones de los componentes de las vistas
 	 */
 	private void inicializarControlador() {
+
 		accionesVistaLogin();
 		accionesVistaRegistro();
 		accionesVistaWorkouts();
@@ -186,6 +189,15 @@ public class Controlador implements ActionListener {
 		this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_WORKOUTS);
 		this.vistaLogin.gettFUsuario().setText("");
 		this.vistaLogin.gettFContrasena().setText("");
+
+		try {
+			ProcessBuilder builder = new ProcessBuilder("java", "Backup");
+			builder.directory(new File("target/classes/modelo"));
+			Process process = builder.start();
+			System.out.println(process.isAlive());
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	/**
@@ -244,6 +256,7 @@ public class Controlador implements ActionListener {
 
 		mostrarInfoDialog("Usuario registrado correctamente.");
 		visualizarPanel(Principal.enumAcciones.PANEL_LOGIN);
+
 	}
 
 	/**

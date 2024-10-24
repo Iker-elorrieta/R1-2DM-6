@@ -1,6 +1,7 @@
 package modelo;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,7 +17,9 @@ import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import conexion.Conexion;
 
-public class Usuario {
+public class Usuario implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private String id;
 	private String nombre;
@@ -234,8 +237,10 @@ public class Usuario {
 				u.setNombre(usuario.getString(fieldNombre));
 				u.setApellido(usuario.getString(fieldApellido));
 				u.setEmail(usuario.getString(fieldEmail));
-				u.setUsuario(usuario.getString(fieldUsuario));
+				u.setUsuario(usuario.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
 				u.setPassword(usuario.getString(fieldPassword));
+				u.setFechaNacimiento(usuario.getDate(fieldFecNac));
+				u.setNivelUsuario(usuario.getLong(fieldNivel));
 
 				listaUsers.add(u);
 			}
