@@ -13,8 +13,8 @@ import conexion.Conexion;
 public class Ejercicio {
 	private String nombre, descripcion, foto;
 	private long numReps, numSeries, tiempoDescanso;
-	
-	//NOMBRE DE LOS CAMPOS
+
+	// NOMBRE DE LOS CAMPOS
 	private static String ejersCollection = "Ejercicios";
 	private static String fieldNombre = "nombre";
 	private static String fieldDescripcion = "descripcion";
@@ -22,9 +22,9 @@ public class Ejercicio {
 	private static String fieldnumReps = "numRepeticiones";
 	private static String fieldNumSeries = "numSeries";
 	private static String fieldTiempoDescanso = "tiempoDescanso";
-	
+
 	public Ejercicio() {
-		
+
 	}
 
 	public Ejercicio(String nombre, String descripcion, String foto, int numReps, int numSeries, int tiempoDescanso) {
@@ -35,8 +35,8 @@ public class Ejercicio {
 		this.numSeries = numSeries;
 		this.tiempoDescanso = tiempoDescanso;
 	}
-	
-	//Getters y setters
+
+	// Getters y setters
 	public String getNombre() {
 		return nombre;
 	}
@@ -85,54 +85,54 @@ public class Ejercicio {
 		this.tiempoDescanso = tiempoDescanso;
 	}
 
-	
-	 public ArrayList<Ejercicio> obtenerEjercicios(String workoutId) {
-	        Firestore fs = null;
-	        ArrayList<Ejercicio> listaEjercicios = new ArrayList<Ejercicio>();
+	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId) {
+		Firestore fs = null;
+		ArrayList<Ejercicio> listaEjercicios = new ArrayList<Ejercicio>();
 
-	        try {
-	            // Conectar a Firestore
-	            fs = Conexion.conectar();
-	            
-	            // Acceder a la subcolección Ejercicios dentro del documento de Workouts con workoutId
-	            ApiFuture<QuerySnapshot> query = fs.collection("Workouts") // Colección Workouts
-	                                               .document(workoutId)    // Documento específico de Workouts
-	                                               .collection(ejersCollection) // Subcolección Ejercicios
-	                                               .get();
-	                                               
-	            QuerySnapshot querySnapshot = query.get();
-	            List<QueryDocumentSnapshot> ejercicios = querySnapshot.getDocuments();
+		try {
+			// Conectar a Firestore
+			fs = Conexion.conectar();
 
-	            for (QueryDocumentSnapshot ejercicioDoc : ejercicios) {
-	                Ejercicio e = new Ejercicio();
-	                e.setNombre(ejercicioDoc.getString(fieldNombre));
-	                e.setDescripcion(ejercicioDoc.getString(fieldDescripcion));
-	                e.setFoto(ejercicioDoc.getString(fieldFoto));
+			// Acceder a la subcolección Ejercicios dentro del documento de Workouts con
+			// workoutId
+			ApiFuture<QuerySnapshot> query = fs.collection("Workouts") // Colección Workouts
+					.document(workoutId) // Documento específico de Workouts
+					.collection(ejersCollection) // Subcolección Ejercicios
+					.get();
 
-	                Long numReps = ejercicioDoc.getLong(fieldnumReps);
-	                Long numSeries = ejercicioDoc.getLong(fieldNumSeries);
-	                Long tiempoDescanso = ejercicioDoc.getLong(fieldTiempoDescanso);
+			QuerySnapshot querySnapshot = query.get();
+			List<QueryDocumentSnapshot> ejercicios = querySnapshot.getDocuments();
 
-	                // Si no es null, convertir Long a int
-	                if (numReps != null) {
-	                    e.setNumReps(numReps.intValue());
-	                }
-	                if (numSeries != null) {
-	                    e.setNumSeries(numSeries.intValue());
-	                }
-	                if (tiempoDescanso != null) {
-	                    e.setTiempoDescanso(tiempoDescanso.intValue());
-	                }
+			for (QueryDocumentSnapshot ejercicioDoc : ejercicios) {
+				Ejercicio e = new Ejercicio();
+				e.setNombre(ejercicioDoc.getString(fieldNombre));
+				e.setDescripcion(ejercicioDoc.getString(fieldDescripcion));
+				e.setFoto(ejercicioDoc.getString(fieldFoto));
 
-	                // Agregar el ejercicio a la lista
-	                listaEjercicios.add(e);
-	                
-	                fs.close();
-	            }
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
+				Long numReps = ejercicioDoc.getLong(fieldnumReps);
+				Long numSeries = ejercicioDoc.getLong(fieldNumSeries);
+				Long tiempoDescanso = ejercicioDoc.getLong(fieldTiempoDescanso);
 
-	        return listaEjercicios;
-	    }
+				// Si no es null, convertir Long a int
+				if (numReps != null) {
+					e.setNumReps(numReps.intValue());
+				}
+				if (numSeries != null) {
+					e.setNumSeries(numSeries.intValue());
+				}
+				if (tiempoDescanso != null) {
+					e.setTiempoDescanso(tiempoDescanso.intValue());
+				}
+
+				// Agregar el ejercicio a la lista
+				listaEjercicios.add(e);
+
+				fs.close();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return listaEjercicios;
 	}
+}

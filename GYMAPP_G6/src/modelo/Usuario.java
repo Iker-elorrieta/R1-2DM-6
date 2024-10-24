@@ -71,7 +71,7 @@ public class Usuario {
 		this.user = user;
 		this.password = password;
 		this.usuario = usuario;
-		this.nivelUsuario = (long) 0;
+		this.nivelUsuario = (long) nivelUsuario;
 		this.fechaNacimiento = fechaNacimiento;
 		this.idiomaPreferido = idiomaPreferido;
 		this.temaPreferido = temaPreferido;

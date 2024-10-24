@@ -1,5 +1,6 @@
 package vista;
 
+import javax.swing.*;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -8,7 +9,6 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.swing.SwingConstants;
 import javax.swing.JButton;
 import java.awt.Color;
@@ -16,74 +16,100 @@ import java.awt.Color;
 public class PanelWorkouts extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-
 	private DefaultListModel<String> workoutListModel;
-
 	private JList<String> workoutsList;
-
 	private DefaultListModel<String> ejersListModel;
-
 	private JList<String> ejersList;
-
-	private JButton btnReturn, btnVideo, btnDescripcion;
-
+	private JButton btnReturn, btnVideo, btnDescripcion, btnStartWorkout;
 	private Map<String, String> workoutUrls = new HashMap<>();
-
 	private Map<String, String> workoutDescripciones = new HashMap<>();
 
 	public PanelWorkouts() {
-		setBackground(new Color(141, 204, 235));
 
 		setBounds(0, 0, 880, 560);
+		setBackground(new Color(173, 216, 230)); // Fondo azul claro
 		setLayout(null);
+
+		// Etiqueta de título
 
 		JLabel lblWorkouts = new JLabel("Workouts");
 		lblWorkouts.setHorizontalAlignment(SwingConstants.CENTER);
 		lblWorkouts.setFont(new Font("Tahoma", Font.BOLD, 30));
-		lblWorkouts.setBounds(274, 55, 271, 36);
+		lblWorkouts.setForeground(new Color(10, 75, 128)); // Azul oscuro
+		lblWorkouts.setBounds(274, 20, 271, 36);
 		add(lblWorkouts);
 
 		workoutListModel = new DefaultListModel<>();
 		workoutsList = new JList<>(workoutListModel);
-		workoutsList.setBackground(new Color(208, 239, 249));
+		workoutsList.setBackground(new Color(208, 239, 249)); // Fondo de la lista
 		workoutsList.setFont(new Font("Tahoma", Font.BOLD, 14));
+		workoutsList.setBorder(BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul oscuro
 
 		JScrollPane scrollPaneWorkouts = new JScrollPane(workoutsList);
-		scrollPaneWorkouts.setBounds(50, 150, 350, 300);
+		scrollPaneWorkouts.setBounds(50, 100, 350, 350);
 		add(scrollPaneWorkouts);
 
 		JLabel lblSelecWorkout = new JLabel("Selecciona un Workout:");
-		lblSelecWorkout.setBackground(new Color(156, 210, 239));
-		scrollPaneWorkouts.setColumnHeaderView(lblSelecWorkout);
 		lblSelecWorkout.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblSelecWorkout.setForeground(new Color(10, 75, 128)); // Azul oscuro
+		scrollPaneWorkouts.setColumnHeaderView(lblSelecWorkout);
 
 		ejersListModel = new DefaultListModel<>();
 		ejersList = new JList<>(ejersListModel);
-		ejersList.setBackground(new Color(211, 235, 248));
+		ejersList.setBackground(new Color(211, 235, 248)); // Fondo de la lista de ejercicios
 		ejersList.setFont(new Font("Tahoma", Font.BOLD, 14));
+		ejersList.setBorder(BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul oscuro
 
 		JScrollPane scrollPaneEjers = new JScrollPane(ejersList);
 		scrollPaneEjers.setBounds(450, 150, 350, 300); // Ajusta el tamaño y la posición del scroll
 		add(scrollPaneEjers);
 
 		JLabel lblSelecEjer = new JLabel("Selecciona un ejercicio:");
-		lblSelecEjer.setBackground(new Color(156, 210, 239));
 		lblSelecEjer.setFont(new Font("Tahoma", Font.BOLD, 14));
+		lblSelecEjer.setForeground(new Color(10, 75, 128)); // Azul
 		scrollPaneEjers.setColumnHeaderView(lblSelecEjer);
 
-		btnReturn = new JButton("Atrás");
-		btnReturn.setBounds(10, 513, 102, 36);
-		add(btnReturn);
-
 		btnVideo = new JButton("Ver vídeo");
-		btnVideo.setBounds(450, 470, 150, 36);
 		btnVideo.setEnabled(false);
+		btnVideo.setBounds(240, 480, 160, 40);
+		btnVideo.setBackground(new Color(10, 75, 128)); // Azul
+		btnVideo.setForeground(Color.WHITE);
+		btnVideo.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnVideo.setFocusPainted(false);
+		btnVideo.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 		add(btnVideo);
 
 		btnDescripcion = new JButton("Ver descripción");
+		btnDescripcion.setBounds(450, 480, 160, 40);
+		btnDescripcion.setBackground(new Color(10, 75, 128)); // Azul
+		btnDescripcion.setForeground(Color.WHITE);
+		btnDescripcion.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnDescripcion.setFocusPainted(false);
 		btnDescripcion.setEnabled(false);
-		btnDescripcion.setBounds(650, 470, 150, 36);
+		btnVideo.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 		add(btnDescripcion);
+
+		// Botón de regresar
+
+		btnReturn = new JButton("Atrás");
+		btnReturn.setBounds(33, 480, 160, 40);
+		btnReturn.setBackground(new Color(10, 75, 128)); // Azul
+		btnReturn.setForeground(Color.WHITE);
+		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnReturn.setFocusPainted(false);
+		btnReturn.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		add(btnReturn);
+
+		// Botón para iniciar el workout
+
+		btnStartWorkout = new JButton("Iniciar Workout");
+		btnStartWorkout.setBounds(680, 480, 160, 40);
+		btnStartWorkout.setBackground(new Color(10, 75, 128)); // Azul oscuro
+		btnStartWorkout.setForeground(Color.WHITE);
+		btnStartWorkout.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnStartWorkout.setFocusPainted(false);
+		btnStartWorkout.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		add(btnStartWorkout);
 
 	}
 
@@ -174,4 +200,13 @@ public class PanelWorkouts extends JPanel {
 	public Map<String, String> getWorkoutDescripciones() {
 		return workoutDescripciones;
 	}
+
+	public JButton getBtnStartWorkout() {
+		return btnStartWorkout;
+	}
+
+	public void setBtnStartWorkout(JButton btnStartWorkout) {
+		this.btnStartWorkout = btnStartWorkout;
+	}
+
 }

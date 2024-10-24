@@ -4,7 +4,6 @@ import javax.swing.JPanel;
 import com.toedter.calendar.JDateChooser;
 import com.toedter.calendar.JTextFieldDateEditor;
 import javax.swing.JLabel;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Calendar;
@@ -16,6 +15,7 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
+import javax.swing.border.LineBorder;
 
 public class PanelRegistro extends JPanel {
 
@@ -38,51 +38,71 @@ public class PanelRegistro extends JPanel {
 	String maxString = ano + "-" + mes + "-" + dia;
 
 	public PanelRegistro() {
-		setBackground(new Color(141, 204, 235));
-		
 		setBounds(0, 0, 880, 560);
 		setLayout(null);
-		
+		setBackground(new Color(173, 216, 230)); // Fondo azul claro
+
 		JLabel lblNewLabel = new JLabel("REGISTRO");
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblNewLabel.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		lblNewLabel.setBounds(307, 62, 265, 84);
 		add(lblNewLabel);
 
 		JLabel lblRegistroName = new JLabel("Nombre:");
-		lblRegistroName.setBounds(171, 170, 79, 25);
+		lblRegistroName.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblRegistroName.setBounds(156, 172, 79, 25);
+		lblRegistroName.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblRegistroName);
 
 		JLabel lblRegistroSurname = new JLabel("Apellido:");
-		lblRegistroSurname.setBounds(171, 225, 79, 25);
+		lblRegistroSurname.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblRegistroSurname.setBounds(156, 227, 79, 25);
+		lblRegistroSurname.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblRegistroSurname);
 
 		JLabel lblFechaDeNacimiento = new JLabel("Fecha de nacimiento:");
-		lblFechaDeNacimiento.setBounds(171, 351, 128, 25);
+		lblFechaDeNacimiento.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblFechaDeNacimiento.setBounds(156, 353, 150, 25);
+		lblFechaDeNacimiento.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblFechaDeNacimiento);
 
 		JLabel lblEmail = new JLabel("Email:");
-		lblEmail.setBounds(171, 285, 79, 25);
+		lblEmail.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblEmail.setBounds(156, 287, 79, 25);
+		lblEmail.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblEmail);
 
 		JLabel lblUsuario = new JLabel("Usuario:");
-		lblUsuario.setBounds(501, 170, 79, 25);
+		lblUsuario.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblUsuario.setBounds(486, 172, 79, 25);
+		lblUsuario.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblUsuario);
 
 		JLabel lblPassword = new JLabel("Contraseña:");
-		lblPassword.setBounds(501, 225, 79, 25);
+		lblPassword.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblPassword.setBounds(486, 227, 79, 25);
+		lblPassword.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblPassword);
 
 		JLabel lblIdioma = new JLabel("Idioma:");
-		lblIdioma.setBounds(501, 285, 79, 25);
+		lblIdioma.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblIdioma.setBounds(486, 287, 79, 25);
+		lblIdioma.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblIdioma);
 
 		JLabel lblTema = new JLabel("Tema:");
-		lblTema.setBounds(501, 351, 79, 25);
+		lblTema.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblTema.setBounds(486, 353, 79, 25);
+		lblTema.setForeground(new Color(10, 75, 128)); // Azul oscuro
 		add(lblTema);
 
 		fechaNacimientoCalendar = new JDateChooser();
-		fechaNacimientoCalendar.setBounds(294, 351, 175, 20);
+		fechaNacimientoCalendar.setBounds(294, 351, 175, 30);
+		fechaNacimientoCalendar.setBackground(Color.WHITE);
+		fechaNacimientoCalendar.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde
+																													// azul
+																													// oscuro
 		add(fechaNacimientoCalendar);
 
 		JTextFieldDateEditor editor = (JTextFieldDateEditor) fechaNacimientoCalendar.getDateEditor();
@@ -93,50 +113,66 @@ public class PanelRegistro extends JPanel {
 			fechaNacimientoCalendar.setMinSelectableDate(dateFormat.parse(minString));
 			fechaNacimientoCalendar.setDate(dateFormat.parse(maxString));
 		} catch (java.text.ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
 		tFRegistroNombre = new JTextField();
-		tFRegistroNombre.setBounds(242, 172, 86, 20);
+		tFRegistroNombre.setBounds(242, 172, 175, 25);
+		tFRegistroNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul
+																											// oscuro
 		add(tFRegistroNombre);
-		tFRegistroNombre.setColumns(10);
 
 		tFRegistroApellido = new JTextField();
-		tFRegistroApellido.setBounds(242, 227, 86, 20);
+		tFRegistroApellido.setBounds(242, 227, 175, 25);
+		tFRegistroApellido.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde
+																												// azul
+																												// oscuro
 		add(tFRegistroApellido);
-		tFRegistroApellido.setColumns(10);
 
 		tFRegistroEmail = new JTextField();
-		tFRegistroEmail.setBounds(242, 287, 86, 20);
+		tFRegistroEmail.setBounds(242, 287, 175, 25);
+		tFRegistroEmail.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul
+																											// oscuro
 		add(tFRegistroEmail);
-		tFRegistroEmail.setColumns(10);
 
 		tFRegistroUser = new JTextField();
-		tFRegistroUser.setBounds(589, 172, 86, 20);
+		tFRegistroUser.setBounds(589, 172, 175, 25);
+		tFRegistroUser.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul
+																											// oscuro
 		add(tFRegistroUser);
-		tFRegistroUser.setColumns(10);
 
 		pFRegistroPassword = new JPasswordField();
-		pFRegistroPassword.setBounds(590, 227, 85, 20);
+		pFRegistroPassword.setBounds(590, 227, 175, 25);
+		pFRegistroPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde
+																												// azul
+																												// oscuro
 		add(pFRegistroPassword);
 
 		cBRegistroIdioma = new JComboBox<>(IdiomaPreferido.values());
-		cBRegistroIdioma.setBounds(590, 286, 85, 22);
+		cBRegistroIdioma.setBounds(590, 286, 175, 25);
+		cBRegistroIdioma.setBackground(Color.WHITE);
 		add(cBRegistroIdioma);
 
 		cBRegistroTema = new JComboBox<>(TemaPreferido.values());
-		cBRegistroTema.setBounds(590, 352, 85, 22);
+		cBRegistroTema.setBounds(590, 351, 175, 25);
+		cBRegistroTema.setBackground(Color.WHITE);
 		add(cBRegistroTema);
 
 		btnReturn = new JButton("Atrás");
-		btnReturn.setBounds(20, 516, 89, 23);
+		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnReturn.setBorder(new LineBorder(new Color(255, 255, 255), 2));
+		btnReturn.setBounds(22, 504, 89, 30);
+		btnReturn.setBackground(new Color(10, 75, 128)); // Azul oscuro
+		btnReturn.setForeground(Color.WHITE);
 		add(btnReturn);
 
 		btnRegistroSignUp = new JButton("Crear cuenta");
+		btnRegistroSignUp.setFont(new Font("Tahoma", Font.BOLD, 11));
+		btnRegistroSignUp.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnRegistroSignUp.setBounds(376, 439, 128, 39);
+		btnRegistroSignUp.setBackground(new Color(10, 75, 128)); // Azul oscuro
+		btnRegistroSignUp.setForeground(new Color(255, 255, 255));
 		add(btnRegistroSignUp);
-
 	}
 
 	public JTextField gettFRegistroNombre() {
