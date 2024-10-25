@@ -8,8 +8,9 @@ import java.io.IOException;
 public class Backup {
 
 	public static void main(String[] args) {
+		int maxLevel = 3;
 		guardarUsuarios(new Usuario().obtenerMultiplesUsuarios());
-		guardarWorkouts(new Workout().obtenerWorkouts((long) 3));
+		guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
 	}
 
 	private static final String FILE_USERS = "backups/usuario.dat";

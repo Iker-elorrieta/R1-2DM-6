@@ -77,7 +77,6 @@ public class Principal extends JFrame {
 		panelWorkouts.setVisible(false);
 		panelEjercicios.setVisible(false);
 
-
 		switch (panel) {
 		case PANEL_LOGIN:
 			panelLogin.setVisible(true);

@@ -8,12 +8,9 @@ public class PanelEjercicios extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton btnReturn;
-	private JButton btnStartPause; // Botón para iniciar y pausar
-	private JLabel lblWorkout, lblImgEjer, lblEjercicio;
-	private JLabel lblMainTimer; // Cronómetro principal
-	private JLabel lblInfoSeries; // Información de series
-	private JLabel lblCountdown; // Cuenta regresiva de series
+	private JButton btnReturn, btnStartPause; // Botón para iniciar y pausar
+	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblInfoSeries, lblCountdown; // Cuenta regresiva
+																									// de series
 	private JTextArea txtAreaDescripcion;
 
 	// Variables de tiempo

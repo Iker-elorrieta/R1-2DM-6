@@ -93,8 +93,8 @@ public class Workout implements Serializable {
 
 		try {
 			fs = Conexion.conectar();
-			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection).whereLessThanOrEqualTo(fieldNivel, nivelUsuario)
-					.get();
+			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection)
+					.whereLessThanOrEqualTo(fieldNivel, nivelUsuario).get();
 			QuerySnapshot querySnapshot = query.get();
 			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
 

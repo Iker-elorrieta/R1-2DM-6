@@ -3,7 +3,6 @@ package controlador;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,12 +10,12 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import modelo.Backup;
 import modelo.Ejercicio;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
 import modelo.Workout;
-import modelo.Backup;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -111,6 +110,7 @@ public class Controlador implements ActionListener {
 
 		this.vistaWorkouts.getBtnStartWorkout().addActionListener(this);
 		this.vistaWorkouts.getBtnStartWorkout().setActionCommand(Principal.enumAcciones.PANEL_EJERCICIOS.toString());
+
 	}
 
 	/**
@@ -190,14 +190,14 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.gettFUsuario().setText("");
 		this.vistaLogin.gettFContrasena().setText("");
 
-		try {
-			ProcessBuilder builder = new ProcessBuilder("java", "Backup");
-			builder.directory(new File("target/classes/modelo"));
-			Process process = builder.start();
-			System.out.println(process.isAlive());
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
+		/*
+		 * try { ProcessBuilder pb = new ProcessBuilder("java","-cp",".", "Backup");
+		 * pb.inheritIO(); Process process = pb.start();
+		 * System.out.println(process.isAlive()); } catch (Exception e1) {
+		 * e1.printStackTrace(); }
+		 */
+
+		Backup.main(null);
 	}
 
 	/**
@@ -332,8 +332,11 @@ public class Controlador implements ActionListener {
 	// Método para obtener ejercicios
 	private void obtenerEjercicios() {
 		String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
-		if (workoutSeleccionado == null)
+
+		if (workoutSeleccionado == null) {
+			vistaWorkouts.getEjersListModel().clear();
 			return;
+		}
 
 		String workoutId = workoutSeleccionado.split(":")[0];
 		vistaWorkouts.getEjersListModel().clear();
