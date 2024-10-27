@@ -335,6 +335,7 @@ public class Controlador implements ActionListener {
 
 		if (workoutSeleccionado == null) {
 			vistaWorkouts.getEjersListModel().clear();
+			vistaWorkouts.getBtnStartWorkout().setEnabled(false);
 			return;
 		}
 
@@ -349,6 +350,7 @@ public class Controlador implements ActionListener {
 			vistaWorkouts.getEjersListModel().addElement(ejercicio.getNombre());
 		}
 
+		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
 	// Método para mostrar el ejercicio seleccionado
@@ -407,8 +409,13 @@ public class Controlador implements ActionListener {
 		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado);
 		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado);
 
-		if (workoutSeleccionado == null)
+		if (workoutSeleccionado == null) {
+			vistaWorkouts.getBtnDescripcion().setEnabled(false);
+			vistaWorkouts.getBtnVideo().setEnabled(false);
+			// en vez de hacer esto igual se puede vaciar el objeto
 			return;
+		}
+			
 
 		// CARGAR URL
 		if (urlWorkout == null || urlWorkout.isEmpty()) {

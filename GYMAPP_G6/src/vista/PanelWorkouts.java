@@ -108,6 +108,7 @@ public class PanelWorkouts extends JPanel {
 		btnStartWorkout.setForeground(Color.WHITE);
 		btnStartWorkout.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnStartWorkout.setFocusPainted(false);
+		btnStartWorkout.setEnabled(false);
 		btnStartWorkout.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
 		add(btnStartWorkout);
 

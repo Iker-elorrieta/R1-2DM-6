@@ -13,8 +13,7 @@ public class Main {
 			// Crear el controlador con las referencias correctas a los paneles existentes
 			new Controlador(ventanaPrincipal, ventanaPrincipal.getPanelLogin(), ventanaPrincipal.getPanelRegistro(),
 					ventanaPrincipal.getPanelWorkouts(), ventanaPrincipal.getPanelEjercicios());
-			
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

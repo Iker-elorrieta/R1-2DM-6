@@ -20,6 +20,7 @@ public class Backup {
 	public static void guardarUsuarios(ArrayList<Usuario> usuarios) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_USERS))) {
 			oos.writeObject(usuarios);
+			System.out.println("Colección de usuarios guardada correctamente.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -28,6 +29,7 @@ public class Backup {
 	public static void guardarWorkouts(ArrayList<Workout> workouts) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_WORKOUTS))) {
 			oos.writeObject(workouts);
+			System.out.println("Colección de workouts/ejercicios guardada correctamente.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

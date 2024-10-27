@@ -35,6 +35,7 @@ public class PanelEjercicios extends JPanel {
 
 		// Botón de regresar
 		btnReturn = new JButton("Atrás");
+		btnReturn.setVisible(false);
 		btnReturn.setBounds(20, 490, 120, 40);
 		btnReturn.setBackground(new Color(70, 130, 180)); // Azul
 		btnReturn.setForeground(Color.WHITE);
@@ -63,6 +64,7 @@ public class PanelEjercicios extends JPanel {
 
 		// Botón de iniciar/pausar
 		btnStartPause = new JButton("Iniciar");
+		btnStartPause.setVisible(false);
 		btnStartPause.setBounds(389, 483, 120, 50);
 		btnStartPause.setBackground(new Color(10, 75, 128)); // Azul
 		btnStartPause.setForeground(Color.WHITE);
