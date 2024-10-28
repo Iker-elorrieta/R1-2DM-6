@@ -14,8 +14,8 @@ public class PanelEjercicios extends JPanel {
 	private JTextArea txtAreaDescripcion;
 
 	// Variables de tiempo
-	private int elapsedTime = 0; // Tiempo transcurrido
-	private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
+	// private int elapsedTime = 0; // Tiempo transcurrido
+	// private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
 
 	/**
 	 * Create the panel.
@@ -101,11 +101,10 @@ public class PanelEjercicios extends JPanel {
 	}
 
 	// Método para formatear el tiempo
-	private String formatTime(int seconds) {
-		int minutes = seconds / 60;
-		seconds = seconds % 60;
-		return String.format("%02d:%02d", minutes, seconds);
-	}
+	/*
+	 * private String formatTime(int seconds) { int minutes = seconds / 60; seconds
+	 * = seconds % 60; return String.format("%02d:%02d", minutes, seconds); }
+	 */
 
 	public JButton getBtnReturn() {
 		return btnReturn;

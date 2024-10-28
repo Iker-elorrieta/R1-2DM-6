@@ -1,7 +1,6 @@
 package principal;
 
 import controlador.Controlador;
-import modelo.Backup;
 
 public class Main {
 	public static void main(String[] args) {
