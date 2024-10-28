@@ -13,6 +13,7 @@ public class Main {
 			new Controlador(ventanaPrincipal, ventanaPrincipal.getPanelLogin(), ventanaPrincipal.getPanelRegistro(),
 					ventanaPrincipal.getPanelWorkouts(), ventanaPrincipal.getPanelEjercicios());
 
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
