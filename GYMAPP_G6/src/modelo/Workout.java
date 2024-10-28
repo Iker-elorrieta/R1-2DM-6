@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -125,5 +127,46 @@ public class Workout implements Serializable {
 		}
 
 		return listaWorkouts;
+	}
+	
+	
+	public Workout obtenerWorkoutPorId(String workoutId) {
+	    Firestore fs = null;
+	    Workout workoutEncontrado = null;
+
+	    try {
+	        fs = Conexion.conectar();
+	        
+	        // Busca el documento específico que coincide con el id proporcionado
+	        DocumentReference docRef = fs.collection(workoutsCollection).document(workoutId);
+	        ApiFuture<DocumentSnapshot> future = docRef.get();
+	        DocumentSnapshot document = future.get();
+
+	        // Verifica si el documento existe
+	        if (document.exists()) {
+	            workoutEncontrado = new Workout();
+	            workoutEncontrado.setId(document.getId());
+	            workoutEncontrado.setNombre(document.getString(fieldNombre));
+
+	            // Campos numéricos: manejo de nulos y conversión de Long a int
+	            Long nivel = document.getLong(fieldNivel);
+	            Long numEjers = document.getLong(fieldNumEjers);
+
+	            if (nivel != null)
+	                workoutEncontrado.setNivel(nivel.intValue());
+	            if (numEjers != null)
+	                workoutEncontrado.setNumEjers(numEjers.intValue());
+
+	            workoutEncontrado.setVideoUrl(document.getString(fieldVideoUrl));
+	            workoutEncontrado.setDescripcion(document.getString(fieldDescripcion));
+	            
+	        }
+
+	        fs.close();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return workoutEncontrado;
+
 	}
 }

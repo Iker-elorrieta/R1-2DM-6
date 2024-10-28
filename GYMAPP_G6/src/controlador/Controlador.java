@@ -353,21 +353,23 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
+	//SACAR POR ID****************************************************************************************
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
-
-		String selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
-		if (selectedWorkout == null)
+		String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+		Workout workout = new Workout();
+		if (workoutSeleccionado == null)
 			return;
 
-		String[] partesWorkout = selectedWorkout.split(":");
+		String[] partesWorkout = workoutSeleccionado.split(":");
 		if (partesWorkout.length <= 1)
 			return;
 
-		String nombreWorkout = partesWorkout[1].trim();
-		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
+		String idWorkout = partesWorkout[0].trim();
+		workout = workout.obtenerWorkoutPorId(idWorkout);
+		this.vistaEjercicios.getLblWorkout().setText(workout.getNombre());		
 
-		// Musetra el primer ejercicio de la lista de ejercicios del workout
+		// Muestra el primer ejercicio de la lista de ejercicios del workout
 		// seleccionado
 
 		if (vistaWorkouts.getEjersListModel().isEmpty())
@@ -401,7 +403,7 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
-	 * Obtiene todos los ejercicios del wrokout seleccionado y los muesta en la
+	 * Obtiene todos los ejercicios del workout seleccionado y los muesta en la
 	 * JList de ejercicios en el panelWorkouts
 	 */
 	private void cargarInfoWorkout() {
