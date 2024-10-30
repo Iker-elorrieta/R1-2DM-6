@@ -10,7 +10,9 @@ import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
+import modelo.Ejercicio;
 import modelo.Workout;
 
 import javax.swing.JButton;
@@ -21,8 +23,10 @@ public class PanelWorkouts extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JList<Workout> workoutsList;
 	private DefaultListModel<Workout> workoutListModel;
-	private DefaultListModel<String> ejersListModel;
-	private JList<String> ejersList;
+	
+	private JList<Ejercicio> ejersList;
+	private DefaultListModel<Ejercicio> ejersListModel;
+	
 	private JButton btnReturn, btnVideo, btnDescripcion, btnStartWorkout;
 	private Map<String, String> workoutUrls = new HashMap<>();
 	private Map<String, String> workoutDescripciones = new HashMap<>();
@@ -80,7 +84,7 @@ public class PanelWorkouts extends JPanel {
 		btnVideo.setForeground(Color.WHITE);
 		btnVideo.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnVideo.setFocusPainted(false);
-		btnVideo.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		btnVideo.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnVideo);
 
 		btnDescripcion = new JButton("Ver descripción");
@@ -90,22 +94,20 @@ public class PanelWorkouts extends JPanel {
 		btnDescripcion.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnDescripcion.setFocusPainted(false);
 		btnDescripcion.setEnabled(false);
-		btnVideo.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		btnDescripcion.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnDescripcion);
 
 		// Botón de regresar
-
 		btnReturn = new JButton("Atrás");
 		btnReturn.setBounds(33, 480, 160, 40);
 		btnReturn.setBackground(new Color(10, 75, 128)); // Azul
 		btnReturn.setForeground(Color.WHITE);
 		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnReturn.setFocusPainted(false);
-		btnReturn.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		btnReturn.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnReturn);
 
 		// Botón para iniciar el workout
-
 		btnStartWorkout = new JButton("Iniciar Workout");
 		btnStartWorkout.setBounds(680, 480, 160, 40);
 		btnStartWorkout.setBackground(new Color(10, 75, 128)); // Azul oscuro
@@ -113,7 +115,7 @@ public class PanelWorkouts extends JPanel {
 		btnStartWorkout.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnStartWorkout.setFocusPainted(false);
 		btnStartWorkout.setEnabled(false);
-		btnStartWorkout.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		btnStartWorkout.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnStartWorkout);
 
 	}
@@ -173,22 +175,23 @@ public class PanelWorkouts extends JPanel {
 	}
 
 	
-
-	public DefaultListModel<String> getEjersListModel() {
-		return ejersListModel;
-	}
-
-	public void setEjersListModel(DefaultListModel<String> ejersListModel) {
-		this.ejersListModel = ejersListModel;
-	}
-
-	public JList<String> getEjersList() {
+	public JList<Ejercicio> getEjersList() {
 		return ejersList;
 	}
 
-	public void setEjersList(JList<String> ejersList) {
+	public void setEjersList(JList<Ejercicio> ejersList) {
 		this.ejersList = ejersList;
 	}
+	
+	public DefaultListModel<Ejercicio> getEjersListModel() {
+		return ejersListModel;
+	}
+
+	public void setEjersListModel(DefaultListModel<Ejercicio> ejersListModel) {
+		this.ejersListModel = ejersListModel;
+	}
+
+	
 
 	public String getWorkoutUrl(String workout) {
 		return workoutUrls.get(workout); // Retorna la URL asociada al workout

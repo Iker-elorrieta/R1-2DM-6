@@ -138,4 +138,9 @@ public class Ejercicio implements Serializable {
 
 		return listaEjercicios;
 	}
+
+	@Override
+	public String toString() {
+		return nombre ;
+	}
 }

@@ -347,7 +347,7 @@ public class Controlador implements ActionListener {
 
 		// Bucle para añadir todos los ejercicios
 		for (Ejercicio ejercicio : listaEjercicios) {
-			vistaWorkouts.getEjersListModel().addElement(ejercicio.getNombre());
+			vistaWorkouts.getEjersListModel().addElement(ejercicio);
 		}
 
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
