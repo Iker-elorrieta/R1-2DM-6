@@ -4,6 +4,7 @@ import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URI;
+import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.swing.JOptionPane;
@@ -191,7 +192,7 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.gettFContrasena().setText("");
 
 		try {
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backupgym.jar");
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", System.getProperty("user.dir") + "/backupgym.jar");
 			pb.inheritIO();
 			Process process = pb.start();
 			System.out.println(process.isAlive());
@@ -361,8 +362,6 @@ public class Controlador implements ActionListener {
 		if (selectedWorkout == null)
 			return;
 
-		
-
 		String nombreWorkout = selectedWorkout.getNombre();
 		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
 
@@ -372,7 +371,7 @@ public class Controlador implements ActionListener {
 		if (vistaWorkouts.getEjersListModel().isEmpty())
 			return;
 		Ejercicio primerEjercicio = new Ejercicio();
-		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId()); 
+		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId());
 		primerEjercicio = ejercicios.getFirst();
 		this.vistaEjercicios.getLblEjercicio().setText(primerEjercicio.getNombre());
 		this.vistaEjercicios.getTxtAreaDescripcion().setText(primerEjercicio.getDescripcion());
@@ -415,7 +414,7 @@ public class Controlador implements ActionListener {
 
 		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
 		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
-			
+
 		// CARGAR URL
 		if (urlWorkout == null || urlWorkout.isEmpty()) {
 			vistaWorkouts.getBtnVideo().setEnabled(false);
