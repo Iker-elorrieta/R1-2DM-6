@@ -17,6 +17,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/in2dm3-a/git/R1-2DM-6/GYMAPP_G6/backupgym.jar"/>
+	<classpathentry kind="lib" path="backupgym.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

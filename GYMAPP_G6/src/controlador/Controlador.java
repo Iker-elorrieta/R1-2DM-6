@@ -192,7 +192,7 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.gettFContrasena().setText("");
 
 		try {
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", System.getProperty("user.dir") + "/backupgym.jar");
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backupgym.jar");
 			pb.inheritIO();
 			Process process = pb.start();
 			System.out.println(process.isAlive());
