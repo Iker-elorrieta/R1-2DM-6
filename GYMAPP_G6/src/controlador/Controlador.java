@@ -331,15 +331,15 @@ public class Controlador implements ActionListener {
 
 	// Método para obtener ejercicios
 	private void obtenerEjercicios() {
-		String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+		Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
 
-		if (workoutSeleccionado == null) {
+		if (selectedWorkout == null) {
 			vistaWorkouts.getEjersListModel().clear();
 			vistaWorkouts.getBtnStartWorkout().setEnabled(false);
 			return;
 		}
 
-		String workoutId = workoutSeleccionado.split(":")[0];
+		String workoutId = selectedWorkout.getId();
 		vistaWorkouts.getEjersListModel().clear();
 
 		Ejercicio ejercicioModel = new Ejercicio();
@@ -356,15 +356,13 @@ public class Controlador implements ActionListener {
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
 
-		String selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
+		Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
 		if (selectedWorkout == null)
 			return;
 
-		String[] partesWorkout = selectedWorkout.split(":");
-		if (partesWorkout.length <= 1)
-			return;
+		
 
-		String nombreWorkout = partesWorkout[1].trim();
+		String nombreWorkout = selectedWorkout.getNombre();
 		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
 
 		// Musetra el primer ejercicio de la lista de ejercicios del workout
@@ -372,8 +370,9 @@ public class Controlador implements ActionListener {
 
 		if (vistaWorkouts.getEjersListModel().isEmpty())
 			return;
-
-		Ejercicio primerEjercicio = new Ejercicio().obtenerEjercicios(partesWorkout[0]).get(0);
+		Ejercicio primerEjercicio = new Ejercicio();
+		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId()); 
+		primerEjercicio = ejercicios.getFirst();
 		this.vistaEjercicios.getLblEjercicio().setText(primerEjercicio.getNombre());
 		this.vistaEjercicios.getTxtAreaDescripcion().setText(primerEjercicio.getDescripcion());
 		this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), primerEjercicio.getFoto(), vistaEjercicios);
@@ -393,10 +392,9 @@ public class Controlador implements ActionListener {
 
 		// Bucle para añadir cada workout a la JList
 		for (Workout workout : listaWorkouts) {
-			String workoutInfo = workout.getId() + ": " + workout.getNombre() + " (Nivel " + workout.getNivel() + ")";
 			String url = workout.getVideoUrl();
 			String descripcion = workout.getDescripcion();
-			vistaWorkouts.addWorkout(workoutInfo, url, descripcion);
+			vistaWorkouts.addWorkout(workout, url, descripcion);
 		}
 	}
 
@@ -405,9 +403,7 @@ public class Controlador implements ActionListener {
 	 * JList de ejercicios en el panelWorkouts
 	 */
 	private void cargarInfoWorkout() {
-		String workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
-		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado);
-		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado);
+		Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
 
 		if (workoutSeleccionado == null) {
 			vistaWorkouts.getBtnDescripcion().setEnabled(false);
@@ -415,6 +411,9 @@ public class Controlador implements ActionListener {
 			// en vez de hacer esto igual se puede vaciar el objeto
 			return;
 		}
+		
+		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
+		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
 			
 
 		// CARGAR URL

@@ -126,4 +126,9 @@ public class Workout implements Serializable {
 
 		return listaWorkouts;
 	}
+
+	@Override
+	public String toString() {
+		return "" + id + " - " + nombre + " - " + nivel ;
+	}
 }
