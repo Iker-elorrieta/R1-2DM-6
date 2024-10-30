@@ -190,14 +190,15 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.gettFUsuario().setText("");
 		this.vistaLogin.gettFContrasena().setText("");
 
-		/*
-		 * try { ProcessBuilder pb = new ProcessBuilder("java","-cp",".", "Backup");
-		 * pb.inheritIO(); Process process = pb.start();
-		 * System.out.println(process.isAlive()); } catch (Exception e1) {
-		 * e1.printStackTrace(); }
-		 */
+		try {
+			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backupgym.jar");
+			pb.inheritIO();
+			Process process = pb.start();
+			System.out.println(process.isAlive());
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 
-		Backup.main(null);
 	}
 
 	/**
@@ -411,11 +412,10 @@ public class Controlador implements ActionListener {
 			// en vez de hacer esto igual se puede vaciar el objeto
 			return;
 		}
-		
+
 		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
 		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
 			
-
 		// CARGAR URL
 		if (urlWorkout == null || urlWorkout.isEmpty()) {
 			vistaWorkouts.getBtnVideo().setEnabled(false);
