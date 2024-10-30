@@ -9,7 +9,7 @@ public class Backup {
 
 	public static void main(String[] args) {
 		int maxLevel = 3;
-		
+
 		guardarUsuarios(new Usuario().obtenerMultiplesUsuarios());
 		guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
 	}
@@ -19,7 +19,9 @@ public class Backup {
 
 	public static void guardarUsuarios(ArrayList<Usuario> usuarios) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_USERS))) {
-			oos.writeObject(usuarios);
+			for (Usuario usu : usuarios) {
+				oos.writeObject(usu);
+			}
 			System.out.println("Colección de usuarios guardada correctamente.");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -28,7 +30,9 @@ public class Backup {
 
 	public static void guardarWorkouts(ArrayList<Workout> workouts) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_WORKOUTS))) {
-			oos.writeObject(workouts);
+			for (Workout wot : workouts) {
+				oos.writeObject(wot);
+			}
 			System.out.println("Colección de workouts/ejercicios guardada correctamente.");
 		} catch (IOException e) {
 			e.printStackTrace();
