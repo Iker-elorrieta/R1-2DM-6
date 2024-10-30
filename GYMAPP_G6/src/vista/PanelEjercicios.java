@@ -14,8 +14,8 @@ public class PanelEjercicios extends JPanel {
 	private JTextArea txtAreaDescripcion;
 
 	// Variables de tiempo
-	// private int elapsedTime = 0; // Tiempo transcurrido
-	// private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
+	private int elapsedTime = 0; // Tiempo transcurrido
+	private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
 
 	/**
 	 * Create the panel.

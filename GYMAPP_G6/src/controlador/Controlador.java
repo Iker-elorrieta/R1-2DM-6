@@ -10,7 +10,6 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import modelo.Backup;
 import modelo.Ejercicio;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;

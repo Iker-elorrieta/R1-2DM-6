@@ -1,7 +1,6 @@
 package vista;
 
 import java.awt.Font;
-import java.awt.Image;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
