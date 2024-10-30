@@ -10,14 +10,17 @@ import java.awt.Font;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.SwingConstants;
+
+import modelo.Workout;
+
 import javax.swing.JButton;
 import java.awt.Color;
 
 public class PanelWorkouts extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private DefaultListModel<String> workoutListModel;
-	private JList<String> workoutsList;
+	private JList<Workout> workoutsList;
+	private DefaultListModel<Workout> workoutListModel;
 	private DefaultListModel<String> ejersListModel;
 	private JList<String> ejersList;
 	private JButton btnReturn, btnVideo, btnDescripcion, btnStartWorkout;
@@ -41,6 +44,7 @@ public class PanelWorkouts extends JPanel {
 
 		workoutListModel = new DefaultListModel<>();
 		workoutsList = new JList<>(workoutListModel);
+		workoutsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		workoutsList.setBackground(new Color(208, 239, 249)); // Fondo de la lista
 		workoutsList.setFont(new Font("Tahoma", Font.BOLD, 14));
 		workoutsList.setBorder(BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul oscuro
@@ -114,11 +118,17 @@ public class PanelWorkouts extends JPanel {
 
 	}
 
-	public void addWorkout(String workout, String url, String descripcion) {
-		if (workout != null && !workout.trim().isEmpty()) {
+	/**
+	 * Método para añadir un objeto Workout al modelo de la lista
+	 * @param workout
+	 * @param url
+	 * @param descripcion
+	 */
+	public void addWorkout(Workout workout, String url, String descripcion) {
+		if (workout != null) {
 			workoutListModel.addElement(workout);
-			workoutUrls.put(workout, url);
-			workoutDescripciones.put(workout, descripcion);
+			workoutUrls.put(workout.getVideoUrl(), url);
+			workoutDescripciones.put(workout.getDescripcion(), descripcion);
 		}
 	}
 
@@ -145,22 +155,24 @@ public class PanelWorkouts extends JPanel {
 	public void setBtnDescripcion(JButton btnDescripcion) {
 		this.btnDescripcion = btnDescripcion;
 	}
-
-	public DefaultListModel<String> getWorkoutListModel() {
-		return workoutListModel;
-	}
-
-	public void setWorkoutListModel(DefaultListModel<String> workoutListModel) {
-		this.workoutListModel = workoutListModel;
-	}
-
-	public JList<String> getWorkoutList() {
+	
+	public JList<Workout> getWorkoutList() {
 		return workoutsList;
 	}
 
-	public void setWorkoutsList(JList<String> workoutsList) {
+	public void setWorkoutsList(JList<Workout> workoutsList) {
 		this.workoutsList = workoutsList;
 	}
+
+	public DefaultListModel<Workout> getWorkoutListModel() {
+		return workoutListModel;
+	}
+
+	public void setWorkoutListModel(DefaultListModel<Workout> workoutListModel) {
+		this.workoutListModel = workoutListModel;
+	}
+
+	
 
 	public DefaultListModel<String> getEjersListModel() {
 		return ejersListModel;
