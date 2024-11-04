@@ -3,6 +3,8 @@ package controlador;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
@@ -156,11 +158,46 @@ public class Controlador implements ActionListener {
 	/**
 	 * Inicio de sesión
 	 */
+
+	public boolean isConnected() throws InterruptedException, IOException {
+		ProcessBuilder pb = new ProcessBuilder("ping", "google.com");
+		Process process = pb.start();
+		return process.waitFor() == 0;
+
+	}
+
+	public boolean backupsFilesExists() {
+		File archivoUsuarios = new File("backups/usuario.dat");
+		File archivoWorkouts = new File("backups/workouts.dat");
+
+		return archivoUsuarios.exists() && archivoUsuarios.length() > 0 && archivoWorkouts.exists()
+				&& archivoWorkouts.length() > 0;
+	}
+
 	private void login() {
 		String usuario = this.vistaLogin.gettFUsuario().getText();
 		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
 
-		// Comprueba que los campos no están vacíos
+		try {
+			if (!isConnected()) {
+				JOptionPane.showMessageDialog(null, "No hay conexión a Internet", "Warning",
+						JOptionPane.WARNING_MESSAGE);
+
+				if (!backupsFilesExists()) {
+					JOptionPane.showMessageDialog(null, "No existen backups", "Error", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				// HACER TODA LA LECTURA DE LOS BACKUPS
+
+			}
+
+		} catch (InterruptedException | IOException e) {
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error al verificar la conexión", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
+		}
+
 		if (usuario.isEmpty() || password.isEmpty()) {
 			mostrarErrorDialog(EMPTY_FIELDS_MESSAGE);
 			return;
@@ -193,8 +230,8 @@ public class Controlador implements ActionListener {
 		try {
 			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backupgym.jar");
 			pb.inheritIO();
-			Process process = pb.start();
-			System.out.println(process.isAlive());
+			pb.start();
+
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
@@ -354,14 +391,15 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
-	//SACAR POR ID****************************************************************************************
+	// SACAR POR
+	// ID****************************************************************************************
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
 
 		Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
 		if (selectedWorkout == null)
 			return;
-	
+
 		String nombreWorkout = selectedWorkout.getNombre();
 		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
 
@@ -456,9 +494,9 @@ public class Controlador implements ActionListener {
 			while (i > 0 && resultado.charAt(i - 1) != ' ') {
 				i--;
 			}
-			if (i > 0 && i < resultado.length()) {
+			if (i > 0 && i < resultado.length())
 				resultado.replace(i, i, "\n");
-			}
+
 		}
 
 		String a = resultado.toString();
