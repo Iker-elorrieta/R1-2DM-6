@@ -7,6 +7,8 @@ import java.net.URI;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.Date;
+
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -65,6 +67,7 @@ public class Controlador implements ActionListener {
 		accionesVistaLogin();
 		accionesVistaRegistro();
 		accionesVistaWorkouts();
+		accionesVistaEjercicios();
 	}
 
 	/**
@@ -114,6 +117,17 @@ public class Controlador implements ActionListener {
 	}
 
 	/**
+	 * Acciones del panel de Workouts
+	 */
+	private void accionesVistaEjercicios() {
+		this.vistaEjercicios.getBtnReturn().addActionListener(this);
+		this.vistaEjercicios.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
+		
+		this.vistaEjercicios.getBtnStartPause().addActionListener(this);
+		this.vistaEjercicios.getBtnStartPause().setActionCommand(Principal.enumAcciones.INICIAR_CONTADOR.toString());
+	}
+
+	/**
 	 * Eventos de las acciones
 	 */
 	@Override
@@ -139,6 +153,8 @@ public class Controlador implements ActionListener {
 			mostrarEjercicioSeleccionado();
 			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
 			break;
+		case INICIAR_CONTADOR:
+			 startCount(this.vistaEjercicios.getLblMainTimer());
 		default:
 			break;
 		}
@@ -354,14 +370,15 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
-	//SACAR POR ID****************************************************************************************
+	// SACAR POR
+	// ID****************************************************************************************
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
 
 		Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
 		if (selectedWorkout == null)
 			return;
-	
+
 		String nombreWorkout = selectedWorkout.getNombre();
 		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
 
@@ -375,6 +392,8 @@ public class Controlador implements ActionListener {
 		primerEjercicio = ejercicios.getFirst();
 		this.vistaEjercicios.getLblEjercicio().setText(primerEjercicio.getNombre());
 		this.vistaEjercicios.getTxtAreaDescripcion().setText(primerEjercicio.getDescripcion());
+		this.vistaEjercicios.getLblSeries().setText("Series: 1/" + primerEjercicio.getNumSeries());
+		this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + primerEjercicio.getNumReps());
 		this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), primerEjercicio.getFoto(), vistaEjercicios);
 
 	}
@@ -478,4 +497,31 @@ public class Controlador implements ActionListener {
 		this.vistaRegistro.getpFRegistroPassword().setText("");
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 	}
+
+	private void startCount(JLabel lbl) {
+	    new Thread(() -> {
+	        int minutos = 0;
+	        int segundos = 0;
+
+	        try {
+	            while (true) {
+	                String tiempo = String.format("%02d:%02d", minutos, segundos);
+	                lbl.setText(tiempo); 
+	                System.out.println(tiempo); 
+
+	                Thread.sleep(1000);
+
+	                segundos++;
+
+	                if (segundos == 60) {
+	                    segundos = 0;
+	                    minutos++;
+	                }
+	            }
+	        } catch (InterruptedException e) {
+	            System.out.println("El contador fue interrumpido.");
+	        }
+	    }).start(); 
+	}
+
 }

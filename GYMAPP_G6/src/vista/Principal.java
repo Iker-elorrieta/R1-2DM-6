@@ -14,7 +14,7 @@ public class Principal extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static enum enumAcciones {
-		PANEL_REGISTRO, REGISTRAR_USUARIO, PANEL_LOGIN, INICIAR_SESION, PANEL_WORKOUTS, PANEL_EJERCICIOS
+		PANEL_REGISTRO, REGISTRAR_USUARIO, PANEL_LOGIN, INICIAR_SESION, PANEL_WORKOUTS, PANEL_EJERCICIOS, INICIAR_CONTADOR
 	}
 
 	private JPanel panelContenedor;
@@ -87,10 +87,10 @@ public class Principal extends JFrame {
 			break;
 		case PANEL_WORKOUTS:
 			panelWorkouts.setVisible(true);
+			break;
 		case PANEL_EJERCICIOS:
 			panelEjercicios.setVisible(true);
-			// colocarImg(getPanelEjercicios().getLblImgEjer(), "media/cej1.jpg",
-			// panelEjercicios);
+			break;			
 		default:
 			break;
 

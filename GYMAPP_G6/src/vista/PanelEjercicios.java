@@ -8,8 +8,8 @@ public class PanelEjercicios extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton btnReturn, btnStartPause; // Botón para iniciar y pausar
-	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblInfoSeries, lblCountdown; // Cuenta regresiva
+	private JButton btnReturn, btnStart; // Botón para iniciar y pausar
+	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; // Cuenta regresiva
 																									// de series
 	private JTextArea txtAreaDescripcion;
 
@@ -29,13 +29,12 @@ public class PanelEjercicios extends JPanel {
 		// Etiqueta de título
 		lblWorkout = new JLabel("");
 		lblWorkout.setHorizontalAlignment(SwingConstants.CENTER);
-		lblWorkout.setFont(new Font("Tahoma", Font.BOLD, 30));
-		lblWorkout.setBounds(577, 21, 293, 83);
+		lblWorkout.setFont(new Font("Tahoma", Font.BOLD, 28));
+		lblWorkout.setBounds(505, 11, 365, 60);
 		add(lblWorkout);
 
 		// Botón de regresar
 		btnReturn = new JButton("Atrás");
-		btnReturn.setVisible(false);
 		btnReturn.setBounds(20, 490, 120, 40);
 		btnReturn.setBackground(new Color(10, 75, 128)); // Azul
 		btnReturn.setBorder(new LineBorder(new Color(255, 255, 255), 2));
@@ -56,7 +55,7 @@ public class PanelEjercicios extends JPanel {
 		add(lblEjercicio);
 
 		// Cronómetro principal
-		lblMainTimer = new JLabel("00:00");
+		lblMainTimer = new JLabel("");
 		lblMainTimer.setFont(new Font("Tahoma", Font.BOLD, 48));
 		lblMainTimer.setBounds(20, 234, 189, 60);
 		lblMainTimer.setHorizontalAlignment(SwingConstants.CENTER);
@@ -64,31 +63,29 @@ public class PanelEjercicios extends JPanel {
 		add(lblMainTimer);
 
 		// Botón de iniciar/pausar
-		btnStartPause = new JButton("Iniciar");
-		btnStartPause.setVisible(false);
-		btnStartPause.setBounds(389, 483, 120, 50);
-		btnStartPause.setBackground(new Color(10, 75, 128)); // Azul
-		btnStartPause.setForeground(Color.WHITE);
-		btnStartPause.setFont(new Font("Tahoma", Font.BOLD, 16));
-		btnStartPause.setFocusPainted(false);
-		btnStartPause.setBorder(new LineBorder(new Color(255, 255, 255), 2));
-		add(btnStartPause);
+		btnStart = new JButton("Iniciar");
+		btnStart.setBounds(389, 483, 120, 50);
+		btnStart.setBackground(new Color(10, 75, 128)); // Azul
+		btnStart.setForeground(Color.WHITE);
+		btnStart.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnStart.setFocusPainted(false);
+		btnStart.setBorder(new LineBorder(new Color(255, 255, 255), 2));
+		add(btnStart);
 
 		// Información de series
-		lblInfoSeries = new JLabel("Series: 1 / 3 (Repeticiones: )");
-		lblInfoSeries.setHorizontalAlignment(SwingConstants.CENTER);
-		lblInfoSeries.setFont(new Font("Tahoma", Font.BOLD, 16));
-		lblInfoSeries.setBounds(280, 262, 259, 30);
-		lblInfoSeries.setForeground(new Color(30, 121, 166)); // Azul
-		add(lblInfoSeries);
+		lblSeries = new JLabel("Series: 1 / 3 ");
+		lblSeries.setHorizontalAlignment(SwingConstants.CENTER);
+		lblSeries.setFont(new Font("Tahoma", Font.BOLD, 16));
+		lblSeries.setBounds(280, 262, 259, 30);
+		lblSeries.setForeground(new Color(30, 121, 166)); // Azul
+		add(lblSeries);
 
 		// Cuenta regresiva para series
 		lblCountdown = new JLabel("Cuenta regresiva: 5");
 		lblCountdown.setHorizontalAlignment(SwingConstants.CENTER);
 		lblCountdown.setFont(new Font("Tahoma", Font.BOLD, 16));
-		lblCountdown.setBounds(280, 303, 300, 30);
+		lblCountdown.setBounds(280, 338, 300, 30);
 		lblCountdown.setForeground(new Color(70, 130, 180)); // Azul
-		lblCountdown.setVisible(false); // Ocultar inicialmente
 		add(lblCountdown);
 
 		txtAreaDescripcion = new JTextArea();
@@ -99,13 +96,24 @@ public class PanelEjercicios extends JPanel {
 		txtAreaDescripcion.setBorder(new LineBorder(new Color(30, 121, 166), 2));
 		txtAreaDescripcion.setBounds(280, 91, 244, 159);
 		add(txtAreaDescripcion);
+		
+		lblRepeticiones = new JLabel("Repeticiones :");
+		lblRepeticiones.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRepeticiones.setForeground(new Color(30, 121, 166));
+		lblRepeticiones.setFont(new Font("Tahoma", Font.BOLD, 16));
+		lblRepeticiones.setBounds(280, 297, 259, 30);
+		add(lblRepeticiones);
+		
+		JButton btnPause = new JButton("Iniciar");
+		btnPause.setForeground(Color.WHITE);
+		btnPause.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnPause.setFocusPainted(false);
+		btnPause.setBorder(new LineBorder(new Color(255, 255, 255), 2));
+		btnPause.setBackground(new Color(10, 75, 128));
+		btnPause.setBounds(389, 483, 120, 50);
+		add(btnPause);
 	}
 
-	// Método para formatear el tiempo
-	/*
-	 * private String formatTime(int seconds) { int minutes = seconds / 60; seconds
-	 * = seconds % 60; return String.format("%02d:%02d", minutes, seconds); }
-	 */
 
 	public JButton getBtnReturn() {
 		return btnReturn;
@@ -147,4 +155,46 @@ public class PanelEjercicios extends JPanel {
 		this.txtAreaDescripcion = txtAreaDescripcion;
 	}
 
+	public JLabel getLblSeries() {
+		return lblSeries;
+	}
+
+	public void setLblSeries(JLabel lblSeries) {
+		this.lblSeries = lblSeries;
+	}
+
+	
+	public JButton getBtnStartPause() {
+		return btnStart;
+	}
+
+	public void setBtnStartPause(JButton btnStartPause) {
+		this.btnStart = btnStartPause;
+	}
+
+	public JLabel getLblRepeticiones() {
+		return lblRepeticiones;
+	}
+
+	public void setLblRepeticiones(JLabel lblRepeticiones) {
+		this.lblRepeticiones = lblRepeticiones;
+	}
+
+	public JLabel getLblCountdown() {
+		return lblCountdown;
+	}
+
+	public void setLblCountdown(JLabel lblCountdown) {
+		this.lblCountdown = lblCountdown;
+	}
+
+
+	public JLabel getLblMainTimer() {
+		return lblMainTimer;
+	}
+
+
+	public void setLblMainTimer(JLabel lblMainTimer) {
+		this.lblMainTimer = lblMainTimer;
+	}
 }
