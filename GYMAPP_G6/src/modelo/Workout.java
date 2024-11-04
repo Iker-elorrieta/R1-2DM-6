@@ -167,6 +167,11 @@ public class Workout implements Serializable {
 	        e.printStackTrace();
 	    }
 	    return workoutEncontrado;
+	}
 
+
+	@Override
+	public String toString() {
+		return "" + id + " - " + nombre + " - " + nivel ;
 	}
 }

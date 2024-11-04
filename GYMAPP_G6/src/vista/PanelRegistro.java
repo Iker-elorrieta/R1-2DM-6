@@ -118,43 +118,38 @@ public class PanelRegistro extends JPanel {
 
 		tFRegistroNombre = new JTextField();
 		tFRegistroNombre.setBounds(242, 172, 175, 25);
-		tFRegistroNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul
-																											// oscuro
+		tFRegistroNombre.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		add(tFRegistroNombre);
 
 		tFRegistroApellido = new JTextField();
 		tFRegistroApellido.setBounds(242, 227, 175, 25);
-		tFRegistroApellido.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde
-																												// azul
-																												// oscuro
+		tFRegistroApellido.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		add(tFRegistroApellido);
 
 		tFRegistroEmail = new JTextField();
 		tFRegistroEmail.setBounds(242, 287, 175, 25);
-		tFRegistroEmail.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul
-																											// oscuro
+		tFRegistroEmail.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		add(tFRegistroEmail);
 
 		tFRegistroUser = new JTextField();
 		tFRegistroUser.setBounds(589, 172, 175, 25);
-		tFRegistroUser.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde azul
-																											// oscuro
+		tFRegistroUser.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		add(tFRegistroUser);
 
 		pFRegistroPassword = new JPasswordField();
 		pFRegistroPassword.setBounds(590, 227, 175, 25);
-		pFRegistroPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); // Borde
-																												// azul
-																												// oscuro
+		pFRegistroPassword.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		add(pFRegistroPassword);
 
 		cBRegistroIdioma = new JComboBox<>(IdiomaPreferido.values());
 		cBRegistroIdioma.setBounds(590, 286, 175, 25);
+		cBRegistroIdioma.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		cBRegistroIdioma.setBackground(Color.WHITE);
 		add(cBRegistroIdioma);
 
 		cBRegistroTema = new JComboBox<>(TemaPreferido.values());
 		cBRegistroTema.setBounds(590, 351, 175, 25);
+		cBRegistroTema.setBorder(javax.swing.BorderFactory.createLineBorder(new Color(10, 75, 128), 2)); 
 		cBRegistroTema.setBackground(Color.WHITE);
 		add(cBRegistroTema);
 

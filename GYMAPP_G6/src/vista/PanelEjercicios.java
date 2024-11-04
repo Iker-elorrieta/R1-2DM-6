@@ -14,8 +14,8 @@ public class PanelEjercicios extends JPanel {
 	private JTextArea txtAreaDescripcion;
 
 	// Variables de tiempo
-	// private int elapsedTime = 0; // Tiempo transcurrido
-	// private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
+	private int elapsedTime = 0; // Tiempo transcurrido
+	private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
 
 	/**
 	 * Create the panel.
@@ -37,7 +37,8 @@ public class PanelEjercicios extends JPanel {
 		btnReturn = new JButton("Atrás");
 		btnReturn.setVisible(false);
 		btnReturn.setBounds(20, 490, 120, 40);
-		btnReturn.setBackground(new Color(70, 130, 180)); // Azul
+		btnReturn.setBackground(new Color(10, 75, 128)); // Azul
+		btnReturn.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnReturn.setForeground(Color.WHITE);
 		btnReturn.setFont(new Font("Tahoma", Font.BOLD, 16));
 		add(btnReturn);
@@ -70,7 +71,7 @@ public class PanelEjercicios extends JPanel {
 		btnStartPause.setForeground(Color.WHITE);
 		btnStartPause.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnStartPause.setFocusPainted(false);
-		btnStartPause.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+		btnStartPause.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnStartPause);
 
 		// Información de series
