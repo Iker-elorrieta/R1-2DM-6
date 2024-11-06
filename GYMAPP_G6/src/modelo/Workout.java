@@ -89,7 +89,7 @@ public class Workout implements Serializable {
 		this.descripcion = descripcion;
 	}
 
-	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario) {
+	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario, boolean online) {
 		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
@@ -128,50 +128,48 @@ public class Workout implements Serializable {
 
 		return listaWorkouts;
 	}
-	
-	
-	public Workout obtenerWorkoutPorId(String workoutId) {
-	    Firestore fs = null;
-	    Workout workoutEncontrado = null;
 
-	    try {
-	        fs = Conexion.conectar();
-	        
-	        // Busca el documento específico que coincide con el id proporcionado
-	        DocumentReference docRef = fs.collection(workoutsCollection).document(workoutId);
-	        ApiFuture<DocumentSnapshot> future = docRef.get();
-	        DocumentSnapshot document = future.get();
+	public Workout obtenerWorkoutPorId(String workoutId, boolean online) {
+		Firestore fs = null;
+		Workout workoutEncontrado = null;
 
-	        // Verifica si el documento existe
-	        if (document.exists()) {
-	            workoutEncontrado = new Workout();
-	            workoutEncontrado.setId(document.getId());
-	            workoutEncontrado.setNombre(document.getString(fieldNombre));
+		try {
+			fs = Conexion.conectar();
 
-	            // Campos numéricos: manejo de nulos y conversión de Long a int
-	            Long nivel = document.getLong(fieldNivel);
-	            Long numEjers = document.getLong(fieldNumEjers);
+			// Busca el documento específico que coincide con el id proporcionado
+			DocumentReference docRef = fs.collection(workoutsCollection).document(workoutId);
+			ApiFuture<DocumentSnapshot> future = docRef.get();
+			DocumentSnapshot document = future.get();
 
-	            if (nivel != null)
-	                workoutEncontrado.setNivel(nivel.intValue());
-	            if (numEjers != null)
-	                workoutEncontrado.setNumEjers(numEjers.intValue());
+			// Verifica si el documento existe
+			if (document.exists()) {
+				workoutEncontrado = new Workout();
+				workoutEncontrado.setId(document.getId());
+				workoutEncontrado.setNombre(document.getString(fieldNombre));
 
-	            workoutEncontrado.setVideoUrl(document.getString(fieldVideoUrl));
-	            workoutEncontrado.setDescripcion(document.getString(fieldDescripcion));
-	            
-	        }
+				// Campos numéricos: manejo de nulos y conversión de Long a int
+				Long nivel = document.getLong(fieldNivel);
+				Long numEjers = document.getLong(fieldNumEjers);
 
-	        fs.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return workoutEncontrado;
+				if (nivel != null)
+					workoutEncontrado.setNivel(nivel.intValue());
+				if (numEjers != null)
+					workoutEncontrado.setNumEjers(numEjers.intValue());
+
+				workoutEncontrado.setVideoUrl(document.getString(fieldVideoUrl));
+				workoutEncontrado.setDescripcion(document.getString(fieldDescripcion));
+
+			}
+
+			fs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return workoutEncontrado;
 	}
-
 
 	@Override
 	public String toString() {
-		return "" + id + " - " + nombre + " - " + nivel ;
+		return "" + id + " - " + nombre + " - " + nivel;
 	}
 }

@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -27,12 +26,29 @@ public class Controlador implements ActionListener {
 	// Constantes para mensajes de error e información
 	private static final String ERROR_TITLE = "Error";
 	private static final String INFO_TITLE = "Información";
+	private static final String WARNING_TITLE = "Warning";
 	private static final String EMPTY_FIELDS_MESSAGE = "Todos los campos son obligatorios.";
 	private static final String INVALID_EMAIL_FORMAT_MESSAGE = "Formato de email incorrecto.";
 	private static final String USER_EXISTS_MESSAGE = "El usuario ya existe.";
 	private static final String USER_NOT_FOUND_MESSAGE = "El usuario no existe.";
 	private static final String LOGIN_SUCCESS_MESSAGE = "Inicio de sesión correcto. \nBienvenid@ ";
 	private static final String INCORRECT_PASSWORD_MESSAGE = "Contraseña incorrecta.";
+	private static final String OFFLINE_MESSAGE = "Contraseña incorrecta.";
+	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
+	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
+
+	// Rutas
+	private String backupsUsuario = "backups/usuario.dat";
+	private String backupsWorkouts = "backups/workouts.dat";
+
+	// Variables
+	private boolean online = true;
+	private static final String isConnectedCommand = "ping";
+	private static final String isConnectedVerifyingWebSite = "google.com";
+	
+	private static final String javaCommand = "java";
+	private static final String jarFlag = "-jar";
+	private static final String backupJarFile = "backupgym.jar";
 
 	// Referencias a las vistas
 	private vista.Principal vistaPrincipal;
@@ -124,7 +140,7 @@ public class Controlador implements ActionListener {
 	private void accionesVistaEjercicios() {
 		this.vistaEjercicios.getBtnReturn().addActionListener(this);
 		this.vistaEjercicios.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
-		
+
 		this.vistaEjercicios.getBtnStartPause().addActionListener(this);
 		this.vistaEjercicios.getBtnStartPause().setActionCommand(Principal.enumAcciones.INICIAR_CONTADOR.toString());
 	}
@@ -156,7 +172,7 @@ public class Controlador implements ActionListener {
 			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
 			break;
 		case INICIAR_CONTADOR:
-			 startCount(this.vistaEjercicios.getLblMainTimer());
+			startCount(this.vistaEjercicios.getLblMainTimer());
 		default:
 			break;
 		}
@@ -176,43 +192,46 @@ public class Controlador implements ActionListener {
 	 */
 
 	public boolean isConnected() throws InterruptedException, IOException {
-		ProcessBuilder pb = new ProcessBuilder("ping", "google.com");
+		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
 		Process process = pb.start();
 		return process.waitFor() == 0;
 
 	}
 
 	public boolean backupsFilesExists() {
-		File archivoUsuarios = new File("backups/usuario.dat");
-		File archivoWorkouts = new File("backups/workouts.dat");
+		File archivoUsuarios = new File(backupsUsuario);
+		File archivoWorkouts = new File(backupsWorkouts);
 
 		return archivoUsuarios.exists() && archivoUsuarios.length() > 0 && archivoWorkouts.exists()
 				&& archivoWorkouts.length() > 0;
 	}
 
-	private void login() {
-		String usuario = this.vistaLogin.gettFUsuario().getText();
-		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
-
+	public void verifyConnection() {
 		try {
 			if (!isConnected()) {
-				JOptionPane.showMessageDialog(null, "No hay conexión a Internet", "Warning",
-						JOptionPane.WARNING_MESSAGE);
+				online = false;
+
+				JOptionPane.showMessageDialog(null, OFFLINE_MESSAGE, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
 
 				if (!backupsFilesExists()) {
-					JOptionPane.showMessageDialog(null, "No existen backups", "Error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, COULDNT_FIND_BACKUPS_MESSAGE, ERROR_TITLE,
+							JOptionPane.ERROR_MESSAGE);
 					return;
 				}
-
-				// HACER TODA LA LECTURA DE LOS BACKUPS
 
 			}
 
 		} catch (InterruptedException | IOException e) {
 			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, "Error al verificar la conexión", "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, CONNECTION_VERIFYING_ERROR_MESSAGE, ERROR_TITLE,
+					JOptionPane.ERROR_MESSAGE);
 			return;
 		}
+	}
+
+	private void login() {
+		String usuario = this.vistaLogin.gettFUsuario().getText();
+		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
 
 		if (usuario.isEmpty() || password.isEmpty()) {
 			mostrarErrorDialog(EMPTY_FIELDS_MESSAGE);
@@ -220,19 +239,19 @@ public class Controlador implements ActionListener {
 		}
 
 		// Obtiene el usuario y comprueba la contraseña
-		Usuario user = new Usuario().obtenerUsuario(usuario);
+		Usuario user = new Usuario().obtenerUsuario(usuario, online);
 
 		if (user == null) {
-			JOptionPane.showMessageDialog(null, USER_NOT_FOUND_MESSAGE, "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, USER_NOT_FOUND_MESSAGE, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
 		if (!user.getPassword().equals(password)) {
-			JOptionPane.showMessageDialog(null, INCORRECT_PASSWORD_MESSAGE, "Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, INCORRECT_PASSWORD_MESSAGE, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 			return;
 		}
 
-		JOptionPane.showMessageDialog(null, LOGIN_SUCCESS_MESSAGE + user.getUsuario(), "Información",
+		JOptionPane.showMessageDialog(null, LOGIN_SUCCESS_MESSAGE + user.getUsuario(), INFO_TITLE,
 				JOptionPane.INFORMATION_MESSAGE);
 
 		limpiarCamposLogin();
@@ -243,15 +262,17 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.gettFUsuario().setText("");
 		this.vistaLogin.gettFContrasena().setText("");
 
+		if (!online)
+			return;
+
 		try {
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backupgym.jar");
+			ProcessBuilder pb = new ProcessBuilder(javaCommand, jarFlag, backupJarFile);
 			pb.inheritIO();
 			pb.start();
 
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -297,7 +318,7 @@ public class Controlador implements ActionListener {
 		}
 
 		// COMPROBACIÓN DE USUARIO EXISTENTE
-		if (nuevoUsuario.obtenerUsuario(user) != null) {
+		if (nuevoUsuario.obtenerUsuario(user, online) != null) {
 			mostrarErrorDialog(USER_EXISTS_MESSAGE);
 			return;
 		}
@@ -397,7 +418,7 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getEjersListModel().clear();
 
 		Ejercicio ejercicioModel = new Ejercicio();
-		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId);
+		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
 
 		// Bucle para añadir todos los ejercicios
 		for (Ejercicio ejercicio : listaEjercicios) {
@@ -407,8 +428,7 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
-	// SACAR POR
-	// ID****************************************************************************************
+	// SACAR POR ID
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
 
@@ -425,7 +445,7 @@ public class Controlador implements ActionListener {
 		if (vistaWorkouts.getEjersListModel().isEmpty())
 			return;
 		Ejercicio primerEjercicio = new Ejercicio();
-		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId());
+		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId(), online);
 		primerEjercicio = ejercicios.getFirst();
 		this.vistaEjercicios.getLblEjercicio().setText(primerEjercicio.getNombre());
 		this.vistaEjercicios.getTxtAreaDescripcion().setText(primerEjercicio.getDescripcion());
@@ -443,7 +463,7 @@ public class Controlador implements ActionListener {
 	 */
 	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
 		Workout workouts = new Workout();
-		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario());
+		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
 		vistaWorkouts.getWorkoutListModel().clear();
 
 		// Bucle para añadir cada workout a la JList
@@ -536,29 +556,29 @@ public class Controlador implements ActionListener {
 	}
 
 	private void startCount(JLabel lbl) {
-	    new Thread(() -> {
-	        int minutos = 0;
-	        int segundos = 0;
+		new Thread(() -> {
+			int minutos = 0;
+			int segundos = 0;
 
-	        try {
-	            while (true) {
-	                String tiempo = String.format("%02d:%02d", minutos, segundos);
-	                lbl.setText(tiempo); 
-	                System.out.println(tiempo); 
+			try {
+				while (true) {
+					String tiempo = String.format("%02d:%02d", minutos, segundos);
+					lbl.setText(tiempo);
+					System.out.println(tiempo);
 
-	                Thread.sleep(1000);
+					Thread.sleep(1000);
 
-	                segundos++;
+					segundos++;
 
-	                if (segundos == 60) {
-	                    segundos = 0;
-	                    minutos++;
-	                }
-	            }
-	        } catch (InterruptedException e) {
-	            System.out.println("El contador fue interrumpido.");
-	        }
-	    }).start(); 
+					if (segundos == 60) {
+						segundos = 0;
+						minutos++;
+					}
+				}
+			} catch (InterruptedException e) {
+				System.out.println("El contador fue interrumpido.");
+			}
+		}).start();
 	}
 
 }
