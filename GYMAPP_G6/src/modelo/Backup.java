@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public class Backup {
 
-	private static final String FILE_USERS = "backups/usuario.dat";
-	private static final String FILE_WORKOUTS = "backups/workouts.dat";
+	public static final String FILE_USERS = "backups/usuario.dat";
+	public static final String FILE_WORKOUTS = "backups/workouts.dat";
 
 	private static int maxLevel = 3;
 

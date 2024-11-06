@@ -90,6 +90,9 @@ public class Workout implements Serializable {
 	}
 
 	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario, boolean online) {
+		if (!online) {
+
+		}
 		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
@@ -130,6 +133,9 @@ public class Workout implements Serializable {
 	}
 
 	public Workout obtenerWorkoutPorId(String workoutId, boolean online) {
+		if (!online) {
+
+		}
 		Firestore fs = null;
 		Workout workoutEncontrado = null;
 

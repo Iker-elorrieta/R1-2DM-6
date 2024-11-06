@@ -1,6 +1,8 @@
 package modelo;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -182,6 +184,27 @@ public class Usuario implements Serializable {
 	// *** MÉTODOS CRUD ***
 
 	public Usuario obtenerUsuario(String userName, boolean online) {
+
+		if (!online) {
+			try {
+				FileInputStream fic = new FileInputStream(Backup.FILE_USERS);
+				ObjectInputStream ois = new ObjectInputStream(fic);
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Usuario usuario = (Usuario) ois.readObject();
+
+					if (usuario.getUser().equals(userName)) {
+						ois.close();
+						return usuario;
+					}
+				}
+				ois.close();
+				JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "ERROR",
+						JOptionPane.ERROR_MESSAGE);
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		Firestore fs = null;
 		Usuario userExists = null;
 
@@ -219,6 +242,10 @@ public class Usuario implements Serializable {
 	}
 
 	public ArrayList<Usuario> obtenerMultiplesUsuarios(boolean online) {
+
+		if (!online) {
+
+		}
 		Firestore fs = null;
 
 		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();

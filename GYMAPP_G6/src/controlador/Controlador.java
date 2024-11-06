@@ -33,7 +33,7 @@ public class Controlador implements ActionListener {
 	private static final String USER_NOT_FOUND_MESSAGE = "El usuario no existe.";
 	private static final String LOGIN_SUCCESS_MESSAGE = "Inicio de sesión correcto. \nBienvenid@ ";
 	private static final String INCORRECT_PASSWORD_MESSAGE = "Contraseña incorrecta.";
-	private static final String OFFLINE_MESSAGE = "Contraseña incorrecta.";
+	private static final String OFFLINE_MESSAGE = "No dispone de conexión a internet.";
 	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
 	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
 
@@ -45,7 +45,7 @@ public class Controlador implements ActionListener {
 	private boolean online = true;
 	private static final String isConnectedCommand = "ping";
 	private static final String isConnectedVerifyingWebSite = "google.com";
-	
+
 	private static final String javaCommand = "java";
 	private static final String jarFlag = "-jar";
 	private static final String backupJarFile = "backupgym.jar";
@@ -81,7 +81,6 @@ public class Controlador implements ActionListener {
 	 * Acciones de los componentes de las vistas
 	 */
 	private void inicializarControlador() {
-
 		accionesVistaLogin();
 		accionesVistaRegistro();
 		accionesVistaWorkouts();
@@ -92,11 +91,17 @@ public class Controlador implements ActionListener {
 	 * Acciones del panel del Login
 	 */
 	private void accionesVistaLogin() {
-		this.vistaLogin.getBtnSignUp().addActionListener(this);
-		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
 
 		this.vistaLogin.getBtnLogin().addActionListener(this);
 		this.vistaLogin.getBtnLogin().setActionCommand(Principal.enumAcciones.INICIAR_SESION.toString());
+
+		this.vistaLogin.getBtnSignUp().addActionListener(this);
+		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
+		this.vistaLogin.getBtnSignUp().setEnabled(false);
+
+		verifyConnection();
+		if (online)
+			this.vistaLogin.getBtnSignUp().setEnabled(true);
 	}
 
 	/**
@@ -187,15 +192,21 @@ public class Controlador implements ActionListener {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
 
-	/**
-	 * Inicio de sesión
-	 */
+	public void verifyConnection() {
+		try {
+			ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
+			Process process = pb.start();
+			online = process.waitFor() == 0;
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			mostrarErrorDialog(CONNECTION_VERIFYING_ERROR_MESSAGE);
+			System.exit(0);
+		}
 
-	public boolean isConnected() throws InterruptedException, IOException {
-		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
-		Process process = pb.start();
-		return process.waitFor() == 0;
+		if (online)
+			return;
 
+		mostrarWarningDialog(OFFLINE_MESSAGE);
 	}
 
 	public boolean backupsFilesExists() {
@@ -206,32 +217,17 @@ public class Controlador implements ActionListener {
 				&& archivoWorkouts.length() > 0;
 	}
 
-	public void verifyConnection() {
-		try {
-			if (!isConnected()) {
-				online = false;
-
-				JOptionPane.showMessageDialog(null, OFFLINE_MESSAGE, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
-
-				if (!backupsFilesExists()) {
-					JOptionPane.showMessageDialog(null, COULDNT_FIND_BACKUPS_MESSAGE, ERROR_TITLE,
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-			}
-
-		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, CONNECTION_VERIFYING_ERROR_MESSAGE, ERROR_TITLE,
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-	}
-
+	/**
+	 * Inicio de sesión
+	 */
 	private void login() {
 		String usuario = this.vistaLogin.gettFUsuario().getText();
 		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
+
+		if (!backupsFilesExists()) {
+			mostrarErrorDialog(COULDNT_FIND_BACKUPS_MESSAGE);
+			return;
+		}
 
 		if (usuario.isEmpty() || password.isEmpty()) {
 			mostrarErrorDialog(EMPTY_FIELDS_MESSAGE);
@@ -242,17 +238,16 @@ public class Controlador implements ActionListener {
 		Usuario user = new Usuario().obtenerUsuario(usuario, online);
 
 		if (user == null) {
-			JOptionPane.showMessageDialog(null, USER_NOT_FOUND_MESSAGE, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+			mostrarErrorDialog(USER_NOT_FOUND_MESSAGE);
 			return;
 		}
 
 		if (!user.getPassword().equals(password)) {
-			JOptionPane.showMessageDialog(null, INCORRECT_PASSWORD_MESSAGE, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+			mostrarErrorDialog(INCORRECT_PASSWORD_MESSAGE);
 			return;
 		}
 
-		JOptionPane.showMessageDialog(null, LOGIN_SUCCESS_MESSAGE + user.getUsuario(), INFO_TITLE,
-				JOptionPane.INFORMATION_MESSAGE);
+		mostrarInfoDialog(LOGIN_SUCCESS_MESSAGE + user.getUsuario());
 
 		limpiarCamposLogin();
 
@@ -375,6 +370,10 @@ public class Controlador implements ActionListener {
 	 */
 	private void mostrarInfoDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
+	}
+
+	private void mostrarWarningDialog(String mensaje) {
+		JOptionPane.showMessageDialog(null, mensaje, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
 	}
 
 	/**

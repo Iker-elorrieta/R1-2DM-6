@@ -89,6 +89,9 @@ public class Ejercicio implements Serializable {
 	}
 
 	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId, boolean online) {
+		if (!online) {
+
+		}
 		Firestore fs = null;
 		ArrayList<Ejercicio> listaEjercicios = new ArrayList<Ejercicio>();
 
