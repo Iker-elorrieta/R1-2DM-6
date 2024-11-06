@@ -8,14 +8,11 @@ public class PanelEjercicios extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton btnReturn, btnStart; // Botón para iniciar y pausar
+	private JButton btnReturn, btnStart, btnPause; // Botón para iniciar y pausar
 	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; // Cuenta regresiva
-																									// de series
+	private boolean isPaused = false;
+	private boolean isRunning = false;																								// de series
 	private JTextArea txtAreaDescripcion;
-
-	// Variables de tiempo
-	private int elapsedTime = 0; // Tiempo transcurrido
-	private int countdownTime = 5; // Tiempo de cuenta regresiva para las series
 
 	/**
 	 * Create the panel.
@@ -104,13 +101,14 @@ public class PanelEjercicios extends JPanel {
 		lblRepeticiones.setBounds(280, 297, 259, 30);
 		add(lblRepeticiones);
 		
-		JButton btnPause = new JButton("Iniciar");
+		btnPause = new JButton("Pausar");
 		btnPause.setForeground(Color.WHITE);
 		btnPause.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnPause.setFocusPainted(false);
 		btnPause.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		btnPause.setBackground(new Color(10, 75, 128));
 		btnPause.setBounds(389, 483, 120, 50);
+		btnPause.setVisible(false);
 		add(btnPause);
 	}
 
@@ -164,13 +162,24 @@ public class PanelEjercicios extends JPanel {
 	}
 
 	
-	public JButton getBtnStartPause() {
+	public JButton getBtnStart() {
 		return btnStart;
 	}
 
-	public void setBtnStartPause(JButton btnStartPause) {
-		this.btnStart = btnStartPause;
+	public void setBtnStart(JButton btnStart) {
+		this.btnStart = btnStart;
 	}
+	
+
+	public JButton getBtnPause() {
+		return btnPause;
+	}
+
+
+	public void setBtnPause(JButton btnPause) {
+		this.btnPause = btnPause;
+	}
+
 
 	public JLabel getLblRepeticiones() {
 		return lblRepeticiones;
@@ -197,4 +206,26 @@ public class PanelEjercicios extends JPanel {
 	public void setLblMainTimer(JLabel lblMainTimer) {
 		this.lblMainTimer = lblMainTimer;
 	}
+
+
+	public boolean isPaused() {
+		return isPaused;
+	}
+
+
+	public void setPaused(boolean isPaused) {
+		this.isPaused = isPaused;
+	}
+
+
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+
+	public void setRunning(boolean isRunning) {
+		this.isRunning = isRunning;
+	}
+	
+	
 }
