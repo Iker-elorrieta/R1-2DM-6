@@ -21,8 +21,9 @@ public class Workout implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String nombre, videoUrl, id, descripcion;
 	private int nivel, numEjers;
+	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>(); // Lista de Ejercicios asociados al Workout
 
-	// NOMBRE DE LOS CAMPOS
+	// Nombres de los campos en Firestore
 	private static String workoutsCollection = "Workouts";
 	private static String fieldNombre = "nombre";
 	private static String fieldNivel = "nivel";
@@ -41,9 +42,10 @@ public class Workout implements Serializable {
 		this.nivel = nivel;
 		this.numEjers = numEjers;
 		this.descripcion = descripcion;
+		this.listaEjercicios = new ArrayList<>();
 	}
 
-//Getters y setters
+	// Getters y setters
 	public String getId() {
 		return id;
 	}
@@ -90,6 +92,14 @@ public class Workout implements Serializable {
 
 	public void setDescripcion(String descripcion) {
 		this.descripcion = descripcion;
+	}
+
+	public ArrayList<Ejercicio> getListaEjercicios() {
+		return listaEjercicios;
+	}
+
+	public void setListaEjercicios(ArrayList<Ejercicio> listaEjercicios) {
+		this.listaEjercicios = listaEjercicios;
 	}
 
 	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario, boolean online) {
