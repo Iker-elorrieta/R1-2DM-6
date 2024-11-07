@@ -33,13 +33,13 @@ public class Controlador implements ActionListener {
 	private static final String USER_NOT_FOUND_MESSAGE = "El usuario no existe.";
 	private static final String LOGIN_SUCCESS_MESSAGE = "Inicio de sesión correcto. \nBienvenid@ ";
 	private static final String INCORRECT_PASSWORD_MESSAGE = "Contraseña incorrecta.";
-	
-	int minutos = 0;
-    int segundos = 0;
-	private static final String OFFLINE_MESSAGE = "Contraseña incorrecta.";
+	private static final String OFFLINE_MESSAGE = "No dispone de conexión a internet.";
 	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
 	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
 
+	int minutos = 0;
+    int segundos = 0;
+    
 	// Rutas
 	private String backupsUsuario = "backups/usuario.dat";
 	private String backupsWorkouts = "backups/workouts.dat";
@@ -48,7 +48,7 @@ public class Controlador implements ActionListener {
 	private boolean online = true;
 	private static final String isConnectedCommand = "ping";
 	private static final String isConnectedVerifyingWebSite = "google.com";
-	
+
 	private static final String javaCommand = "java";
 	private static final String jarFlag = "-jar";
 	private static final String backupJarFile = "backupgym.jar";
@@ -84,7 +84,6 @@ public class Controlador implements ActionListener {
 	 * Acciones de los componentes de las vistas
 	 */
 	private void inicializarControlador() {
-
 		accionesVistaLogin();
 		accionesVistaRegistro();
 		accionesVistaWorkouts();
@@ -95,11 +94,17 @@ public class Controlador implements ActionListener {
 	 * Acciones del panel del Login
 	 */
 	private void accionesVistaLogin() {
-		this.vistaLogin.getBtnSignUp().addActionListener(this);
-		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
 
 		this.vistaLogin.getBtnLogin().addActionListener(this);
 		this.vistaLogin.getBtnLogin().setActionCommand(Principal.enumAcciones.INICIAR_SESION.toString());
+
+		this.vistaLogin.getBtnSignUp().addActionListener(this);
+		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
+		this.vistaLogin.getBtnSignUp().setEnabled(false);
+
+		verifyConnection();
+		if (online)
+			this.vistaLogin.getBtnSignUp().setEnabled(true);
 	}
 
 	/**
@@ -199,13 +204,33 @@ public class Controlador implements ActionListener {
 	private void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
-
 	
 	public boolean isConnected() throws InterruptedException, IOException {
 		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
 		Process process = pb.start();
 		return process.waitFor() == 0;
+	}
 
+	public void verifyConnection() {
+		try {
+			ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
+			Process process = pb.start();
+			online = process.waitFor() == 0;
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			mostrarErrorDialog(CONNECTION_VERIFYING_ERROR_MESSAGE);
+			System.exit(0);
+		}
+
+		if (online)
+			return;
+
+		mostrarWarningDialog(OFFLINE_MESSAGE);
+
+		if (!backupsFilesExists()) {
+			mostrarErrorDialog(COULDNT_FIND_BACKUPS_MESSAGE);
+			return;
+		}
 	}
 
 	public boolean backupsFilesExists() {
@@ -216,29 +241,9 @@ public class Controlador implements ActionListener {
 				&& archivoWorkouts.length() > 0;
 	}
 
-	public void verifyConnection() {
-		try {
-			if (!isConnected()) {
-				online = false;
-
-				JOptionPane.showMessageDialog(null, OFFLINE_MESSAGE, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
-
-				if (!backupsFilesExists()) {
-					JOptionPane.showMessageDialog(null, COULDNT_FIND_BACKUPS_MESSAGE, ERROR_TITLE,
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-			}
-
-		} catch (InterruptedException | IOException e) {
-			e.printStackTrace();
-			JOptionPane.showMessageDialog(null, CONNECTION_VERIFYING_ERROR_MESSAGE, ERROR_TITLE,
-					JOptionPane.ERROR_MESSAGE);
-			return;
-		}
-	}
-
+	/**
+	 * Inicio de sesión
+	 */
 	private void login() {
 		String usuario = this.vistaLogin.gettFUsuario().getText();
 		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
@@ -252,17 +257,16 @@ public class Controlador implements ActionListener {
 		Usuario user = new Usuario().obtenerUsuario(usuario, online);
 
 		if (user == null) {
-			JOptionPane.showMessageDialog(null, USER_NOT_FOUND_MESSAGE, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+			mostrarErrorDialog(USER_NOT_FOUND_MESSAGE);
 			return;
 		}
 
 		if (!user.getPassword().equals(password)) {
-			JOptionPane.showMessageDialog(null, INCORRECT_PASSWORD_MESSAGE, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+			mostrarErrorDialog(INCORRECT_PASSWORD_MESSAGE);
 			return;
 		}
 
-		JOptionPane.showMessageDialog(null, LOGIN_SUCCESS_MESSAGE + user.getUsuario(), INFO_TITLE,
-				JOptionPane.INFORMATION_MESSAGE);
+		mostrarInfoDialog(LOGIN_SUCCESS_MESSAGE + user.getUsuario());
 
 		limpiarCamposLogin();
 
@@ -387,6 +391,10 @@ public class Controlador implements ActionListener {
 		JOptionPane.showMessageDialog(null, mensaje, INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 	}
 
+	private void mostrarWarningDialog(String mensaje) {
+		JOptionPane.showMessageDialog(null, mensaje, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
+	}
+
 	/**
 	 * Llena un nuevo usuario con los datos obtenidos de la vista
 	 *
@@ -405,7 +413,7 @@ public class Controlador implements ActionListener {
 		nuevoUsuario.setNombre(nombre);
 		nuevoUsuario.setApellido(apellido);
 		nuevoUsuario.setEmail(email);
-		nuevoUsuario.setUser(user);
+		nuevoUsuario.setUsuario(user);
 		nuevoUsuario.setPassword(password);
 		nuevoUsuario.setIdiomaPreferido(idioma);
 		nuevoUsuario.setTemaPreferido(tema);
@@ -551,6 +559,7 @@ public class Controlador implements ActionListener {
 			JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
 		});
 	}
+	
 
 	/**
 	 * Vacía los campos del formulario del registro
@@ -564,6 +573,7 @@ public class Controlador implements ActionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 	}
 
+	
 	private void startCount(JLabel lbl) {
 	    // Si el cronómetro ya está corriendo, no hacemos nada
 	    if (this.vistaEjercicios.isRunning()) {
@@ -624,10 +634,4 @@ public class Controlador implements ActionListener {
 		this.vistaEjercicios.getBtnStart().setVisible(true);
 		this.vistaEjercicios.getBtnPause().setVisible(false);
 	}
-	
-	
-
-
-	
-
 }

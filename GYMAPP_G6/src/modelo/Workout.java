@@ -1,5 +1,8 @@
 package modelo;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,40 +93,59 @@ public class Workout implements Serializable {
 	}
 
 	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario, boolean online) {
-		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
-		try {
-			fs = Conexion.conectar();
-			ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection)
-					.whereLessThanOrEqualTo(fieldNivel, nivelUsuario).get();
-			QuerySnapshot querySnapshot = query.get();
-			List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
+		if (!online) {
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
 
-			for (QueryDocumentSnapshot workout : workouts) {
-				Workout w = new Workout();
-				w.setId(workout.getId());
-				w.setNombre(workout.getString(fieldNombre));
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Workout workout = (Workout) ois.readObject();
 
-				// Cambiar de getString a getLong para los campos numéricos
-				Long nivel = workout.getLong(fieldNivel);
-				Long numEjers = workout.getLong(fieldNumEjers);
-
-				// Evitar el error de casting si el valor es null
-				if (nivel != null)
-					w.setNivel(nivel.intValue()); // Convertir de Long a int
-
-				if (numEjers != null)
-					w.setNumEjers(numEjers.intValue()); // Convertir de Long a int
-
-				w.setVideoUrl(workout.getString(fieldVideoUrl));
-				w.setDescripcion(workout.getString(fieldDescripcion));
-				listaWorkouts.add(w);
-
+					// workout level
+					if (workout.getNivel() <= nivelUsuario) {
+						listaWorkouts.add(workout);
+					}
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
 			}
-			fs.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+
+		} else {
+			Firestore fs = null;
+
+			try {
+				fs = Conexion.conectar();
+				ApiFuture<QuerySnapshot> query = fs.collection(workoutsCollection)
+						.whereLessThanOrEqualTo(fieldNivel, nivelUsuario).get();
+				QuerySnapshot querySnapshot = query.get();
+				List<QueryDocumentSnapshot> workouts = querySnapshot.getDocuments();
+
+				for (QueryDocumentSnapshot workout : workouts) {
+					Workout w = new Workout();
+					w.setId(workout.getId());
+					w.setNombre(workout.getString(fieldNombre));
+
+					// Cambiar de getString a getLong para los campos numéricos
+					Long nivel = workout.getLong(fieldNivel);
+					Long numEjers = workout.getLong(fieldNumEjers);
+
+					// Evitar el error de casting si el valor es null
+					if (nivel != null)
+						w.setNivel(nivel.intValue()); // Convertir de Long a int
+
+					if (numEjers != null)
+						w.setNumEjers(numEjers.intValue()); // Convertir de Long a int
+
+					w.setVideoUrl(workout.getString(fieldVideoUrl));
+					w.setDescripcion(workout.getString(fieldDescripcion));
+					listaWorkouts.add(w);
+
+				}
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		return listaWorkouts;
@@ -169,6 +191,63 @@ public class Workout implements Serializable {
 	    return workoutEncontrado;
 	}
 
+	public Workout obtenerWorkoutPorId(String workoutId, boolean online) {
+		Workout workoutEncontrado = null;
+
+		if (!online) {
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
+
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Workout workout = (Workout) ois.readObject();
+
+					if (workout.getId().equals(workoutId)) {
+						workoutEncontrado = workout;
+						break;
+					}
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			Firestore fs = null;
+
+			try {
+				fs = Conexion.conectar();
+
+				// Busca el documento específico que coincide con el id proporcionado
+				DocumentReference docRef = fs.collection(workoutsCollection).document(workoutId);
+				ApiFuture<DocumentSnapshot> future = docRef.get();
+				DocumentSnapshot document = future.get();
+
+				// Verifica si el documento existe
+				if (document.exists()) {
+					workoutEncontrado = new Workout();
+					workoutEncontrado.setId(document.getId());
+					workoutEncontrado.setNombre(document.getString(fieldNombre));
+
+					// Campos numéricos: manejo de nulos y conversión de Long a int
+					Long nivel = document.getLong(fieldNivel);
+					Long numEjers = document.getLong(fieldNumEjers);
+
+					if (nivel != null)
+						workoutEncontrado.setNivel(nivel.intValue());
+					if (numEjers != null)
+						workoutEncontrado.setNumEjers(numEjers.intValue());
+
+					workoutEncontrado.setVideoUrl(document.getString(fieldVideoUrl));
+					workoutEncontrado.setDescripcion(document.getString(fieldDescripcion));
+
+				}
+
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return workoutEncontrado;
+	}
 
 	@Override
 	public String toString() {
