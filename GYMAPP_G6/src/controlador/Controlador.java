@@ -207,6 +207,11 @@ public class Controlador implements ActionListener {
 			return;
 
 		mostrarWarningDialog(OFFLINE_MESSAGE);
+
+		if (!backupsFilesExists()) {
+			mostrarErrorDialog(COULDNT_FIND_BACKUPS_MESSAGE);
+			return;
+		}
 	}
 
 	public boolean backupsFilesExists() {
@@ -223,11 +228,6 @@ public class Controlador implements ActionListener {
 	private void login() {
 		String usuario = this.vistaLogin.gettFUsuario().getText();
 		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
-
-		if (!backupsFilesExists()) {
-			mostrarErrorDialog(COULDNT_FIND_BACKUPS_MESSAGE);
-			return;
-		}
 
 		if (usuario.isEmpty() || password.isEmpty()) {
 			mostrarErrorDialog(EMPTY_FIELDS_MESSAGE);
@@ -394,7 +394,7 @@ public class Controlador implements ActionListener {
 		nuevoUsuario.setNombre(nombre);
 		nuevoUsuario.setApellido(apellido);
 		nuevoUsuario.setEmail(email);
-		nuevoUsuario.setUser(user);
+		nuevoUsuario.setUsuario(user);
 		nuevoUsuario.setPassword(password);
 		nuevoUsuario.setIdiomaPreferido(idioma);
 		nuevoUsuario.setTemaPreferido(tema);

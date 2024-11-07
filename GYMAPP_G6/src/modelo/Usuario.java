@@ -27,7 +27,6 @@ public class Usuario implements Serializable {
 	private String nombre;
 	private String apellido;
 	private String email;
-	private String user;
 	private String password;
 	private String usuario;
 	private Long nivelUsuario;
@@ -73,7 +72,6 @@ public class Usuario implements Serializable {
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.email = email;
-		this.user = user;
 		this.password = password;
 		this.usuario = usuario;
 		this.nivelUsuario = (long) nivelUsuario;
@@ -115,14 +113,6 @@ public class Usuario implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = user;
 	}
 
 	public String getPassword() {
@@ -191,15 +181,12 @@ public class Usuario implements Serializable {
 				ObjectInputStream ois = new ObjectInputStream(fic);
 				while (fic.getChannel().position() < fic.getChannel().size()) {
 					Usuario usuario = (Usuario) ois.readObject();
-
-					if (usuario.getUser().equals(userName)) {
+					if (usuario.getUsuario().equals(userName)) {
 						ois.close();
 						return usuario;
 					}
 				}
 				ois.close();
-				JOptionPane.showMessageDialog(null, "Usuario o contraseña incorrectos", "ERROR",
-						JOptionPane.ERROR_MESSAGE);
 			} catch (ClassNotFoundException | IOException e) {
 				e.printStackTrace();
 			}
@@ -243,39 +230,48 @@ public class Usuario implements Serializable {
 
 	public ArrayList<Usuario> obtenerMultiplesUsuarios(boolean online) {
 
-		if (!online) {
-
-		}
+		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();
 		Firestore fs = null;
 
-		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();
+		if (!online) {
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_USERS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
 
-		try {
-			fs = Conexion.conectar();
-
-			ApiFuture<QuerySnapshot> query = fs.collection(usersCollection).get();
-
-			QuerySnapshot querySnapshot = query.get();
-			List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
-			for (QueryDocumentSnapshot usuario : usuarios) {
-
-				Usuario u = new Usuario();
-				u.setId(usuario.getId());
-				u.setNombre(usuario.getString(fieldNombre));
-				u.setApellido(usuario.getString(fieldApellido));
-				u.setEmail(usuario.getString(fieldEmail));
-				u.setUsuario(usuario.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
-				u.setPassword(usuario.getString(fieldPassword));
-				u.setFechaNacimiento(usuario.getDate(fieldFecNac));
-				u.setNivelUsuario(usuario.getLong(fieldNivel));
-
-				listaUsers.add(u);
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Usuario usuario = (Usuario) ois.readObject();
+					listaUsers.add(usuario);
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
 			}
-			fs.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} else {
+			try {
+				fs = Conexion.conectar();
 
+				ApiFuture<QuerySnapshot> query = fs.collection(usersCollection).get();
+
+				QuerySnapshot querySnapshot = query.get();
+				List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
+				for (QueryDocumentSnapshot usuario : usuarios) {
+
+					Usuario u = new Usuario();
+					u.setId(usuario.getId());
+					u.setNombre(usuario.getString(fieldNombre));
+					u.setApellido(usuario.getString(fieldApellido));
+					u.setEmail(usuario.getString(fieldEmail));
+					u.setUsuario(usuario.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
+					u.setPassword(usuario.getString(fieldPassword));
+					u.setFechaNacimiento(usuario.getDate(fieldFecNac));
+					u.setNivelUsuario(usuario.getLong(fieldNivel));
+
+					listaUsers.add(u);
+				}
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 		return listaUsers;
 	}
 
@@ -293,7 +289,7 @@ public class Usuario implements Serializable {
 			userData.put(fieldFecNac, this.fechaNacimiento);
 			userData.put(fieldIdioma, this.idiomaPreferido != null ? this.idiomaPreferido.name() : null);
 			userData.put(fieldTema, this.temaPreferido != null ? this.temaPreferido.name() : null);
-			userData.put(fieldUsuario, this.user);
+			userData.put(fieldUsuario, this.usuario);
 			userData.put(fieldPassword, this.password);
 			userData.put(fieldTipoUsuario, TipoUsuario.CLIENTE);
 			userData.put(fieldNivel, this.nivelUsuario);
