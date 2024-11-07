@@ -71,7 +71,7 @@ public class PanelEjercicios extends JPanel {
 		add(btnStart);
 
 		// Información de series
-		lblSeries = new JLabel("Series: 1 / 3 ");
+		lblSeries = new JLabel("");
 		lblSeries.setHorizontalAlignment(SwingConstants.CENTER);
 		lblSeries.setFont(new Font("Tahoma", Font.BOLD, 16));
 		lblSeries.setBounds(280, 262, 259, 30);
@@ -107,7 +107,7 @@ public class PanelEjercicios extends JPanel {
 		btnPause.setFont(new Font("Tahoma", Font.BOLD, 16));
 		btnPause.setFocusPainted(false);
 		btnPause.setBorder(new LineBorder(new Color(255, 255, 255), 2));
-		btnPause.setBackground(new Color(10, 75, 128));
+		btnPause.setBackground(new Color(255, 94, 94));
 		btnPause.setBounds(389, 483, 120, 50);
 		btnPause.setVisible(false);
 		add(btnPause);

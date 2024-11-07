@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import modelo.Ejercicio;
+import modelo.Serie;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
@@ -200,6 +201,7 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_EJERCICIOS:
 			mostrarEjercicioSeleccionado();
+			cargarSeries("gfd", online);
 			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
 			break;
 		case PANEL_HISTORICO:
@@ -592,6 +594,21 @@ public class Controlador implements ActionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 	}
 
+	private void cargarSeries(String ejercicioId, boolean online) {
+		// Crear una instancia de Serie y obtener la lista de series para el ejercicio
+		// dado
+		Serie series = new Serie();
+		ArrayList<Serie> listaSeries = series.obtenerSeries(ejercicioId, online);
+
+		// Bucle para añadir cada serie a la lista o concatenarlos en el texto
+		for (Serie serie : listaSeries) {
+			String nombre = serie.getNombreSerie();
+
+			vistaEjercicios.getLblSeries().setText(nombre);
+		}
+
+	}
+
 	private void startCount(JLabel lbl) {
 		// Si el cronómetro ya está corriendo, no hacemos nada
 		if (this.vistaEjercicios.isRunning()) {
@@ -650,4 +667,5 @@ public class Controlador implements ActionListener {
 		this.vistaEjercicios.getBtnStart().setVisible(true);
 		this.vistaEjercicios.getBtnPause().setVisible(false);
 	}
+
 }
