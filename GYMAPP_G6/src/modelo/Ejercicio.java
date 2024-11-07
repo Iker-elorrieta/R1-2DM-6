@@ -88,7 +88,7 @@ public class Ejercicio implements Serializable {
 		this.tiempoDescanso = tiempoDescanso;
 	}
 
-	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId) {
+	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId, boolean online) {
 		Firestore fs = null;
 		ArrayList<Ejercicio> listaEjercicios = new ArrayList<Ejercicio>();
 

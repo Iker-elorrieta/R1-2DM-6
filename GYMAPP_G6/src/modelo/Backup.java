@@ -7,22 +7,22 @@ import java.io.IOException;
 
 public class Backup {
 
-	public static void main(String[] args) {
-		int maxLevel = 3;
-
-		guardarUsuarios(new Usuario().obtenerMultiplesUsuarios());
-		guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel));
-	}
-
 	private static final String FILE_USERS = "backups/usuario.dat";
 	private static final String FILE_WORKOUTS = "backups/workouts.dat";
+
+	private static int maxLevel = 3;
+
+	public static void main(String[] args) {
+		guardarUsuarios(new Usuario().obtenerMultiplesUsuarios(true));
+		guardarWorkouts(new Workout().obtenerWorkouts((long) maxLevel, true));
+	}
 
 	public static void guardarUsuarios(ArrayList<Usuario> usuarios) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_USERS))) {
 			for (Usuario usu : usuarios) {
 				oos.writeObject(usu);
 			}
-			System.out.println("Colección de usuarios guardada correctamente.");
+			System.out.println("Users saved");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -33,7 +33,7 @@ public class Backup {
 			for (Workout wot : workouts) {
 				oos.writeObject(wot);
 			}
-			System.out.println("Colección de workouts/ejercicios guardada correctamente.");
+			System.out.println("Workouts saved");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

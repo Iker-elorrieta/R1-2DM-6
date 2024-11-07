@@ -181,7 +181,7 @@ public class Usuario implements Serializable {
 
 	// *** MÉTODOS CRUD ***
 
-	public Usuario obtenerUsuario(String userName) {
+	public Usuario obtenerUsuario(String userName, boolean online) {
 		Firestore fs = null;
 		Usuario userExists = null;
 
@@ -218,7 +218,7 @@ public class Usuario implements Serializable {
 		return userExists;
 	}
 
-	public ArrayList<Usuario> obtenerMultiplesUsuarios() {
+	public ArrayList<Usuario> obtenerMultiplesUsuarios(boolean online) {
 		Firestore fs = null;
 
 		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();

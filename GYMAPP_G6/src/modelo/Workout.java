@@ -89,7 +89,7 @@ public class Workout implements Serializable {
 		this.descripcion = descripcion;
 	}
 
-	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario) {
+	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario, boolean online) {
 		Firestore fs = null;
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
