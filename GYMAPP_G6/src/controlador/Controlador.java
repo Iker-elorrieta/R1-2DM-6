@@ -37,6 +37,9 @@ public class Controlador implements ActionListener {
 	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
 	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
 
+	int minutos = 0;
+    int segundos = 0;
+    
 	// Rutas
 	private String backupsUsuario = "backups/usuario.dat";
 	private String backupsWorkouts = "backups/workouts.dat";
@@ -145,9 +148,13 @@ public class Controlador implements ActionListener {
 	private void accionesVistaEjercicios() {
 		this.vistaEjercicios.getBtnReturn().addActionListener(this);
 		this.vistaEjercicios.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
+		
+		this.vistaEjercicios.getBtnStart().addActionListener(this);
+		this.vistaEjercicios.getBtnStart().setActionCommand(Principal.enumAcciones.INICIAR_REANUDAR_CONTADOR.toString());
+		
+		this.vistaEjercicios.getBtnPause().addActionListener(this);
+		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSAR_CONTADOR.toString());
 
-		this.vistaEjercicios.getBtnStartPause().addActionListener(this);
-		this.vistaEjercicios.getBtnStartPause().setActionCommand(Principal.enumAcciones.INICIAR_CONTADOR.toString());
 	}
 
 	/**
@@ -171,17 +178,23 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_WORKOUTS:
 			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
+			resetCount(this.vistaEjercicios.getLblMainTimer());
 			break;
 		case PANEL_EJERCICIOS:
 			mostrarEjercicioSeleccionado();
 			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
 			break;
-		case INICIAR_CONTADOR:
+		case INICIAR_REANUDAR_CONTADOR:
 			startCount(this.vistaEjercicios.getLblMainTimer());
+			break;
+		case PAUSAR_CONTADOR:
+			pauseCount(this.vistaEjercicios.getLblMainTimer());
+			break;
 		default:
 			break;
 		}
 	}
+
 
 	/**
 	 * Visualizar un panel
@@ -190,6 +203,12 @@ public class Controlador implements ActionListener {
 	 */
 	private void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
+	}
+	
+	public boolean isConnected() throws InterruptedException, IOException {
+		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
+		Process process = pb.start();
+		return process.waitFor() == 0;
 	}
 
 	public void verifyConnection() {
@@ -427,7 +446,6 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
-	// SACAR POR ID
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
 
@@ -541,6 +559,7 @@ public class Controlador implements ActionListener {
 			JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
 		});
 	}
+	
 
 	/**
 	 * Vacía los campos del formulario del registro
@@ -554,30 +573,65 @@ public class Controlador implements ActionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 	}
 
+	
 	private void startCount(JLabel lbl) {
-		new Thread(() -> {
-			int minutos = 0;
-			int segundos = 0;
+	    // Si el cronómetro ya está corriendo, no hacemos nada
+	    if (this.vistaEjercicios.isRunning()) {
+	        return;
+	    }
 
-			try {
-				while (true) {
-					String tiempo = String.format("%02d:%02d", minutos, segundos);
-					lbl.setText(tiempo);
-					System.out.println(tiempo);
+	    // Cambiamos el estado del cronómetro
+	    this.vistaEjercicios.setPaused(false);
+	    this.vistaEjercicios.setRunning(true);
 
-					Thread.sleep(1000);
+	    // Configuramos la visibilidad y el texto del botón
+	    this.vistaEjercicios.getBtnPause().setVisible(true);
+	    this.vistaEjercicios.getBtnStart().setText("Reanudar");
+	    this.vistaEjercicios.getBtnStart().setVisible(false);
 
+	    new Thread(() -> {
+	        try {
+	            while (this.vistaEjercicios.isRunning()) {
+	                if (!this.vistaEjercicios.isPaused()) {
+	                    // Formateamos el tiempo y lo mostramos en la etiqueta
+	                    String tiempo = String.format("%02d:%02d", minutos, segundos);
+	                    lbl.setText(tiempo);
+
+
+	                    Thread.sleep(1000);
+
+	                    // Incrementamos los segundo
 					segundos++;
 
-					if (segundos == 60) {
-						segundos = 0;
-						minutos++;
-					}
-				}
-			} catch (InterruptedException e) {
-				System.out.println("El contador fue interrumpido.");
-			}
-		}).start();
+	                    // Si los segundos llegan a 60, incrementamos los minutos
+	                    if (segundos == 60) {
+	                        segundos = 0;
+	                        minutos++;
+	                    }
+	                }
+	            }
+	        } catch (InterruptedException e) {
+	            System.out.println("El contador fue interrumpido.");
+	        }
+	    }).start();
+					
 	}
 
+	
+	private void pauseCount(JLabel lblMainTimer) {
+		this.vistaEjercicios.setRunning(false);
+		this.vistaEjercicios.setPaused(true);
+		this.vistaEjercicios.getBtnPause().setVisible(false);
+		this.vistaEjercicios.getBtnStart().setVisible(true);
+	}
+	
+	private void resetCount(JLabel lblMainTimer) {
+		this.vistaEjercicios.setRunning(false);
+		this.vistaEjercicios.setPaused(true);
+		minutos=0;
+		segundos=0;
+		this.vistaEjercicios.getBtnStart().setText("Iniciar");
+		this.vistaEjercicios.getBtnStart().setVisible(true);
+		this.vistaEjercicios.getBtnPause().setVisible(false);
+	}
 }
