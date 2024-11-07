@@ -23,11 +23,11 @@ public class PanelWorkouts extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JList<Workout> workoutsList;
 	private DefaultListModel<Workout> workoutListModel;
-	
+
 	private JList<Ejercicio> ejersList;
 	private DefaultListModel<Ejercicio> ejersListModel;
-	
-	private JButton btnReturn, btnVideo, btnDescripcion, btnStartWorkout;
+
+	private JButton btnReturn, btnVideo, btnDescripcion, btnStartWorkout, btnHistorico;
 	private Map<String, String> workoutUrls = new HashMap<>();
 	private Map<String, String> workoutDescripciones = new HashMap<>();
 
@@ -118,10 +118,20 @@ public class PanelWorkouts extends JPanel {
 		btnStartWorkout.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnStartWorkout);
 
+		btnHistorico = new JButton("Ver histórico de workouts");
+		btnHistorico.setForeground(Color.WHITE);
+		btnHistorico.setFont(new Font("Tahoma", Font.BOLD, 12));
+		btnHistorico.setBorder(new LineBorder(new Color(255, 255, 255)));
+		btnHistorico.setBackground(new Color(10, 75, 128));
+		btnHistorico.setBounds(450, 114, 199, 25);
+		btnHistorico.setFocusPainted(false);
+		add(btnHistorico);
+
 	}
 
 	/**
 	 * Método para añadir un objeto Workout al modelo de la lista
+	 * 
 	 * @param workout
 	 * @param url
 	 * @param descripcion
@@ -157,7 +167,7 @@ public class PanelWorkouts extends JPanel {
 	public void setBtnDescripcion(JButton btnDescripcion) {
 		this.btnDescripcion = btnDescripcion;
 	}
-	
+
 	public JList<Workout> getWorkoutList() {
 		return workoutsList;
 	}
@@ -174,7 +184,6 @@ public class PanelWorkouts extends JPanel {
 		this.workoutListModel = workoutListModel;
 	}
 
-	
 	public JList<Ejercicio> getEjersList() {
 		return ejersList;
 	}
@@ -182,7 +191,7 @@ public class PanelWorkouts extends JPanel {
 	public void setEjersList(JList<Ejercicio> ejersList) {
 		this.ejersList = ejersList;
 	}
-	
+
 	public DefaultListModel<Ejercicio> getEjersListModel() {
 		return ejersListModel;
 	}
@@ -190,8 +199,6 @@ public class PanelWorkouts extends JPanel {
 	public void setEjersListModel(DefaultListModel<Ejercicio> ejersListModel) {
 		this.ejersListModel = ejersListModel;
 	}
-
-	
 
 	public String getWorkoutUrl(String workout) {
 		return workoutUrls.get(workout); // Retorna la URL asociada al workout
@@ -223,6 +230,14 @@ public class PanelWorkouts extends JPanel {
 
 	public void setBtnStartWorkout(JButton btnStartWorkout) {
 		this.btnStartWorkout = btnStartWorkout;
+	}
+
+	public JButton getBtnHistorico() {
+		return btnHistorico;
+	}
+
+	public void setBtnHistorico(JButton btnHistorico) {
+		this.btnHistorico = btnHistorico;
 	}
 
 }

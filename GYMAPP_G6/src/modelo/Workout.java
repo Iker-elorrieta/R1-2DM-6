@@ -21,7 +21,7 @@ public class Workout implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String nombre, videoUrl, id, descripcion;
 	private int nivel, numEjers;
-	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>(); // Lista de Ejercicios asociados al Workout
+	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
 
 	// Nombres de los campos en Firestore
 	private static String workoutsCollection = "Workouts";

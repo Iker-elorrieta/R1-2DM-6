@@ -19,6 +19,7 @@ public class Ejercicio implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String nombre, descripcion, foto;
 	private long numReps, numSeries, tiempoDescanso;
+	//private ArrayList<Serie> listaSeries = new ArrayList<>();
 
 	// NOMBRE DE LOS CAMPOS
 	private static String ejersCollection = "Ejercicios";

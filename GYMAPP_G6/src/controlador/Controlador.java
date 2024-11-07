@@ -59,6 +59,7 @@ public class Controlador implements ActionListener {
 	private vista.PanelRegistro vistaRegistro;
 	private vista.PanelWorkouts vistaWorkouts;
 	private vista.PanelEjercicios vistaEjercicios;
+	private vista.PanelHistorico vistaHistorico;
 
 	/**
 	 * Constructor del controlador, inicializa las vistas y el controlador
@@ -68,14 +69,17 @@ public class Controlador implements ActionListener {
 	 * @param vistaRegistro   vista del panel de Registro
 	 * @param vistaWorkouts   vista del panel de Workouts
 	 * @param vistaEjercicios vista del panel de Ejercicios
+	 * @param vistaHistorico  vista del panel de Historico
 	 */
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro,
-			vista.PanelWorkouts vistaWorkouts, vista.PanelEjercicios vistaEjercicios) {
+			vista.PanelWorkouts vistaWorkouts, vista.PanelEjercicios vistaEjercicios,
+			vista.PanelHistorico vistaHistorico) {
 		this.vistaPrincipal = vistaPrincipal;
 		this.vistaLogin = vistaLogin;
 		this.vistaRegistro = vistaRegistro;
 		this.vistaWorkouts = vistaWorkouts;
 		this.vistaEjercicios = vistaEjercicios;
+		this.vistaHistorico = vistaHistorico;
 
 		this.inicializarControlador();
 	}
@@ -88,6 +92,7 @@ public class Controlador implements ActionListener {
 		accionesVistaRegistro();
 		accionesVistaWorkouts();
 		accionesVistaEjercicios();
+		accionesVistaHistorico();
 	}
 
 	/**
@@ -140,6 +145,10 @@ public class Controlador implements ActionListener {
 		this.vistaWorkouts.getBtnStartWorkout().addActionListener(this);
 		this.vistaWorkouts.getBtnStartWorkout().setActionCommand(Principal.enumAcciones.PANEL_EJERCICIOS.toString());
 
+		// Listerner para mostrar el panel de histórico
+		this.vistaWorkouts.getBtnHistorico().addActionListener(this);
+		this.vistaWorkouts.getBtnHistorico().setActionCommand(Principal.enumAcciones.PANEL_HISTORICO.toString());
+
 	}
 
 	/**
@@ -156,6 +165,14 @@ public class Controlador implements ActionListener {
 		this.vistaEjercicios.getBtnPause().addActionListener(this);
 		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSAR_CONTADOR.toString());
 
+	}
+
+	/**
+	 * Acciones del panel de Histórico
+	 */
+	private void accionesVistaHistorico() {
+		this.vistaHistorico.getBtnReturn().addActionListener(this);
+		this.vistaHistorico.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
 	}
 
 	/**
@@ -184,6 +201,9 @@ public class Controlador implements ActionListener {
 		case PANEL_EJERCICIOS:
 			mostrarEjercicioSeleccionado();
 			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
+			break;
+		case PANEL_HISTORICO:
+			visualizarPanel(Principal.enumAcciones.PANEL_HISTORICO);
 			break;
 		case INICIAR_REANUDAR_CONTADOR:
 			startCount(this.vistaEjercicios.getLblMainTimer());

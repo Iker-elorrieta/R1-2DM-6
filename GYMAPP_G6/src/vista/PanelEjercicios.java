@@ -9,9 +9,10 @@ public class PanelEjercicios extends JPanel {
 	private static final long serialVersionUID = 1L;
 
 	private JButton btnReturn, btnStart, btnPause; // Botón para iniciar y pausar
-	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; // Cuenta regresiva
+	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; // Cuenta
+																													// regresiva
 	private boolean isPaused = false;
-	private boolean isRunning = false;																								// de series
+	private boolean isRunning = false; // de series
 	private JTextArea txtAreaDescripcion;
 
 	/**
@@ -93,14 +94,14 @@ public class PanelEjercicios extends JPanel {
 		txtAreaDescripcion.setBorder(new LineBorder(new Color(30, 121, 166), 2));
 		txtAreaDescripcion.setBounds(280, 91, 244, 159);
 		add(txtAreaDescripcion);
-		
+
 		lblRepeticiones = new JLabel("Repeticiones :");
 		lblRepeticiones.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRepeticiones.setForeground(new Color(30, 121, 166));
 		lblRepeticiones.setFont(new Font("Tahoma", Font.BOLD, 16));
 		lblRepeticiones.setBounds(280, 297, 259, 30);
 		add(lblRepeticiones);
-		
+
 		btnPause = new JButton("Pausar");
 		btnPause.setForeground(Color.WHITE);
 		btnPause.setFont(new Font("Tahoma", Font.BOLD, 16));
@@ -111,7 +112,6 @@ public class PanelEjercicios extends JPanel {
 		btnPause.setVisible(false);
 		add(btnPause);
 	}
-
 
 	public JButton getBtnReturn() {
 		return btnReturn;
@@ -161,7 +161,6 @@ public class PanelEjercicios extends JPanel {
 		this.lblSeries = lblSeries;
 	}
 
-	
 	public JButton getBtnStart() {
 		return btnStart;
 	}
@@ -169,17 +168,14 @@ public class PanelEjercicios extends JPanel {
 	public void setBtnStart(JButton btnStart) {
 		this.btnStart = btnStart;
 	}
-	
 
 	public JButton getBtnPause() {
 		return btnPause;
 	}
 
-
 	public void setBtnPause(JButton btnPause) {
 		this.btnPause = btnPause;
 	}
-
 
 	public JLabel getLblRepeticiones() {
 		return lblRepeticiones;
@@ -197,35 +193,28 @@ public class PanelEjercicios extends JPanel {
 		this.lblCountdown = lblCountdown;
 	}
 
-
 	public JLabel getLblMainTimer() {
 		return lblMainTimer;
 	}
-
 
 	public void setLblMainTimer(JLabel lblMainTimer) {
 		this.lblMainTimer = lblMainTimer;
 	}
 
-
 	public boolean isPaused() {
 		return isPaused;
 	}
-
 
 	public void setPaused(boolean isPaused) {
 		this.isPaused = isPaused;
 	}
 
-
 	public boolean isRunning() {
 		return isRunning;
 	}
 
-
 	public void setRunning(boolean isRunning) {
 		this.isRunning = isRunning;
 	}
-	
-	
+
 }
