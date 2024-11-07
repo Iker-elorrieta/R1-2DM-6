@@ -97,6 +97,21 @@ public class Ejercicio implements Serializable {
 
 		if (!online) {
 
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
+
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Workout workout = (Workout) ois.readObject();
+
+					// Verifica si el workout tiene el id que estamos buscando
+					if (workout.getId().equals(workoutId)) {
+						listaEjercicios = workout.getListaEjercicios(); // Obtiene los ejercicios asociados
+						break;
+					}
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			Firestore fs = null;
 

@@ -112,8 +112,10 @@ public class Workout implements Serializable {
 				while (fic.getChannel().position() < fic.getChannel().size()) {
 					Workout workout = (Workout) ois.readObject();
 
-					// workout level
+					// Filtro por nivel
 					if (workout.getNivel() <= nivelUsuario) {
+						workout.setListaEjercicios(new Ejercicio().obtenerEjercicios(workout.getId(), online)); // Cargar
+																												// ejercicios
 						listaWorkouts.add(workout);
 					}
 				}
@@ -151,7 +153,7 @@ public class Workout implements Serializable {
 					w.setDescripcion(workout.getString(fieldDescripcion));
 					listaWorkouts.add(w);
 
-					w.setListaEjercicios(new Ejercicio().obtenerEjercicios(workoutsCollection, online));
+					w.setListaEjercicios(new Ejercicio().obtenerEjercicios(workout.getId().toString(), online));
 
 				}
 				fs.close();
