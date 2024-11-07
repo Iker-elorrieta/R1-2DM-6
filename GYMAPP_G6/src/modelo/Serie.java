@@ -56,59 +56,6 @@ public class Serie {
 		this.tiempo = tiempo;
 	}
 
-	public ArrayList<Serie> obtenerSeries(String ejercicioId, boolean online) {
-		ArrayList<Serie> listaSeries = new ArrayList<Serie>();
-
-		if (!online) {
-
-		} else {
-			Firestore fs = null;
-
-			try {
-				fs = Conexion.conectar();
-
-				ApiFuture<QuerySnapshot> workoutQuery = fs.collection(workoutCollection).get();
-				List<QueryDocumentSnapshot> workoutDocs = workoutQuery.get().getDocuments();
-
-				for (QueryDocumentSnapshot workoutDoc : workoutDocs) {
-					ApiFuture<QuerySnapshot> ejerciciosQuery = workoutDoc.getReference().collection(ejersCollection)
-							.get();
-					List<QueryDocumentSnapshot> ejerciciosDocs = ejerciciosQuery.get().getDocuments();
-
-					for (QueryDocumentSnapshot ejercicioDoc : ejerciciosDocs) {
-						if (ejercicioDoc.getId().equals(ejercicioId)) {
-							ApiFuture<QuerySnapshot> seriesQuery = ejercicioDoc.getReference()
-									.collection(seriesCollection).get();
-							List<QueryDocumentSnapshot> seriesDocs = seriesQuery.get().getDocuments();
-
-							for (QueryDocumentSnapshot serieDoc : seriesDocs) {
-								Serie s = new Serie();
-								s.setNombreSerie(serieDoc.getString(fieldNombre));
-
-								Long numReps = serieDoc.getLong(fieldnumReps);
-								Long tiempo = serieDoc.getLong(fieldTiempo);
-
-								if (numReps != null) {
-									s.setNumReps(numReps);
-								}
-								if (tiempo != null) {
-									s.setTiempo(tiempo);
-								}
-
-								listaSeries.add(s);
-							}
-							break;
-						}
-					}
-				}
-
-				fs.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		return listaSeries;
-	}
+	
 
 }

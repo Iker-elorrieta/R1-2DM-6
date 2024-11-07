@@ -8,7 +8,7 @@ public class PanelEjercicios extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton btnReturn, btnStart, btnPause; // Botón para iniciar y pausar
+	private JButton btnReturn, btnStart, btnPause, btnNext; // Botón para iniciar y pausar
 	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; // Cuenta
 																													// regresiva
 	private boolean isPaused = false;
@@ -111,6 +111,10 @@ public class PanelEjercicios extends JPanel {
 		btnPause.setBounds(389, 483, 120, 50);
 		btnPause.setVisible(false);
 		add(btnPause);
+		
+		btnNext = new JButton("siguiente");
+		btnNext.setBounds(618, 477, 89, 23);
+		add(btnNext);
 	}
 
 	public JButton getBtnReturn() {
@@ -217,4 +221,13 @@ public class PanelEjercicios extends JPanel {
 		this.isRunning = isRunning;
 	}
 
+	public JButton getBtnNext() {
+		return btnNext;
+	}
+
+	public void setBtnNext(JButton btnNext) {
+		this.btnNext = btnNext;
+	}
+	
+	
 }

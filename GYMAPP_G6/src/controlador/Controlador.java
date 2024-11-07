@@ -38,8 +38,12 @@ public class Controlador implements ActionListener {
 	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
 	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
 
-	int minutos = 0;
-	int segundos = 0;
+	private int minutos = 0;
+	private int segundos = 0;
+	
+	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
+	
+	private Ejercicio ejercicioActual;
 
 	// Rutas
 	private String backupsUsuario = "backups/usuario.dat";
@@ -166,6 +170,8 @@ public class Controlador implements ActionListener {
 		this.vistaEjercicios.getBtnPause().addActionListener(this);
 		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSAR_CONTADOR.toString());
 
+		this.vistaEjercicios.getBtnNext().addActionListener(this);
+		this.vistaEjercicios.getBtnNext().setActionCommand(Principal.enumAcciones.CAMBIAR_EJERCICIO.toString());
 	}
 
 	/**
@@ -200,10 +206,9 @@ public class Controlador implements ActionListener {
 			resetCount(this.vistaEjercicios.getLblMainTimer());
 			break;
 		case PANEL_EJERCICIOS:
-			mostrarEjercicioSeleccionado();
-			cargarSeries("gfd", online);
-			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
-			break;
+		    mostrarEjercicioSeleccionado();
+		    visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
+		    break;
 		case PANEL_HISTORICO:
 			visualizarPanel(Principal.enumAcciones.PANEL_HISTORICO);
 			break;
@@ -213,6 +218,8 @@ public class Controlador implements ActionListener {
 		case PAUSAR_CONTADOR:
 			pauseCount(this.vistaEjercicios.getLblMainTimer());
 			break;
+		case CAMBIAR_EJERCICIO:
+			cambiarAlSiguienteEjercicio();
 		default:
 			break;
 		}
@@ -370,45 +377,22 @@ public class Controlador implements ActionListener {
 
 	}
 
-	/**
-	 * Comprueba si los datos del registro están vacíos
-	 *
-	 * @param nombre          texto del textField del nombre
-	 * @param email           texto del textField del email
-	 * @param user            texto del textField del usuario
-	 * @param password        texto del textField de la contraseña
-	 * @param fechaNacimiento fecha del textField de fecha de nacimiento
-	 * @return devuelve un booleano de si están vacíos o no
-	 */
+
 	private boolean camposRegistroVacios(String nombre, String email, String user, String password,
 			Date fechaNacimiento) {
 		return nombre.isEmpty() || email.isEmpty() || user.isEmpty() || password.isEmpty() || fechaNacimiento == null;
 	}
 
-	/**
-	 * Comprueba si el formato del email es correcto
-	 *
-	 * @param email texto del textField del email
-	 * @return devuelve un booleano para indicar si es correcto o no
-	 */
+	
 	private boolean esEmailValido(String email) {
 		return email.contains("@") && email.contains(".");
 	}
 
-	/**
-	 * Muestra un cuadro de diálogo de error
-	 *
-	 * @param mensaje mensaje a mostrar
-	 */
 	private void mostrarErrorDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 	}
 
-	/**
-	 * Muestra un cuadro de diálogo de información
-	 *
-	 * @param mensaje mensaje a mostrar
-	 */
+
 	private void mostrarInfoDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -417,19 +401,7 @@ public class Controlador implements ActionListener {
 		JOptionPane.showMessageDialog(null, mensaje, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
 	}
 
-	/**
-	 * Llena un nuevo usuario con los datos obtenidos de la vista
-	 *
-	 * @param nuevoUsuario    nuevo usuario a llenar
-	 * @param nombre          texto del textField del nombre
-	 * @param apellido        texto del textField del apellido
-	 * @param email           texto del textField del email
-	 * @param user            texto del textField del usuario
-	 * @param password        texto del textField de la contraseña
-	 * @param idioma          idioma preferido del ComboBox
-	 * @param tema            tema preferido del ComboBox
-	 * @param fechaNacimiento fecha de nacimiento
-	 */
+
 	private void llenarUsuario(Usuario nuevoUsuario, String nombre, String apellido, String email, String user,
 			String password, IdiomaPreferido idioma, TemaPreferido tema, Date fechaNacimiento, int nivelUsuario) {
 		nuevoUsuario.setNombre(nombre);
@@ -470,36 +442,51 @@ public class Controlador implements ActionListener {
 
 	// Método para mostrar el ejercicio seleccionado
 	private void mostrarEjercicioSeleccionado() {
+	    Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
+	    if (selectedWorkout == null)
+	        return;
 
-		Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
-		if (selectedWorkout == null)
-			return;
+	    String nombreWorkout = selectedWorkout.getNombre();
+	    this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
 
-		String nombreWorkout = selectedWorkout.getNombre();
-		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
+	    if (vistaWorkouts.getEjersListModel().isEmpty())
+	        return;
 
-		// Muestra el primer ejercicio de la lista de ejercicios del workout
-		// seleccionado
+	    // Obtener lista de ejercicios para este workout
+	    ArrayList<Ejercicio> ejercicios = new Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online);
+	    if (ejercicios.isEmpty()) {
+	        return;
+	    }
 
-		if (vistaWorkouts.getEjersListModel().isEmpty())
-			return;
-		Ejercicio primerEjercicio = new Ejercicio();
-		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId(), online);
-		primerEjercicio = ejercicios.getFirst();
-		this.vistaEjercicios.getLblEjercicio().setText(primerEjercicio.getNombre());
-		this.vistaEjercicios.getTxtAreaDescripcion().setText(primerEjercicio.getDescripcion());
-		this.vistaEjercicios.getLblSeries().setText("Series: 1/" + primerEjercicio.getNumSeries());
-		this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + primerEjercicio.getNumReps());
-		this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), primerEjercicio.getFoto(), vistaEjercicios);
+	    // Mostrar el primer ejercicio
+	    this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
+	    this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
 
+	    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+	    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
+	    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
+	    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
+	}
+	
+	private void cambiarAlSiguienteEjercicio() {
+	    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) {
+	        return; // Si no hay ejercicios, no hacer nada
+	    }
+
+	    // Obtener el índice del ejercicio actual
+	    int indiceActual = listaEjercicios.indexOf(this.ejercicioActual);
+	    int siguienteIndice = (indiceActual + 1) % listaEjercicios.size(); // Ciclar al primer ejercicio al llegar al final
+
+	    // Establecer el siguiente ejercicio como el ejercicio actual
+	    this.ejercicioActual = listaEjercicios.get(siguienteIndice);
+
+	    // Mostrar la información del siguiente ejercicio
+	    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+	    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
+	    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
+	    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
 	}
 
-	/**
-	 * Carga los workouts del usuario y los muestra en la lista del panelWorkouts
-	 * 
-	 * @param usuario usuario que tiene la sesión iniciada
-	 * @param accion  panel al que se le atribuye la acción
-	 */
 	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
 		Workout workouts = new Workout();
 		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
@@ -513,10 +500,7 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	/**
-	 * Obtiene todos los ejercicios del workout seleccionado y los muesta en la
-	 * JList de ejercicios en el panelWorkouts
-	 */
+
 	private void cargarInfoWorkout() {
 		Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
 
@@ -594,20 +578,7 @@ public class Controlador implements ActionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 	}
 
-	private void cargarSeries(String ejercicioId, boolean online) {
-		// Crear una instancia de Serie y obtener la lista de series para el ejercicio
-		// dado
-		Serie series = new Serie();
-		ArrayList<Serie> listaSeries = series.obtenerSeries(ejercicioId, online);
-
-		// Bucle para añadir cada serie a la lista o concatenarlos en el texto
-		for (Serie serie : listaSeries) {
-			String nombre = serie.getNombreSerie();
-
-			vistaEjercicios.getLblSeries().setText(nombre);
-		}
-
-	}
+	
 
 	private void startCount(JLabel lbl) {
 		// Si el cronómetro ya está corriendo, no hacemos nada

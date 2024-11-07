@@ -17,7 +17,7 @@ import conexion.Conexion;
 public class Ejercicio implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private String nombre, descripcion, foto;
+	private String nombre, descripcion, foto, id;
 	private long numReps, numSeries, tiempoDescanso;
 	// private ArrayList<Serie> listaSeries = new ArrayList<>();
 
@@ -44,6 +44,14 @@ public class Ejercicio implements Serializable {
 	}
 
 	// Getters y setters
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -91,6 +99,8 @@ public class Ejercicio implements Serializable {
 	public void setTiempoDescanso(long tiempoDescanso) {
 		this.tiempoDescanso = tiempoDescanso;
 	}
+	
+	
 
 	// Método para obtener ejercicios asociados a un Workout
 	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId, boolean online) {
