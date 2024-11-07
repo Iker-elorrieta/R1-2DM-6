@@ -31,6 +31,12 @@ public class Backup {
 	public static void guardarWorkouts(ArrayList<Workout> workouts) {
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILE_WORKOUTS))) {
 			for (Workout wot : workouts) {
+
+				if (wot.getListaEjercicios() == null || wot.getListaEjercicios().isEmpty()) {
+
+					wot.setListaEjercicios(new Ejercicio().obtenerEjercicios(wot.getId(), true)); // Este método debería
+																									// llenar la lista
+				}
 				oos.writeObject(wot);
 			}
 			System.out.println("Workouts saved");
@@ -38,4 +44,5 @@ public class Backup {
 			e.printStackTrace();
 		}
 	}
+
 }

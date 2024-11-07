@@ -151,6 +151,8 @@ public class Workout implements Serializable {
 					w.setDescripcion(workout.getString(fieldDescripcion));
 					listaWorkouts.add(w);
 
+					w.setListaEjercicios(new Ejercicio().obtenerEjercicios(workoutsCollection, online));
+
 				}
 				fs.close();
 			} catch (Exception e) {
@@ -159,46 +161,6 @@ public class Workout implements Serializable {
 		}
 
 		return listaWorkouts;
-	}
-	
-	
-	public Workout obtenerWorkoutPorId(String workoutId) {
-	    Firestore fs = null;
-	    Workout workoutEncontrado = null;
-
-	    try {
-	        fs = Conexion.conectar();
-	        
-	        // Busca el documento específico que coincide con el id proporcionado
-	        DocumentReference docRef = fs.collection(workoutsCollection).document(workoutId);
-	        ApiFuture<DocumentSnapshot> future = docRef.get();
-	        DocumentSnapshot document = future.get();
-
-	        // Verifica si el documento existe
-	        if (document.exists()) {
-	            workoutEncontrado = new Workout();
-	            workoutEncontrado.setId(document.getId());
-	            workoutEncontrado.setNombre(document.getString(fieldNombre));
-
-	            // Campos numéricos: manejo de nulos y conversión de Long a int
-	            Long nivel = document.getLong(fieldNivel);
-	            Long numEjers = document.getLong(fieldNumEjers);
-
-	            if (nivel != null)
-	                workoutEncontrado.setNivel(nivel.intValue());
-	            if (numEjers != null)
-	                workoutEncontrado.setNumEjers(numEjers.intValue());
-
-	            workoutEncontrado.setVideoUrl(document.getString(fieldVideoUrl));
-	            workoutEncontrado.setDescripcion(document.getString(fieldDescripcion));
-	            
-	        }
-
-	        fs.close();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return workoutEncontrado;
 	}
 
 	public Workout obtenerWorkoutPorId(String workoutId, boolean online) {
@@ -261,6 +223,6 @@ public class Workout implements Serializable {
 
 	@Override
 	public String toString() {
-		return "" + id + " - " + nombre + " - " + nivel ;
+		return "" + id + " - " + nombre + " - " + nivel;
 	}
 }
