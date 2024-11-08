@@ -1,5 +1,8 @@
 package modelo;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +20,8 @@ public class Serie {
 	// NOMBRE DE LOS CAMPOS
 	private static String seriesCollection = "Series";
 	private static String ejersCollection = "Ejercicios";
-	private static String workoutCollection = "Workout";
 	private static String fieldNombre = "nombre";
-	private static String fieldnumReps = "numRepeticiones";
+	private static String fieldNumReps = "numRepeticiones";
 	private static String fieldTiempo = "tiempo";
 
 	public Serie() {
@@ -57,5 +59,66 @@ public class Serie {
 	}
 
 	
+	public ArrayList<Serie> obtenerSeries(String ejercicioId, boolean online) {
+		ArrayList<Serie> listaSeries = new ArrayList<Serie>();
+
+		if (!online) {
+
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
+
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Ejercicio ejercicio = (Ejercicio) ois.readObject();
+
+					// Verifica si el workout tiene el id que estamos buscando
+					if (ejercicio.getId().equals(ejercicioId)) {
+						listaSeries = ejercicio.getListaSeries(); // Obtiene los ejercicios asociados
+						break;
+					}
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			Firestore fs = null;
+
+			try {
+				// Conectar a Firestore
+				fs = Conexion.conectar();
+
+				ApiFuture<QuerySnapshot> query = fs.collection("Ejercicios") 
+						.document(ejercicioId) 
+						.collection(seriesCollection) 
+						.get();
+
+				QuerySnapshot querySnapshot = query.get();
+				List<QueryDocumentSnapshot> series = querySnapshot.getDocuments();
+
+				for (QueryDocumentSnapshot serieDoc : series) {
+					Serie s = new Serie();
+					s.setNombreSerie(serieDoc.getString(fieldNombre));
+
+					Long numReps = serieDoc.getLong(fieldNumReps);
+					Long tiempo = serieDoc.getLong(fieldTiempo);
+
+					if (numReps != null) {
+						s.setNumReps(numReps);
+					}
+					if (tiempo != null) {
+						s.setTiempo(tiempo);
+					}
+
+					listaSeries.add(s);
+				}
+
+				// Cierra la conexión a Firestore después del bucle
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return listaSeries;
+	}
 
 }

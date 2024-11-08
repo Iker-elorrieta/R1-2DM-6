@@ -8,11 +8,10 @@ public class PanelEjercicios extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
-	private JButton btnReturn, btnStart, btnPause, btnNext; // Botón para iniciar y pausar
-	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; // Cuenta
-																													// regresiva
+	private JButton btnReturn, btnStart, btnPause, btnNext, btnExit; // Botón para iniciar y pausar
+	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; 
 	private boolean isPaused = false;
-	private boolean isRunning = false; // de series
+	private boolean isRunning = false; 
 	private JTextArea txtAreaDescripcion;
 
 	/**
@@ -42,7 +41,7 @@ public class PanelEjercicios extends JPanel {
 
 		// Imagen del ejercicio
 		lblImgEjer = new JLabel("");
-		lblImgEjer.setBounds(572, 206, 259, 237);
+		lblImgEjer.setBounds(573, 211, 259, 237);
 		lblImgEjer.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY)); // Borde para la imagen
 		add(lblImgEjer);
 
@@ -113,8 +112,17 @@ public class PanelEjercicios extends JPanel {
 		add(btnPause);
 		
 		btnNext = new JButton("siguiente");
-		btnNext.setBounds(618, 477, 89, 23);
+		btnNext.setBounds(450, 413, 89, 23);
 		add(btnNext);
+		
+		btnExit = new JButton("Salir");
+		btnExit.setForeground(Color.WHITE);
+		btnExit.setFont(new Font("Tahoma", Font.BOLD, 16));
+		btnExit.setFocusPainted(false);
+		btnExit.setBorder(new LineBorder(new Color(255, 255, 255), 2));
+		btnExit.setBackground(new Color(10, 75, 128));
+		btnExit.setBounds(750, 480, 120, 50);
+		add(btnExit);
 	}
 
 	public JButton getBtnReturn() {
@@ -181,6 +189,14 @@ public class PanelEjercicios extends JPanel {
 		this.btnPause = btnPause;
 	}
 
+	public JButton getBtnExit() {
+		return btnExit;
+	}
+
+	public void setBtnExit(JButton btnExit) {
+		this.btnExit = btnExit;
+	}
+
 	public JLabel getLblRepeticiones() {
 		return lblRepeticiones;
 	}
@@ -228,6 +244,4 @@ public class PanelEjercicios extends JPanel {
 	public void setBtnNext(JButton btnNext) {
 		this.btnNext = btnNext;
 	}
-	
-	
 }

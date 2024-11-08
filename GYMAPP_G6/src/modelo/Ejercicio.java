@@ -19,7 +19,7 @@ public class Ejercicio implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String nombre, descripcion, foto, id;
 	private long numReps, numSeries, tiempoDescanso;
-	// private ArrayList<Serie> listaSeries = new ArrayList<>();
+	private ArrayList<Serie> listaSeries = new ArrayList<>();
 
 	// NOMBRE DE LOS CAMPOS
 	private static String ejersCollection = "Ejercicios";
@@ -98,6 +98,14 @@ public class Ejercicio implements Serializable {
 
 	public void setTiempoDescanso(long tiempoDescanso) {
 		this.tiempoDescanso = tiempoDescanso;
+	}
+	
+	public ArrayList<Serie> getListaSeries() {
+		return listaSeries;
+	}
+
+	public void setListaSeries(ArrayList<Serie> listaSeries) {
+		this.listaSeries = listaSeries;
 	}
 	
 	

@@ -42,6 +42,7 @@ public class Controlador implements ActionListener {
 	private int segundos = 0;
 	
 	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
+	private ArrayList<Serie> listaSeries = new ArrayList<>();
 	
 	private Ejercicio ejercicioActual;
 
@@ -162,10 +163,12 @@ public class Controlador implements ActionListener {
 	private void accionesVistaEjercicios() {
 		this.vistaEjercicios.getBtnReturn().addActionListener(this);
 		this.vistaEjercicios.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
+		
+		this.vistaEjercicios.getBtnExit().addActionListener(this);
+		this.vistaEjercicios.getBtnExit().setActionCommand(Principal.enumAcciones.CERRAR_PROGRAMA.toString());
 
 		this.vistaEjercicios.getBtnStart().addActionListener(this);
-		this.vistaEjercicios.getBtnStart()
-				.setActionCommand(Principal.enumAcciones.INICIAR_REANUDAR_CONTADOR.toString());
+		this.vistaEjercicios.getBtnStart().setActionCommand(Principal.enumAcciones.INICIAR_REANUDAR_CONTADOR.toString());
 
 		this.vistaEjercicios.getBtnPause().addActionListener(this);
 		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSAR_CONTADOR.toString());
@@ -207,6 +210,7 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_EJERCICIOS:
 		    mostrarEjercicioSeleccionado();
+		    obtenerSeries();
 		    visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
 		    break;
 		case PANEL_HISTORICO:
@@ -220,6 +224,9 @@ public class Controlador implements ActionListener {
 			break;
 		case CAMBIAR_EJERCICIO:
 			cambiarAlSiguienteEjercicio();
+			break;
+		case CERRAR_PROGRAMA:
+			System.exit(0);
 		default:
 			break;
 		}
@@ -233,6 +240,11 @@ public class Controlador implements ActionListener {
 	private void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
+	
+	
+	
+	
+
 
 	public boolean isConnected() throws InterruptedException, IOException {
 		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
@@ -416,155 +428,8 @@ public class Controlador implements ActionListener {
 
 	}
 
-	// Método para obtener ejercicios
-	private void obtenerEjercicios() {
-		Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
-
-		if (selectedWorkout == null) {
-			vistaWorkouts.getEjersListModel().clear();
-			vistaWorkouts.getBtnStartWorkout().setEnabled(false);
-			return;
-		}
-
-		String workoutId = selectedWorkout.getId();
-		vistaWorkouts.getEjersListModel().clear();
-
-		Ejercicio ejercicioModel = new Ejercicio();
-		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
-
-		// Bucle para añadir todos los ejercicios
-		for (Ejercicio ejercicio : listaEjercicios) {
-			vistaWorkouts.getEjersListModel().addElement(ejercicio);
-		}
-
-		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
-	}
-
-	// Método para mostrar el ejercicio seleccionado
-	private void mostrarEjercicioSeleccionado() {
-	    Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
-	    if (selectedWorkout == null)
-	        return;
-
-	    String nombreWorkout = selectedWorkout.getNombre();
-	    this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
-
-	    if (vistaWorkouts.getEjersListModel().isEmpty())
-	        return;
-
-	    // Obtener lista de ejercicios para este workout
-	    ArrayList<Ejercicio> ejercicios = new Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online);
-	    if (ejercicios.isEmpty()) {
-	        return;
-	    }
-
-	    // Mostrar el primer ejercicio
-	    this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
-	    this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
-
-	    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
-	    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
-	    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
-	    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
-	}
-	
-	private void cambiarAlSiguienteEjercicio() {
-	    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) {
-	        return; // Si no hay ejercicios, no hacer nada
-	    }
-
-	    // Obtener el índice del ejercicio actual
-	    int indiceActual = listaEjercicios.indexOf(this.ejercicioActual);
-	    int siguienteIndice = (indiceActual + 1) % listaEjercicios.size(); // Ciclar al primer ejercicio al llegar al final
-
-	    // Establecer el siguiente ejercicio como el ejercicio actual
-	    this.ejercicioActual = listaEjercicios.get(siguienteIndice);
-
-	    // Mostrar la información del siguiente ejercicio
-	    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
-	    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
-	    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
-	    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
-	}
-
-	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
-		Workout workouts = new Workout();
-		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
-		vistaWorkouts.getWorkoutListModel().clear();
-
-		// Bucle para añadir cada workout a la JList
-		for (Workout workout : listaWorkouts) {
-			String url = workout.getVideoUrl();
-			String descripcion = workout.getDescripcion();
-			vistaWorkouts.addWorkout(workout, url, descripcion);
-		}
-	}
 
 
-	private void cargarInfoWorkout() {
-		Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
-
-		if (workoutSeleccionado == null) {
-			vistaWorkouts.getBtnDescripcion().setEnabled(false);
-			vistaWorkouts.getBtnVideo().setEnabled(false);
-			// en vez de hacer esto igual se puede vaciar el objeto
-			return;
-		}
-
-		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
-		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
-
-		// CARGAR URL
-		if (urlWorkout == null || urlWorkout.isEmpty()) {
-			vistaWorkouts.getBtnVideo().setEnabled(false);
-			return;
-		}
-
-		for (ActionListener al : vistaWorkouts.getBtnVideo().getActionListeners()) {
-			vistaWorkouts.getBtnVideo().removeActionListener(al);
-		}
-
-		vistaWorkouts.getBtnVideo().setEnabled(true);
-		vistaWorkouts.getBtnVideo().addActionListener(event -> {
-			try {
-				Desktop.getDesktop().browse(new URI(urlWorkout));
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		});
-
-		// CARGAR DESCRIPCIÓN
-		if (descripcionWorkout == null || descripcionWorkout.isEmpty()) {
-			vistaWorkouts.getBtnDescripcion().setEnabled(false);
-			return;
-		}
-
-		for (ActionListener al : vistaWorkouts.getBtnDescripcion().getActionListeners()) {
-			vistaWorkouts.getBtnDescripcion().removeActionListener(al);
-		}
-
-		vistaWorkouts.getBtnDescripcion().setEnabled(true);
-
-		int max = 50;
-		StringBuilder resultado = new StringBuilder(descripcionWorkout);
-
-		if (max > resultado.length())
-			max = resultado.length();
-
-		for (int i = max; i < resultado.length(); i += max) {
-			while (i > 0 && resultado.charAt(i - 1) != ' ') {
-				i--;
-			}
-			if (i > 0 && i < resultado.length())
-				resultado.replace(i, i, "\n");
-
-		}
-
-		String a = resultado.toString();
-		vistaWorkouts.getBtnDescripcion().addActionListener(event -> {
-			JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
-		});
-	}
 
 	/**
 	 * Vacía los campos del formulario del registro
@@ -578,7 +443,180 @@ public class Controlador implements ActionListener {
 		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
 	}
 
-	
+	// Método para obtener ejercicios
+		private void obtenerEjercicios() {
+			Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
+
+			if (selectedWorkout == null) {
+				vistaWorkouts.getEjersListModel().clear();
+				vistaWorkouts.getBtnStartWorkout().setEnabled(false);
+				return;
+			}
+
+			String workoutId = selectedWorkout.getId();
+			vistaWorkouts.getEjersListModel().clear();
+
+			Ejercicio ejercicioModel = new Ejercicio();
+			ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
+			
+
+			// Bucle para añadir todos los ejercicios
+			for (Ejercicio ejercicio : listaEjercicios) {
+				vistaWorkouts.getEjersListModel().addElement(ejercicio);
+			}
+
+			vistaWorkouts.getBtnStartWorkout().setEnabled(true);
+		}
+
+		// Método para mostrar el ejercicio seleccionado
+		private void mostrarEjercicioSeleccionado() {
+			Serie serie = new Serie();
+		    Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
+		    if (selectedWorkout == null)
+		        return;
+
+		    String nombreWorkout = selectedWorkout.getNombre();
+		    this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
+
+		    if (vistaWorkouts.getEjersListModel().isEmpty())
+		        return;
+
+		    // Obtener lista de ejercicios para este workout
+		    ArrayList<Ejercicio> ejercicios = new Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online);
+		    if (ejercicios.isEmpty()) {
+		        return;
+		    }
+
+		    // Mostrar el primer ejercicio
+		    this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
+		    this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
+		    listaSeries = serie.obtenerSeries(ejercicioActual.getId(), online);
+
+		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
+		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
+		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
+		}
+		
+		private void cambiarAlSiguienteEjercicio() {
+		    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) {
+		        return; // Si no hay ejercicios, no hacer nada
+		    }
+
+		    // Obtener el índice del ejercicio actual
+		    int indiceActual = listaEjercicios.indexOf(this.ejercicioActual);
+		    int siguienteIndice = (indiceActual + 1) % listaEjercicios.size(); // Ciclar al primer ejercicio al llegar al final
+
+		    // Establecer el siguiente ejercicio como el ejercicio actual
+		    this.ejercicioActual = listaEjercicios.get(siguienteIndice);
+
+		    // Mostrar la información del siguiente ejercicio
+		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
+		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
+		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
+		}
+
+		private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
+			Workout workouts = new Workout();
+			ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
+			vistaWorkouts.getWorkoutListModel().clear();
+
+			// Bucle para añadir cada workout a la JList
+			for (Workout workout : listaWorkouts) {
+				String url = workout.getVideoUrl();
+				String descripcion = workout.getDescripcion();
+				vistaWorkouts.addWorkout(workout, url, descripcion);
+			}
+		}
+
+
+		private void cargarInfoWorkout() {
+			Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+
+			if (workoutSeleccionado == null) {
+				vistaWorkouts.getBtnDescripcion().setEnabled(false);
+				vistaWorkouts.getBtnVideo().setEnabled(false);
+				// en vez de hacer esto igual se puede vaciar el objeto
+				return;
+			}
+
+			String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
+			String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
+
+			// CARGAR URL
+			if (urlWorkout == null || urlWorkout.isEmpty()) {
+				vistaWorkouts.getBtnVideo().setEnabled(false);
+				return;
+			}
+
+			for (ActionListener al : vistaWorkouts.getBtnVideo().getActionListeners()) {
+				vistaWorkouts.getBtnVideo().removeActionListener(al);
+			}
+
+			vistaWorkouts.getBtnVideo().setEnabled(true);
+			vistaWorkouts.getBtnVideo().addActionListener(event -> {
+				try {
+					Desktop.getDesktop().browse(new URI(urlWorkout));
+				} catch (Exception ex) {
+					ex.printStackTrace();
+				}
+			});
+
+			// CARGAR DESCRIPCIÓN
+			if (descripcionWorkout == null || descripcionWorkout.isEmpty()) {
+				vistaWorkouts.getBtnDescripcion().setEnabled(false);
+				return;
+			}
+
+			for (ActionListener al : vistaWorkouts.getBtnDescripcion().getActionListeners()) {
+				vistaWorkouts.getBtnDescripcion().removeActionListener(al);
+			}
+
+			vistaWorkouts.getBtnDescripcion().setEnabled(true);
+
+			int max = 50;
+			StringBuilder resultado = new StringBuilder(descripcionWorkout);
+
+			if (max > resultado.length())
+				max = resultado.length();
+
+			for (int i = max; i < resultado.length(); i += max) {
+				while (i > 0 && resultado.charAt(i - 1) != ' ') {
+					i--;
+				}
+				if (i > 0 && i < resultado.length())
+					resultado.replace(i, i, "\n");
+
+			}
+
+			String a = resultado.toString();
+			vistaWorkouts.getBtnDescripcion().addActionListener(event -> {
+				JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
+			});
+		}
+		
+		
+		private void obtenerSeries() {
+		    Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
+		    if (selectedWorkout == null) {
+		        return;
+		    }
+
+		    String workoutId = selectedWorkout.getId();
+		    Ejercicio ejercicioModel = new Ejercicio();
+		    Serie serieModel = new Serie();
+
+		    // Obtiene la lista de ejercicios asociados al workout seleccionado
+		    ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
+
+		    // Ahora obtiene las series para cada ejercicio
+		    ArrayList<Serie> listaSeries = new ArrayList<>();
+		    for (Ejercicio ejercicio : listaEjercicios) {
+		    	listaSeries = serieModel.obtenerSeries(ejercicio.getId(), online);
+		    	System.out.println(listaSeries.get(0).getNombreSerie());
+		    	}
+		    }
 
 	private void startCount(JLabel lbl) {
 		// Si el cronómetro ya está corriendo, no hacemos nada
