@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import modelo.Cronometro;
 import modelo.Ejercicio;
 import modelo.Serie;
 import modelo.Usuario;
@@ -42,7 +43,6 @@ public class Controlador implements ActionListener {
 	private int segundos = 0;
 	
 	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
-	private ArrayList<Serie> listaSeries = new ArrayList<>();
 	
 	private Ejercicio ejercicioActual;
 
@@ -206,11 +206,12 @@ public class Controlador implements ActionListener {
 			break;
 		case PANEL_WORKOUTS:
 			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
-			resetCount(this.vistaEjercicios.getLblMainTimer());
 			break;
 		case PANEL_EJERCICIOS:
 		    mostrarEjercicioSeleccionado();
 		    obtenerSeries();
+		    Cronometro cronometroSerie = new Cronometro(this.vistaEjercicios.getLblSerieCount());
+		    Cronometro cronometroMain = new Cronometro(this.vistaEjercicios.getLblMainTimer());
 		    visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
 		    break;
 		case PANEL_HISTORICO:
@@ -237,7 +238,7 @@ public class Controlador implements ActionListener {
 	 *
 	 * @param panel variable para indicar el panel que se visualiza
 	 */
-	private void visualizarPanel(Principal.enumAcciones panel) {
+	public void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
 	
@@ -470,52 +471,42 @@ public class Controlador implements ActionListener {
 
 		// Método para mostrar el ejercicio seleccionado
 		private void mostrarEjercicioSeleccionado() {
-			Serie serie = new Serie();
 		    Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
-		    if (selectedWorkout == null)
-		        return;
+		    if (selectedWorkout == null) return;
 
-		    String nombreWorkout = selectedWorkout.getNombre();
-		    this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
+		    this.vistaEjercicios.getLblWorkout().setText(selectedWorkout.getNombre());
 
-		    if (vistaWorkouts.getEjersListModel().isEmpty())
-		        return;
+		    if (vistaWorkouts.getEjersListModel().isEmpty()) return;
 
-		    // Obtener lista de ejercicios para este workout
 		    ArrayList<Ejercicio> ejercicios = new Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online);
-		    if (ejercicios.isEmpty()) {
-		        return;
-		    }
+		    if (ejercicios.isEmpty()) return;
 
-		    // Mostrar el primer ejercicio
 		    this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
 		    this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
-		    listaSeries = serie.obtenerSeries(ejercicioActual.getId(), online);
+		    ArrayList<Serie>listaSeries = new Serie().obtenerSeries(ejercicioActual.getId(), online);
 
-		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
-		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
-		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
+		    this.vistaEjercicios.cambiarVentana(ejercicioActual);
+		    
+//		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+//		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
+//		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
 		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
 		}
 		
 		private void cambiarAlSiguienteEjercicio() {
-		    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) {
-		        return; // Si no hay ejercicios, no hacer nada
-		    }
+		    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) return;
 
-		    // Obtener el índice del ejercicio actual
 		    int indiceActual = listaEjercicios.indexOf(this.ejercicioActual);
-		    int siguienteIndice = (indiceActual + 1) % listaEjercicios.size(); // Ciclar al primer ejercicio al llegar al final
+		    int siguienteIndice = (indiceActual + 1) % listaEjercicios.size();
 
-		    // Establecer el siguiente ejercicio como el ejercicio actual
 		    this.ejercicioActual = listaEjercicios.get(siguienteIndice);
 
-		    // Mostrar la información del siguiente ejercicio
 		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
 		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
 		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
 		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
 		}
+
 
 		private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
 			Workout workouts = new Workout();
@@ -599,82 +590,21 @@ public class Controlador implements ActionListener {
 		
 		private void obtenerSeries() {
 		    Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
-		    if (selectedWorkout == null) {
-		        return;
-		    }
+		    if (selectedWorkout == null) return;
 
 		    String workoutId = selectedWorkout.getId();
 		    Ejercicio ejercicioModel = new Ejercicio();
 		    Serie serieModel = new Serie();
 
-		    // Obtiene la lista de ejercicios asociados al workout seleccionado
 		    ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
 
-		    // Ahora obtiene las series para cada ejercicio
-		    ArrayList<Serie> listaSeries = new ArrayList<>();
 		    for (Ejercicio ejercicio : listaEjercicios) {
-		    	listaSeries = serieModel.obtenerSeries(ejercicio.getId(), online);
-		    	System.out.println(listaSeries.get(0).getNombreSerie());
-		    	}
+		        ArrayList<Serie> listaSeries = serieModel.obtenerSeries(ejercicio.getId(), online);
+		        for (Serie serie : listaSeries) {
+		            System.out.println(serie.getNombreSerie());
+		        }
 		    }
-
-	private void startCount(JLabel lbl) {
-		// Si el cronómetro ya está corriendo, no hacemos nada
-		if (this.vistaEjercicios.isRunning()) {
-			return;
 		}
 
-		// Cambiamos el estado del cronómetro
-		this.vistaEjercicios.setPaused(false);
-		this.vistaEjercicios.setRunning(true);
-
-		// Configuramos la visibilidad y el texto del botón
-		this.vistaEjercicios.getBtnPause().setVisible(true);
-		this.vistaEjercicios.getBtnStart().setText("Reanudar");
-		this.vistaEjercicios.getBtnStart().setVisible(false);
-
-		new Thread(() -> {
-			try {
-				while (this.vistaEjercicios.isRunning()) {
-					if (!this.vistaEjercicios.isPaused()) {
-						// Formateamos el tiempo y lo mostramos en la etiqueta
-						String tiempo = String.format("%02d:%02d", minutos, segundos);
-						lbl.setText(tiempo);
-
-						Thread.sleep(1000);
-
-						// Incrementamos los segundo
-						segundos++;
-
-						// Si los segundos llegan a 60, incrementamos los minutos
-						if (segundos == 60) {
-							segundos = 0;
-							minutos++;
-						}
-					}
-				}
-			} catch (InterruptedException e) {
-				System.out.println("El contador fue interrumpido.");
-			}
-		}).start();
-
-	}
-
-	private void pauseCount(JLabel lblMainTimer) {
-		this.vistaEjercicios.setRunning(false);
-		this.vistaEjercicios.setPaused(true);
-		this.vistaEjercicios.getBtnPause().setVisible(false);
-		this.vistaEjercicios.getBtnStart().setVisible(true);
-	}
-
-	private void resetCount(JLabel lblMainTimer) {
-		this.vistaEjercicios.setRunning(false);
-		this.vistaEjercicios.setPaused(true);
-		minutos = 0;
-		segundos = 0;
-		this.vistaEjercicios.getBtnStart().setText("Iniciar");
-		this.vistaEjercicios.getBtnStart().setVisible(true);
-		this.vistaEjercicios.getBtnPause().setVisible(false);
-	}
 
 }

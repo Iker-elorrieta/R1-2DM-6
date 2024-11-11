@@ -309,4 +309,9 @@ public class Usuario implements Serializable {
 
 	}
 
+	public void insertarNuevoItemHistorial(Historial historial) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
