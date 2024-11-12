@@ -11,14 +11,14 @@ public class CronometroRegresivo extends Thread {
 	private double tiempoEjerSegundos;
 	boolean finished = false;
 
-	public CronometroRegresivo(JLabel lblVisualizarCronometro, double tiempoEjercicio) {
+	public CronometroRegresivo(JLabel lblVisualizarCronometro, double tiempoEjer) {
 		this.lblCronometro = lblVisualizarCronometro;
-		this.tiempoEjerSegundos = tiempoEjercicio;
-		this.minutos = ((int) tiempoEjercicio / 60);
-		this.segundos = ((int) tiempoEjercicio % 60);
+		this.tiempoEjerSegundos = tiempoEjer;
+		this.minutos = ((int) tiempoEjer / 60);
+		this.segundos = ((int) tiempoEjer % 60);
 	}
 
-	
+	@Override
 	public void run() {
 		while (started && tiempoEjerSegundos > 0) {
 			if (running) {

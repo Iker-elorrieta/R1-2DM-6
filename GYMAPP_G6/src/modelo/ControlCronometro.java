@@ -9,49 +9,43 @@ import vista.PanelEjercicios;
 import vista.Principal;
 
 public class ControlCronometro extends Thread {
-	private PanelEjercicios pEjercicio;
-	private Workout workoutSelect;
-	private Cronometro cPrincipal;
-	private CronometroRegresivo cDescanso;
-	private Cronometro cEjercicio;
-	private CronometroRegresivo cSerie;
-	private int contadorEjercicio = 0;
-	private int contadorSerie = 0;
-	boolean siguientePulsado = false;
-	boolean finalizar = false;
+	private PanelEjercicios vistaEjercicio;
+	private Workout selectedWorkout;
+	private Cronometro mainTimer;
+	private CronometroRegresivo descansoTimer;
+	private Cronometro ejercicioTimer;
+	private CronometroRegresivo serieTimer;
+	private int contEjercicio = 0;
+	private int contSerie = 0;
+	boolean nextClicked = false;
+	boolean finish = false;
 	private Usuario usuarioLogeado;
 	private Controlador controlador;
 
-	
 
-	public ControlCronometro(PanelEjercicios pEjercicio, Workout workoutSelect, Cronometro cPrincipal,
-			CronometroRegresivo cDescanso, Cronometro cEjercicio, CronometroRegresivo cSerie, int contadorEjercicio,
-			int contadorSerie, boolean siguientePulsado, boolean finalizar, Usuario usuarioLogeado,
-			Controlador controlador) {
-		this.pEjercicio = pEjercicio;
-		this.workoutSelect = workoutSelect;
-		this.cPrincipal = cPrincipal;
-		this.cDescanso = cDescanso;
-		this.cEjercicio = cEjercicio;
-		this.cSerie = cSerie;
-		this.contadorEjercicio = contadorEjercicio;
-		this.contadorSerie = contadorSerie;
-		this.siguientePulsado = siguientePulsado;
-		this.finalizar = finalizar;
+	public ControlCronometro(PanelEjercicios vistaEjercicio, Workout selectedWorkout, Cronometro mainTimer,
+			CronometroRegresivo descansoTimer, Cronometro ejercicioTimer, CronometroRegresivo serieTimer,
+			Usuario usuarioLogeado, Controlador controlador) {
+		this.vistaEjercicio = vistaEjercicio;
+		this.selectedWorkout = selectedWorkout;
+		this.mainTimer = mainTimer;
+		this.descansoTimer = descansoTimer;
+		this.ejercicioTimer = ejercicioTimer;
+		this.serieTimer = serieTimer;
 		this.usuarioLogeado = usuarioLogeado;
 		this.controlador = controlador;
 	}
 
 	@Override
 	public void run() {
-		Ejercicio ejercicioActual = workoutSelect.getListaEjercicios().get(contadorEjercicio);
-		cPrincipal.iniciar();
-		cEjercicio.iniciar();
-		cSerie.iniciar();
-		while (contadorEjercicio < workoutSelect.getListaEjercicios().size() && !finalizar) {
-			ejercicioActual = workoutSelect.getListaEjercicios().get(contadorEjercicio);
+		Ejercicio ejercicioActual = selectedWorkout.getListaEjercicios().get(contEjercicio);
+		mainTimer.iniciar();
+		ejercicioTimer.iniciar();
+		serieTimer.iniciar();
+		while (contEjercicio < selectedWorkout.getListaEjercicios().size() && !finish) {
+			ejercicioActual = selectedWorkout.getListaEjercicios().get(contEjercicio);
 
-			while (contadorSerie < ejercicioActual.getListaSeries().size() && !finalizar) {
+			while (contSerie < ejercicioActual.getListaSeries().size() && !finish) {
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -59,47 +53,47 @@ public class ControlCronometro extends Thread {
 				}
 
 				// Si la serie ha finalizado
-				if (!cSerie.isAlive()) {
-					if (!finalizar) {
-						contadorSerie++;
+				if (!serieTimer.isAlive()) {
+					if (!finish) {
+						contSerie++;
 						// Tras finalizar la ultima serie por algun motivo entra en el bucle para
 						// controlar obligamos a salir
-						if (contadorSerie >= ejercicioActual.getListaSeries().size() || finalizar) {
+						if (contSerie >= ejercicioActual.getListaSeries().size() || finish) {
 							break;
 						}
-						iniciarDescanso();
+						startDescanso();
 
 						// Los campos que varian seran el descanso y la serie
-						cDescanso = new CronometroRegresivo(pEjercicio.getLblDescanso(),
-								workoutSelect.getListaEjercicios().get(contadorEjercicio).getTiempoDescanso());
+						descansoTimer = new CronometroRegresivo(vistaEjercicio.getLblDescanso(),
+								selectedWorkout.getListaEjercicios().get(contEjercicio).getTiempoDescanso());
 						// Actulizamos el descanso en panel
-						pEjercicio.getLblDescanso().setText(String.format("%02d:%02d",
-								((int) workoutSelect.getListaEjercicios().get(contadorEjercicio).getTiempoDescanso() / 60), // min
-								((int) workoutSelect.getListaEjercicios().get(contadorEjercicio).getTiempoDescanso() % 60)));
+						vistaEjercicio.getLblDescanso().setText(String.format("%02d:%02d",
+								((int) selectedWorkout.getListaEjercicios().get(contEjercicio).getTiempoDescanso() / 60), // min
+								((int) selectedWorkout.getListaEjercicios().get(contEjercicio).getTiempoDescanso() % 60)));
 
 						// Inicializamos la siguiente serie pero la detenomos hasta que lo active
-						cSerie = new CronometroRegresivo(pEjercicio.getGrupoCronometros().get(contadorSerie),
-								ejercicioActual.getListaSeries().get(contadorSerie).getTiempo());
-						cSerie.iniciar();
-						cSerie.pause();
-						pEjercicio.getBtnStart().setVisible(true);
+						serieTimer = new CronometroRegresivo(vistaEjercicio.getGrupoCronometros().get(contSerie),
+								ejercicioActual.getListaSeries().get(contSerie).getTiempo());
+						serieTimer.iniciar();
+						serieTimer.pause();
+						vistaEjercicio.getBtnStart().setVisible(true);
 					}
 				}
 			}
-			if (!finalizar) {
+			if (!finish) {
 				// No se por que pero la ultima serie no se ejecuta el descanso como deberia
-				iniciarDescanso();
+				startDescanso();
 				// Reiniciar variables para el siguiente ejercicio
-				contadorSerie = -1; // por algun motivo al salir del bucle y vuelve a entrar automaticametnte accede
+				contSerie = -1; // por algun motivo al salir del bucle y vuelve a entrar automaticametnte accede
 									// a la linea 54 y accede per
-				contadorEjercicio++;
-				pEjercicio.getBtnStart().setVisible(false);
-				pEjercicio.getBtnPause().setVisible(false);
+				contEjercicio++;
+				vistaEjercicio.getBtnStart().setVisible(false);
+				vistaEjercicio.getBtnPause().setVisible(false);
 
-				if (contadorEjercicio < workoutSelect.getListaEjercicios().size() && !finalizar) {
-					pEjercicio.getBtnNext().setVisible(true);
+				if (contEjercicio < selectedWorkout.getListaEjercicios().size() && !finish) {
+					vistaEjercicio.getBtnNext().setVisible(true);
 
-					while (!siguientePulsado) {
+					while (!nextClicked) {
 						// No hara nada hasta que pulse siguiente
 						try {
 							Thread.sleep(500);
@@ -108,37 +102,36 @@ public class ControlCronometro extends Thread {
 						}
 					}
 
-					Siguiente();
-					// tras finalizar reseteamos para la ronda siguietne
-					siguientePulsado = false;
+					next();
+					nextClicked = false;
 				}
 			}
 		}
-		if (!finalizar) {
+		if (!finish) {
 			finalizarProceso();
 			controlador.visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);;
 		}
 	}
 
 	public void finalizarProceso() {
-		finalizar = true;
+		finish = true;
 		String nombreEjercicio = "";
-		for (int i = 0; i < contadorEjercicio; i++) {
-			nombreEjercicio += workoutSelect.getListaEjercicios().get(i).getNombre() + "\n";
+		for (int i = 0; i < contEjercicio; i++) {
+			nombreEjercicio += selectedWorkout.getListaEjercicios().get(i).getNombre() + "\n";
 		}
-		String tiempoRealizacion = pEjercicio.getLblWorkout().getText().toString();
-		double porcentajeRealizacion = (100 * contadorEjercicio) / workoutSelect.getListaEjercicios().size();
+		String tiempoRealizacion = vistaEjercicio.getLblWorkout().getText().toString();
+		double porcentajeRealizacion = (100 * contEjercicio) / selectedWorkout.getListaEjercicios().size();
 		String texto = String.format("Tiempo total del ejercicio %s ejercicio realizado %s Porcentaje %s  bien hecho",
 				tiempoRealizacion, nombreEjercicio, porcentajeRealizacion);
 
-		Historial historial = new Historial(workoutSelect, new Date(), porcentajeRealizacion, tiempoRealizacion);
-		historial.mIngresarHistorico(usuarioLogeado.getEmail(), workoutSelect);
+		Historial historial = new Historial(selectedWorkout, new Date(), porcentajeRealizacion, tiempoRealizacion);
+		historial.mIngresarHistorico(usuarioLogeado.getEmail(), selectedWorkout);
 		usuarioLogeado.insertarNuevoItemHistorial(historial);
-		if (cPrincipal != null) {
-			cPrincipal.finishProcess();
-			cDescanso.finishProcess();
-			cEjercicio.finishProcess();
-			cSerie.finishProcess();
+		if (mainTimer != null) {
+			mainTimer.finishProcess();
+			descansoTimer.finishProcess();
+			ejercicioTimer.finishProcess();
+			serieTimer.finishProcess();
 		}
 		JOptionPane.showMessageDialog(null, texto);
 		// El cambio de ventana
@@ -146,35 +139,35 @@ public class ControlCronometro extends Thread {
 	}
 
 	public void pausar() {
-		cEjercicio.pause();
-		cSerie.pause();
-		cPrincipal.pause();
-		pEjercicio.getBtnStart().setVisible(true);
-		pEjercicio.getBtnPause().setVisible(false);
+		ejercicioTimer.pause();
+		serieTimer.pause();
+		mainTimer.pause();
+		vistaEjercicio.getBtnStart().setVisible(true);
+		vistaEjercicio.getBtnPause().setVisible(false);
 	}
 
 	public void play() {
 		// La primera ejecucion seria desencadenar todo el proceso
-		if (!cPrincipal.isAlive()) {
+		if (!mainTimer.isAlive()) {
 			this.start();
 		}
 		// Activar la serie
-		if (cSerie != null) {
-			cSerie.activate();
-			cEjercicio.activate();
-			cPrincipal.activate();
+		if (serieTimer != null) {
+			serieTimer.activate();
+			ejercicioTimer.activate();
+			mainTimer.activate();
 
 		}
-		pEjercicio.getBtnStart().setVisible(false);
-		pEjercicio.getBtnPause().setVisible(true);
+		vistaEjercicio.getBtnStart().setVisible(false);
+		vistaEjercicio.getBtnPause().setVisible(true);
 	}
 
-	private void iniciarDescanso() {
-		cDescanso.iniciar();
-		pEjercicio.getBtnStart().setVisible(false);
-		pEjercicio.getBtnPause().setVisible(false);
+	private void startDescanso() {
+		descansoTimer.iniciar();
+		vistaEjercicio.getBtnStart().setVisible(false);
+		vistaEjercicio.getBtnPause().setVisible(false);
 		// Esperamos hasta que el proceso termine
-		while (cDescanso.isAlive()) {
+		while (descansoTimer.isAlive()) {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
@@ -185,12 +178,12 @@ public class ControlCronometro extends Thread {
 	}
 
 	// Al pulsar boton siguiente
-	public void Siguiente() {
-		siguientePulsado = true;
-		cEjercicio.reset();
-		pEjercicio.cambiarVentana(workoutSelect.getListaEjercicios().get(contadorEjercicio));
-		pEjercicio.getBtnStart().setVisible(true);
-		pEjercicio.getBtnNext().setVisible(false);
+	public void next() {
+		nextClicked = true;
+		ejercicioTimer.reset();
+		vistaEjercicio.cambiarVentana(selectedWorkout.getListaEjercicios().get(contEjercicio));
+		vistaEjercicio.getBtnStart().setVisible(true);
+		vistaEjercicio.getBtnNext().setVisible(false);
 
 	}
 }

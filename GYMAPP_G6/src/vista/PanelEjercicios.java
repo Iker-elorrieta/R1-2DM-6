@@ -20,7 +20,7 @@ public class PanelEjercicios extends JPanel {
 	private boolean isPaused = false;
 	private boolean isRunning = false; 
 	private JTextArea txtAreaDescripcion;
-	private JLabel lblSerieCount, lblDescanso;
+	private JLabel lblSerieCount, lblDescanso; 
 	private ArrayList<JLabel> grupoCronometros;
 	private Workout selectedWorkout;
 	
@@ -140,6 +140,8 @@ public class PanelEjercicios extends JPanel {
 		lblTiempoEjer = new JLabel("New label");
 		lblTiempoEjer.setBounds(56, 387, 46, 14);
 		add(lblTiempoEjer);
+		
+		lblCronNextSerie = new JLabel("Siguiente Serie");
 	}
 
 	public JButton getBtnReturn() {
@@ -310,8 +312,8 @@ public class PanelEjercicios extends JPanel {
 		btnStart.setVisible(true);
 		btnNext.setVisible(false);
 		btnPause.setVisible(false);
-		lblNextSerie.setVisible(false);
-		lblCronNextSerie.setVisible(false);
+
+		
 		int labelAltura = 24;
 		int margenEntrePanelSeires = 15;
 		
@@ -319,7 +321,7 @@ public class PanelEjercicios extends JPanel {
 		lblMainTimer.setText("00:00");
 		lblTiempoEjer.setText("00:00");
 		lblCronNextSerie.setText("00:05");
-		this.removeAll();
+	
 		
 		txtAreaDescripcion.setText(ejercicio.getNombre() + " - Descripción");
 		lblWorkout.setText("Workout " + selectedWorkout.getNombre());

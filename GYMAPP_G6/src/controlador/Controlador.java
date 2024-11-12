@@ -14,13 +14,16 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import modelo.ControlCronometro;
 import modelo.Cronometro;
+import modelo.CronometroRegresivo;
 import modelo.Ejercicio;
 import modelo.Serie;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
 import modelo.Workout;
+import vista.PanelEjercicios;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -39,8 +42,14 @@ public class Controlador implements ActionListener {
 	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
 	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
 
-	private int minutos = 0;
-	private int segundos = 0;
+	private Usuario usuarioLogeado;
+	private ArrayList<Workout> listaWorkouts;
+	private Workout selectedWorkout;
+	private Cronometro mainTimer;
+	private CronometroRegresivo cronDescanso;
+	private Cronometro cronEjercicio;
+	private CronometroRegresivo cronSerie;
+	private ControlCronometro controlCronometro;
 	
 	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
 	
@@ -168,13 +177,13 @@ public class Controlador implements ActionListener {
 		this.vistaEjercicios.getBtnExit().setActionCommand(Principal.enumAcciones.CERRAR_PROGRAMA.toString());
 
 		this.vistaEjercicios.getBtnStart().addActionListener(this);
-		this.vistaEjercicios.getBtnStart().setActionCommand(Principal.enumAcciones.INICIAR_REANUDAR_CONTADOR.toString());
+		this.vistaEjercicios.getBtnStart().setActionCommand(Principal.enumAcciones.PLAY.toString());
 
 		this.vistaEjercicios.getBtnPause().addActionListener(this);
-		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSAR_CONTADOR.toString());
+		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSE.toString());
 
 		this.vistaEjercicios.getBtnNext().addActionListener(this);
-		this.vistaEjercicios.getBtnNext().setActionCommand(Principal.enumAcciones.CAMBIAR_EJERCICIO.toString());
+		this.vistaEjercicios.getBtnNext().setActionCommand(Principal.enumAcciones.NEXT_EJERCICIO.toString());
 	}
 
 	/**
@@ -208,23 +217,37 @@ public class Controlador implements ActionListener {
 			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
 			break;
 		case PANEL_EJERCICIOS:
-		    mostrarEjercicioSeleccionado();
-		    obtenerSeries();
-		    Cronometro cronometroSerie = new Cronometro(this.vistaEjercicios.getLblSerieCount());
-		    Cronometro cronometroMain = new Cronometro(this.vistaEjercicios.getLblMainTimer());
-		    visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
-		    break;
+			if(selectedWorkout != null) {
+				PanelEjercicios vistaEjercicios = this.vistaPrincipal.getPanelEjercicios();
+				
+				vistaEjercicios.setSelectedWorkout(selectedWorkout);
+				vistaEjercicios.cambiarVentana(selectedWorkout.getListaEjercicios().get(0));
+				
+				mainTimer = new Cronometro(vistaEjercicios.getLblMainTimer());
+				cronEjercicio = new Cronometro(vistaEjercicios.getLblCountdown());
+				//cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0), selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getTiempo());
+				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblDescanso(), selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso());
+				
+				controlCronometro = new ControlCronometro(vistaEjercicios, selectedWorkout, mainTimer, cronDescanso, cronEjercicio, cronDescanso, usuarioLogeado, this);
+				
+				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_EJERCICIOS);
+				
+			} else {
+				JOptionPane.showMessageDialog(null, "Elige una opción");
+			}
+			break;
 		case PANEL_HISTORICO:
 			visualizarPanel(Principal.enumAcciones.PANEL_HISTORICO);
 			break;
-		case INICIAR_REANUDAR_CONTADOR:
-			startCount(this.vistaEjercicios.getLblMainTimer());
+		case PLAY:
+			controlCronometro.play();
 			break;
-		case PAUSAR_CONTADOR:
-			pauseCount(this.vistaEjercicios.getLblMainTimer());
+		case PAUSE:
+			controlCronometro.pausar();
 			break;
-		case CAMBIAR_EJERCICIO:
-			cambiarAlSiguienteEjercicio();
+		case NEXT_EJERCICIO:
+			controlCronometro.next();
+			//cambiarAlSiguienteEjercicio();
 			break;
 		case CERRAR_PROGRAMA:
 			System.exit(0);
@@ -446,7 +469,7 @@ public class Controlador implements ActionListener {
 
 	// Método para obtener ejercicios
 		private void obtenerEjercicios() {
-			Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
+			selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
 
 			if (selectedWorkout == null) {
 				vistaWorkouts.getEjersListModel().clear();
@@ -470,7 +493,7 @@ public class Controlador implements ActionListener {
 		}
 
 		// Método para mostrar el ejercicio seleccionado
-		private void mostrarEjercicioSeleccionado() {
+		/*private void mostrarEjercicioSeleccionado() {
 		    Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
 		    if (selectedWorkout == null) return;
 
@@ -491,9 +514,9 @@ public class Controlador implements ActionListener {
 //		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
 //		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
 		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
-		}
+		}*/
 		
-		private void cambiarAlSiguienteEjercicio() {
+		/*private void cambiarAlSiguienteEjercicio() {
 		    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) return;
 
 		    int indiceActual = listaEjercicios.indexOf(this.ejercicioActual);
@@ -505,7 +528,7 @@ public class Controlador implements ActionListener {
 		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
 		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
 		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
-		}
+		}*/
 
 
 		private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
@@ -588,7 +611,7 @@ public class Controlador implements ActionListener {
 		}
 		
 		
-		private void obtenerSeries() {
+		/*private void obtenerSeries() {
 		    Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
 		    if (selectedWorkout == null) return;
 
@@ -604,7 +627,7 @@ public class Controlador implements ActionListener {
 		            System.out.println(serie.getNombreSerie());
 		        }
 		    }
-		}
+		}*/
 
 
 }
