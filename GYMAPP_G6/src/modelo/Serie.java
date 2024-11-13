@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -59,9 +60,9 @@ public class Serie {
 	}
 
 	
-	public ArrayList<Serie> obtenerSeries(String ejercicioId, boolean online) {
+	public ArrayList<Serie> obtenerSeries(String ejersCollection, String ejercicioId, String workoutId, boolean online) {
 	    ArrayList<Serie> listaSeries = new ArrayList<>();
-
+	    
 	    if (!online) {
 	        try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
 	             ObjectInputStream ois = new ObjectInputStream(fic)) {
@@ -85,18 +86,17 @@ public class Serie {
 	            // Conectar a Firestore
 	            fs = Conexion.conectar();
 
-	            ApiFuture<QuerySnapshot> query = fs.collection("Ejercicios") 
-	                    .document(ejercicioId) 
-	                    .collection(seriesCollection) 
-	                    .get();
-
-	            QuerySnapshot querySnapshot = query.get();
-	            List<QueryDocumentSnapshot> series = querySnapshot.getDocuments();
+	            DocumentReference workoutDoc = fs.collection("Workouts").document(workoutId);
+	            DocumentReference ejerDoc = workoutDoc.collection(ejersCollection).document(ejercicioId);
+	            
+	            ApiFuture<QuerySnapshot> seriesQuery = ejerDoc.collection(seriesCollection).get();
+	            QuerySnapshot seriesSnapshot = seriesQuery.get();
+	            List<QueryDocumentSnapshot> series = seriesSnapshot.getDocuments();
 
 	            for (QueryDocumentSnapshot serieDoc : series) {
 	                Serie s = new Serie();
+	                
 	                s.setNombreSerie(serieDoc.getString(fieldNombre));
-
 	                Long numReps = serieDoc.getLong(fieldNumReps);
 	                Long tiempo = serieDoc.getLong(fieldTiempo);
 

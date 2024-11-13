@@ -131,7 +131,6 @@ public class PanelEjercicios extends JPanel {
 		
 		lblSerieCount = new JLabel("000");
 		lblSerieCount.setBounds(46, 305, 94, 14);
-		add(lblSerieCount);
 		
 		lblDescanso = new JLabel("00");
 		lblDescanso.setBounds(56, 330, 94, 14);
@@ -312,10 +311,6 @@ public class PanelEjercicios extends JPanel {
 		btnStart.setVisible(true);
 		btnNext.setVisible(false);
 		btnPause.setVisible(false);
-
-		
-		int labelAltura = 24;
-		int margenEntrePanelSeires = 15;
 		
 		grupoCronometros = new ArrayList<JLabel>();
 		lblMainTimer.setText("00:00");
@@ -330,24 +325,14 @@ public class PanelEjercicios extends JPanel {
 				((int) selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso() % 60)));// seg
 		
 		for(Serie serie : ejercicio.getListaSeries()) {
-			lblSeries = new JLabel(serie.getNombreSerie());
-			lblSeries.setBounds(280, 262, 259, 30);
+			lblSeries = new JLabel();
+			lblSeries.setBounds(270, 250, 259, 30);
 			this.add(lblSeries);
 			
-			lblImgEjer = new JLabel(ejercicio.getFoto());
-			lblImgEjer.setBounds(573, 211, 259, 237);
-			this.add(lblImgEjer);
-			lblImgEjer.setIcon(new ImageIcon(new ImageIcon(ejercicio.getFoto()).getImage()
-					.getScaledInstance(lblImgEjer.getWidth(), lblImgEjer.getHeight(), Image.SCALE_SMOOTH)));
 			
-			lblSerieCount = new JLabel("");
-			lblSerieCount.setBounds(334, labelAltura, 100, 14);
-			lblSerieCount.setText((String.format("%02d:%02d", ((int) serie.getTiempo() / 60), // min
-					((int) serie.getTiempo() % 60))));// seg
 			this.add(lblSerieCount);
 			
 			grupoCronometros.add(lblSerieCount);
-			labelAltura += lblImgEjer.getHeight() + margenEntrePanelSeires;
 		}
 		lblEjercicio.setText(ejercicio.getNombre());
 	    txtAreaDescripcion.setText(ejercicio.getDescripcion());
@@ -355,16 +340,4 @@ public class PanelEjercicios extends JPanel {
 	}
 	
 		
-		
-		/*
-			conjuntoDeCronometros.add(lblCSerie);
-			labelAltura += lblImgSerie.getHeight() + margenEntrePanelSeires;
-
-			if (labelAltura > panelMenu.getHeight() - 20) {
-				panelMenu.setPreferredSize(new Dimension(400, labelAltura + margenEntrePanelSeires));
-			}
-			panelMenu.revalidate();
-			panelMenu.repaint();
-		}*/
-	
 }

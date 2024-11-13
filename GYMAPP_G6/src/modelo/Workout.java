@@ -114,7 +114,7 @@ public class Workout implements Serializable {
 
 					// Filtro por nivel
 					if (workout.getNivel() <= nivelUsuario) {
-						workout.setListaEjercicios(new Ejercicio().obtenerEjercicios(workout.getId(), online)); // Cargar
+						workout.setListaEjercicios(new Ejercicio().obtenerEjercicios(workout.getId().toString(), online)); // Cargar
 																												// ejercicios
 						listaWorkouts.add(workout);
 					}
@@ -151,9 +151,11 @@ public class Workout implements Serializable {
 
 					w.setVideoUrl(workout.getString(fieldVideoUrl));
 					w.setDescripcion(workout.getString(fieldDescripcion));
+					
+					w.setListaEjercicios(new Ejercicio().obtenerEjercicios(w.getId(), online));
 					listaWorkouts.add(w);
 
-					w.setListaEjercicios(new Ejercicio().obtenerEjercicios(workout.getId().toString(), online));
+					
 
 				}
 				fs.close();

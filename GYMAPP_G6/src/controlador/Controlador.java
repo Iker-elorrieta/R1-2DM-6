@@ -214,22 +214,28 @@ public class Controlador implements ActionListener {
 			login();
 			break;
 		case PANEL_WORKOUTS:
+			if(listaWorkouts == null) {
+				listaWorkouts = new Workout().obtenerWorkouts(usuarioLogeado.getNivelUsuario(), online);
+			}
+			controlCronometro.finalizarProceso();
 			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
 			break;
 		case PANEL_EJERCICIOS:
 			if(selectedWorkout != null) {
 				PanelEjercicios vistaEjercicios = this.vistaPrincipal.getPanelEjercicios();
-				
+				ArrayList<Ejercicio> listaEjercicios = selectedWorkout.getListaEjercicios();
 				vistaEjercicios.setSelectedWorkout(selectedWorkout);
-				vistaEjercicios.cambiarVentana(selectedWorkout.getListaEjercicios().get(0));
-				
+				vistaEjercicios.cambiarVentana(listaEjercicios.get(0));
+				this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), listaEjercicios.get(0).getFoto() , vistaEjercicios);
 				mainTimer = new Cronometro(vistaEjercicios.getLblMainTimer());
 				cronEjercicio = new Cronometro(vistaEjercicios.getLblCountdown());
-				//cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0), selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getTiempo());
-				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblDescanso(), selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso());
+				cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0), listaEjercicios.get(0).getListaSeries().get(0).getTiempo());
+				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblDescanso(), listaEjercicios.get(0).getTiempoDescanso());
 				
 				controlCronometro = new ControlCronometro(vistaEjercicios, selectedWorkout, mainTimer, cronDescanso, cronEjercicio, cronDescanso, usuarioLogeado, this);
-				
+				vistaEjercicios.getLblSeries().setText(listaEjercicios.get(0).getListaSeries().get(0).getNombreSerie());
+				vistaEjercicios.getLblSerieCount().setText((String.format("%02d:%02d", ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() / 60), ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() % 60))));
+
 				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_EJERCICIOS);
 				
 			} else {

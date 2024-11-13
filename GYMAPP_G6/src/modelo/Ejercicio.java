@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -138,37 +139,29 @@ public class Ejercicio implements Serializable {
 				// Conectar a Firestore
 				fs = Conexion.conectar();
 
-				// Acceder a la subcolección Ejercicios dentro del documento de Workouts con
-				// workoutId
-				ApiFuture<QuerySnapshot> query = fs.collection("Workouts") // Colección Workouts
-						.document(workoutId) // Documento específico de Workouts
-						.collection(ejersCollection) // Subcolección Ejercicios
-						.get();
+				DocumentReference workoutDoc =fs.collection("Workouts").document(workoutId);
+				ApiFuture<QuerySnapshot> ejersQuery = workoutDoc.collection(ejersCollection).get();
+				QuerySnapshot ejersSnapshot = ejersQuery.get();
+				List<QueryDocumentSnapshot> ejercicios = ejersSnapshot.getDocuments();
 
-				QuerySnapshot querySnapshot = query.get();
-				List<QueryDocumentSnapshot> ejercicios = querySnapshot.getDocuments();
-
-				for (QueryDocumentSnapshot ejercicioDoc : ejercicios) {
+				for (QueryDocumentSnapshot ejercicio : ejercicios) {
 					Ejercicio e = new Ejercicio();
-					e.setNombre(ejercicioDoc.getString(fieldNombre));
-					e.setDescripcion(ejercicioDoc.getString(fieldDescripcion));
-					e.setFoto(ejercicioDoc.getString(fieldFoto));
+					e.setId(ejercicio.getId());
+					e.setNombre(ejercicio.getString(fieldNombre));
+					e.setDescripcion(ejercicio.getString(fieldDescripcion));
+					e.setFoto(ejercicio.getString(fieldFoto));
 
-					Long numReps = ejercicioDoc.getLong(fieldnumReps);
-					Long numSeries = ejercicioDoc.getLong(fieldNumSeries);
-					Long tiempoDescanso = ejercicioDoc.getLong(fieldTiempoDescanso);
+					Long numReps = ejercicio.getLong(fieldnumReps);
+					Long tiempoDescanso = ejercicio.getLong(fieldTiempoDescanso);
 
 					// Si no es null, convertir Long a int
 					if (numReps != null) {
 						e.setNumReps(numReps);
 					}
-					if (numSeries != null) {
-						e.setNumSeries(numSeries);
-					}
 					if (tiempoDescanso != null) {
 						e.setTiempoDescanso(tiempoDescanso);
 					}
-
+					e.setListaSeries(new Serie().obtenerSeries(ejersCollection, e.getId(), workoutId, online));
 					// Agregar el ejercicio a la lista
 					listaEjercicios.add(e);
 				}
