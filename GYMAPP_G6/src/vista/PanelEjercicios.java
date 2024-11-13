@@ -2,17 +2,30 @@ package vista;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+
 import javax.swing.border.LineBorder;
+
+import controlador.Controlador;
+import modelo.Ejercicio;
+import modelo.Serie;
+import modelo.Workout;
 
 public class PanelEjercicios extends JPanel {
 
 	private static final long serialVersionUID = 1L;
 
 	private JButton btnReturn, btnStart, btnPause, btnNext, btnExit; // Botón para iniciar y pausar
-	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; 
+	private JLabel lblWorkout, lblImgEjer, lblEjercicio, lblTiempoEjer, lblMainTimer, lblSeries, lblRepeticiones, lblCountdown; 
 	private boolean isPaused = false;
 	private boolean isRunning = false; 
 	private JTextArea txtAreaDescripcion;
+	private JLabel lblSerieCount, lblDescanso; 
+	private ArrayList<JLabel> grupoCronometros;
+	private Workout selectedWorkout;
+	
+	JLabel lblCronNextSerie;
+	JLabel lblNextSerie;
 
 	/**
 	 * Create the panel.
@@ -69,14 +82,6 @@ public class PanelEjercicios extends JPanel {
 		btnStart.setBorder(new LineBorder(new Color(255, 255, 255), 2));
 		add(btnStart);
 
-		// Información de series
-		lblSeries = new JLabel("");
-		lblSeries.setHorizontalAlignment(SwingConstants.CENTER);
-		lblSeries.setFont(new Font("Tahoma", Font.BOLD, 16));
-		lblSeries.setBounds(280, 262, 259, 30);
-		lblSeries.setForeground(new Color(30, 121, 166)); // Azul
-		add(lblSeries);
-
 		// Cuenta regresiva para series
 		lblCountdown = new JLabel("Cuenta regresiva: 5");
 		lblCountdown.setHorizontalAlignment(SwingConstants.CENTER);
@@ -123,6 +128,20 @@ public class PanelEjercicios extends JPanel {
 		btnExit.setBackground(new Color(10, 75, 128));
 		btnExit.setBounds(750, 480, 120, 50);
 		add(btnExit);
+		
+		lblSerieCount = new JLabel("000");
+		lblSerieCount.setBounds(46, 305, 94, 14);
+		add(lblSerieCount);
+		
+		lblDescanso = new JLabel("00");
+		lblDescanso.setBounds(56, 330, 94, 14);
+		add(lblDescanso);
+		
+		lblTiempoEjer = new JLabel("New label");
+		lblTiempoEjer.setBounds(56, 387, 46, 14);
+		add(lblTiempoEjer);
+		
+		lblCronNextSerie = new JLabel("Siguiente Serie");
 	}
 
 	public JButton getBtnReturn() {
@@ -244,4 +263,108 @@ public class PanelEjercicios extends JPanel {
 	public void setBtnNext(JButton btnNext) {
 		this.btnNext = btnNext;
 	}
+
+	public JLabel getLblSerieCount() {
+		return lblSerieCount;
+	}
+
+	public void setLblSerieCount(JLabel lblSerieCount) {
+		this.lblSerieCount = lblSerieCount;
+	}
+
+	public JLabel getLblDescanso() {
+		return lblDescanso;
+	}
+
+	public void setLblDescanso(JLabel lblDescanso) {
+		this.lblDescanso = lblDescanso;
+	}
+	
+	public JLabel getLblCronSerie() {
+		return lblCronNextSerie;
+	}
+
+	public void setLblCronSerie(JLabel lblCronNextSerie) {
+		this.lblCronNextSerie = lblCronNextSerie;
+	}
+
+	public JLabel getLblNextSerie() {
+		return lblNextSerie;
+	}
+
+	public void setLblNextSerie(JLabel lblNextSerie) {
+		this.lblNextSerie = lblNextSerie;
+	}
+
+	public ArrayList<JLabel> getGrupoCronometros() {
+		return grupoCronometros;
+	}
+	
+	public Workout getSelectedWorkout() {
+		return selectedWorkout;
+	}
+
+	public void setSelectedWorkout(Workout selectedWorkout) {
+		this.selectedWorkout = selectedWorkout;
+	}
+
+	public void cambiarVentana(Ejercicio ejercicio) {
+		btnStart.setVisible(true);
+		btnNext.setVisible(false);
+		btnPause.setVisible(false);
+
+		
+		int labelAltura = 24;
+		int margenEntrePanelSeires = 15;
+		
+		grupoCronometros = new ArrayList<JLabel>();
+		lblMainTimer.setText("00:00");
+		lblTiempoEjer.setText("00:00");
+		lblCronNextSerie.setText("00:05");
+	
+		
+		txtAreaDescripcion.setText(ejercicio.getNombre() + " - Descripción");
+		lblWorkout.setText("Workout " + selectedWorkout.getNombre());
+		
+		lblDescanso.setText(String.format("%02d:%02d", ((int) selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso() / 60), // min
+				((int) selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso() % 60)));// seg
+		
+		for(Serie serie : ejercicio.getListaSeries()) {
+			lblSeries = new JLabel(serie.getNombreSerie());
+			lblSeries.setBounds(280, 262, 259, 30);
+			this.add(lblSeries);
+			
+			lblImgEjer = new JLabel(ejercicio.getFoto());
+			lblImgEjer.setBounds(573, 211, 259, 237);
+			this.add(lblImgEjer);
+			lblImgEjer.setIcon(new ImageIcon(new ImageIcon(ejercicio.getFoto()).getImage()
+					.getScaledInstance(lblImgEjer.getWidth(), lblImgEjer.getHeight(), Image.SCALE_SMOOTH)));
+			
+			lblSerieCount = new JLabel("");
+			lblSerieCount.setBounds(334, labelAltura, 100, 14);
+			lblSerieCount.setText((String.format("%02d:%02d", ((int) serie.getTiempo() / 60), // min
+					((int) serie.getTiempo() % 60))));// seg
+			this.add(lblSerieCount);
+			
+			grupoCronometros.add(lblSerieCount);
+			labelAltura += lblImgEjer.getHeight() + margenEntrePanelSeires;
+		}
+		lblEjercicio.setText(ejercicio.getNombre());
+	    txtAreaDescripcion.setText(ejercicio.getDescripcion());
+	    lblRepeticiones.setText("Repeticiones: " + ejercicio.getNumReps());
+	}
+	
+		
+		
+		/*
+			conjuntoDeCronometros.add(lblCSerie);
+			labelAltura += lblImgSerie.getHeight() + margenEntrePanelSeires;
+
+			if (labelAltura > panelMenu.getHeight() - 20) {
+				panelMenu.setPreferredSize(new Dimension(400, labelAltura + margenEntrePanelSeires));
+			}
+			panelMenu.revalidate();
+			panelMenu.repaint();
+		}*/
+	
 }

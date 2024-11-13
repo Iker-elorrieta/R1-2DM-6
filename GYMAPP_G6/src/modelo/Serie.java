@@ -46,7 +46,7 @@ public class Serie {
 		return numReps;
 	}
 
-	public void setNumReps(Long numReps) {
+	public void setNumReps(long numReps) {
 		this.numReps = numReps;
 	}
 
@@ -60,65 +60,70 @@ public class Serie {
 
 	
 	public ArrayList<Serie> obtenerSeries(String ejercicioId, boolean online) {
-		ArrayList<Serie> listaSeries = new ArrayList<Serie>();
+	    ArrayList<Serie> listaSeries = new ArrayList<>();
 
-		if (!online) {
+	    if (!online) {
+	        try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+	             ObjectInputStream ois = new ObjectInputStream(fic)) {
 
-			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
-					ObjectInputStream ois = new ObjectInputStream(fic)) {
+	            while (fic.getChannel().position() < fic.getChannel().size()) {
+	                Ejercicio ejercicio = (Ejercicio) ois.readObject();
 
-				while (fic.getChannel().position() < fic.getChannel().size()) {
-					Ejercicio ejercicio = (Ejercicio) ois.readObject();
+	                // Verifica si el workout tiene el id que estamos buscando
+	                if (ejercicio.getId().equals(ejercicioId)) {
+	                    listaSeries = ejercicio.getListaSeries(); // Obtiene los ejercicios asociados
+	                    break;
+	                }
+	            }
+	        } catch (ClassNotFoundException | IOException e) {
+	            e.printStackTrace();
+	        }
+	    } else {
+	        Firestore fs = null;
 
-					// Verifica si el workout tiene el id que estamos buscando
-					if (ejercicio.getId().equals(ejercicioId)) {
-						listaSeries = ejercicio.getListaSeries(); // Obtiene los ejercicios asociados
-						break;
-					}
-				}
-			} catch (ClassNotFoundException | IOException e) {
-				e.printStackTrace();
-			}
-		} else {
-			Firestore fs = null;
+	        try {
+	            // Conectar a Firestore
+	            fs = Conexion.conectar();
 
-			try {
-				// Conectar a Firestore
-				fs = Conexion.conectar();
+	            ApiFuture<QuerySnapshot> query = fs.collection("Ejercicios") 
+	                    .document(ejercicioId) 
+	                    .collection(seriesCollection) 
+	                    .get();
 
-				ApiFuture<QuerySnapshot> query = fs.collection("Ejercicios") 
-						.document(ejercicioId) 
-						.collection(seriesCollection) 
-						.get();
+	            QuerySnapshot querySnapshot = query.get();
+	            List<QueryDocumentSnapshot> series = querySnapshot.getDocuments();
 
-				QuerySnapshot querySnapshot = query.get();
-				List<QueryDocumentSnapshot> series = querySnapshot.getDocuments();
+	            for (QueryDocumentSnapshot serieDoc : series) {
+	                Serie s = new Serie();
+	                s.setNombreSerie(serieDoc.getString(fieldNombre));
 
-				for (QueryDocumentSnapshot serieDoc : series) {
-					Serie s = new Serie();
-					s.setNombreSerie(serieDoc.getString(fieldNombre));
+	                Long numReps = serieDoc.getLong(fieldNumReps);
+	                Long tiempo = serieDoc.getLong(fieldTiempo);
 
-					Long numReps = serieDoc.getLong(fieldNumReps);
-					Long tiempo = serieDoc.getLong(fieldTiempo);
+	                if (numReps != null) {
+	                    s.setNumReps(numReps.intValue());
+	                }
+	                if (tiempo != null) {
+	                    s.setTiempo(tiempo.intValue());
+	                }
 
-					if (numReps != null) {
-						s.setNumReps(numReps);
-					}
-					if (tiempo != null) {
-						s.setTiempo(tiempo);
-					}
+	                listaSeries.add(s);
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        } finally {
+	            if (fs != null) {
+	                try {
+	                    fs.close();
+	                } catch (Exception e) {
+	                    e.printStackTrace();
+	                }
+	            }
+	        }
+	    }
 
-					listaSeries.add(s);
-				}
-
-				// Cierra la conexión a Firestore después del bucle
-				fs.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-
-		return listaSeries;
+	    return listaSeries;
 	}
+
 
 }
