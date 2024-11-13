@@ -5,7 +5,7 @@ import javax.swing.JLabel;
 public class CronometroRegresivo extends Thread {
 	private int minutos = 0;
 	private int segundos = 0;
-	private boolean started = false;
+	private boolean iniciado = false;
 	private boolean running = false;
 	private JLabel lblCronometro;
 	private double tiempoEjerSegundos;
@@ -20,7 +20,7 @@ public class CronometroRegresivo extends Thread {
 
 	@Override
 	public void run() {
-		while (started && tiempoEjerSegundos > 0) {
+		while (iniciado && tiempoEjerSegundos > 0) {
 			if (running) {
 				tiempoEjerSegundos--;
 
@@ -45,14 +45,14 @@ public class CronometroRegresivo extends Thread {
 	}
 
 	public void iniciar() {
-		if (!started) {
-			started = true;
+		if (!iniciado) {
+			iniciado = true;
 			running = true;
 			start();
 		}
 	}
 
-	public void pause() {
+	public void detener() {
 		running = false;
 	}
 
@@ -68,8 +68,8 @@ public class CronometroRegresivo extends Thread {
 		return running;
 	}
 
-	public void finishProcess() {
-		started = false;
+	public void terminarProceso() {
+		iniciado = false;
 	}
 
 }

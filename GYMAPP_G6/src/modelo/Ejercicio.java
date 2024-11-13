@@ -19,7 +19,7 @@ public class Ejercicio implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private String nombre, descripcion, foto, id;
-	private long numReps, numSeries, tiempoDescanso;
+	private long numReps, tiempoDescanso;
 	private ArrayList<Serie> listaSeries = new ArrayList<>();
 
 	// NOMBRE DE LOS CAMPOS
@@ -28,7 +28,6 @@ public class Ejercicio implements Serializable {
 	private static String fieldDescripcion = "descripcion";
 	private static String fieldFoto = "foto";
 	private static String fieldnumReps = "numRepeticiones";
-	private static String fieldNumSeries = "numSeries";
 	private static String fieldTiempoDescanso = "tiempoDescanso";
 
 	public Ejercicio() {
@@ -40,7 +39,6 @@ public class Ejercicio implements Serializable {
 		this.descripcion = descripcion;
 		this.foto = foto;
 		this.numReps = numReps;
-		this.numSeries = numSeries;
 		this.tiempoDescanso = tiempoDescanso;
 	}
 
@@ -86,11 +84,11 @@ public class Ejercicio implements Serializable {
 	}
 
 	public long getNumSeries() {
-		return numSeries;
+		return listaSeries.size();
 	}
 
 	public void setNumSeries(long numSeries) {
-		this.numSeries = numSeries;
+		listaSeries.size();
 	}
 
 	public long getTiempoDescanso() {

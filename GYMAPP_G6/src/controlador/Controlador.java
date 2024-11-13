@@ -9,7 +9,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
 
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,7 +17,6 @@ import modelo.ControlCronometro;
 import modelo.Cronometro;
 import modelo.CronometroRegresivo;
 import modelo.Ejercicio;
-import modelo.Serie;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
@@ -45,15 +43,11 @@ public class Controlador implements ActionListener {
 	private Usuario usuarioLogeado;
 	private ArrayList<Workout> listaWorkouts;
 	private Workout selectedWorkout;
-	private Cronometro mainTimer;
+	private Cronometro cPrincipal;
 	private CronometroRegresivo cronDescanso;
 	private Cronometro cronEjercicio;
 	private CronometroRegresivo cronSerie;
 	private ControlCronometro controlCronometro;
-	
-	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
-	
-	private Ejercicio ejercicioActual;
 
 	// Rutas
 	private String backupsUsuario = "backups/usuario.dat";
@@ -223,20 +217,26 @@ public class Controlador implements ActionListener {
 		case PANEL_EJERCICIOS:
 			if(selectedWorkout != null) {
 				PanelEjercicios vistaEjercicios = this.vistaPrincipal.getPanelEjercicios();
-				ArrayList<Ejercicio> listaEjercicios = selectedWorkout.getListaEjercicios();
-				vistaEjercicios.setSelectedWorkout(selectedWorkout);
-				vistaEjercicios.cambiarVentana(listaEjercicios.get(0));
-				this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), listaEjercicios.get(0).getFoto() , vistaEjercicios);
-				mainTimer = new Cronometro(vistaEjercicios.getLblMainTimer());
-				cronEjercicio = new Cronometro(vistaEjercicios.getLblCountdown());
-				cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0), listaEjercicios.get(0).getListaSeries().get(0).getTiempo());
-				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblDescanso(), listaEjercicios.get(0).getTiempoDescanso());
 				
-				controlCronometro = new ControlCronometro(vistaEjercicios, selectedWorkout, mainTimer, cronDescanso, cronEjercicio, cronDescanso, usuarioLogeado, this);
-				vistaEjercicios.getLblSeries().setText(listaEjercicios.get(0).getListaSeries().get(0).getNombreSerie());
-				vistaEjercicios.getLblSerieCount().setText((String.format("%02d:%02d", ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() / 60), ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() % 60))));
+				vistaEjercicios.setSelectedWorkout(selectedWorkout);
+				vistaEjercicios.cambiarVentana(selectedWorkout.getListaEjercicios().get(0));
+				
+				cPrincipal = new Cronometro(vistaEjercicios.getLblCWorkout());
+				cronEjercicio = new Cronometro(vistaEjercicios.getLblCTiempoE());
+				cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0), 
+						selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getTiempo());
+				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblCDescanso(), 
+						selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso());
+				controlCronometro = new ControlCronometro(vistaEjercicios, this, usuarioLogeado, 
+						selectedWorkout, cPrincipal, cronDescanso, cronEjercicio, cronSerie);
+				
+				this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), selectedWorkout.getListaEjercicios().get(0).getFoto() , vistaEjercicios);
+				
+				
+				vistaEjercicios.getLblNombreSerie().setText(selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getNombreSerie());
+				//vistaEjercicios.getLblSerieCount().setText((String.format("%02d:%02d", ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() / 60), ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() % 60))));
 
-				this.vistaPrincipal.visualizarPaneles(Principal.enumAcciones.PANEL_EJERCICIOS);
+				this.vistaPrincipal.visualizarPaneles(accion);
 				
 			} else {
 				JOptionPane.showMessageDialog(null, "Elige una opción");

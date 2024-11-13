@@ -5,8 +5,8 @@ import javax.swing.JLabel;
 public class Cronometro extends Thread {
 	private int minutos = 0;
 	private int segundos = 0;
-	private boolean started = false;
-	private boolean finished = false;
+	private boolean iniciado = false;
+	private boolean finalizado = false;
 
 	private boolean running = false;
 	private JLabel lblCronometro;
@@ -17,7 +17,7 @@ public class Cronometro extends Thread {
 
 	@Override
 	public void run() {
-		while (started) {
+		while (iniciado) {
 			if (running) {
 				segundos++;
 
@@ -39,12 +39,12 @@ public class Cronometro extends Thread {
 
 			}
 		}
-		finished = true;
+		finalizado = true;
 	}
 
 	public void iniciar() {
-		if (!started) {
-			started = true;
+		if (!iniciado) {
+			iniciado = true;
 			running = true;
 			start();
 		}
@@ -55,7 +55,7 @@ public class Cronometro extends Thread {
 		segundos = 0;
 	}
 
-	public void pause() {
+	public void detener() {
 		running = false;
 	}
 
@@ -64,14 +64,14 @@ public class Cronometro extends Thread {
 	}
 
 	public boolean finished() {
-		return finished;
+		return finalizado;
 	}
 
 	public boolean running() {
 		return running;
 	}
 
-	public void finishProcess() {
-		started = false;
+	public void terminarProceso() {
+		iniciado = false;
 	}
 }
