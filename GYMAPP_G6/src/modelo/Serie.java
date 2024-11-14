@@ -23,7 +23,6 @@ public class Serie implements Serializable {
 
 	// NOMBRE DE LOS CAMPOS
 	private static String seriesCollection = "Series";
-	private static String ejersCollection = "Ejercicios";
 	private static String fieldNombre = "nombre";
 	private static String fieldNumReps = "numRepeticiones";
 	private static String fieldTiempo = "tiempo";

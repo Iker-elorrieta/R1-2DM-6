@@ -163,7 +163,7 @@ public class PanelEjercicios extends JPanel {
 		lblEjercicio.setBounds(195, 26, 300, 30);
 		lblEjercicio.setFont(new Font("Tahoma", Font.BOLD, 20));
 		add(lblEjercicio);
-		
+
 		lblRepeticiones = new JLabel("Repeticiones :");
 		lblRepeticiones.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRepeticiones.setForeground(new Color(30, 121, 166));
@@ -172,22 +172,21 @@ public class PanelEjercicios extends JPanel {
 		add(lblRepeticiones);
 
 	}
-	
+
 	public void cambiarVentana(Ejercicio ejercicio) {
 		btnStart.setVisible(true);
 		btnPause.setVisible(false);
 		btnNext.setVisible(false);
 		lblLaProximaSerie.setVisible(true);
 		lblCProximaSerie.setVisible(true);
-		
 
 		grupoCronometros = new ArrayList<JLabel>();
 		lblCWorkout.setText("00:00");
 		lblCTiempoE.setText("00:00");
 		lblCProximaSerie.setText("00:05");
 		txtAreaDescripcion.setText(selectedWorkout.getDescripcion());
-		lblTiempoDescansoTexto.setText("Tiempo de descanso " +  ejercicio.getTiempoDescanso() + " seg" );
-		
+		lblTiempoDescansoTexto.setText("Tiempo de descanso " + ejercicio.getTiempoDescanso() + " seg");
+
 		lblDescripcion.setText(ejercicio.getNombre() + "- Descripción:");
 		lblWorkout.setText("Workout: " + selectedWorkout.getNombre());
 
@@ -295,10 +294,5 @@ public class PanelEjercicios extends JPanel {
 	public JLabel getLblDescripcion() {
 		return lblDescripcion;
 	}
-
-
-	
-	
-	
 
 }
