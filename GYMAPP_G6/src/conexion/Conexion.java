@@ -22,7 +22,6 @@ public class Conexion {
 					.setProjectId(projectID).setCredentials(GoogleCredentials.fromStream(serviceAccount)).build();
 			fs = firestoreOptions.getService();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

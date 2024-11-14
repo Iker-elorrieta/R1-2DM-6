@@ -1,7 +1,6 @@
 package vista;
 
 import java.awt.Image;
-
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,7 +13,8 @@ public class Principal extends JFrame {
 	private static final long serialVersionUID = 1L;
 
 	public static enum enumAcciones {
-		PANEL_REGISTRO, REGISTRAR_USUARIO, PANEL_LOGIN, INICIAR_SESION, PANEL_WORKOUTS, PANEL_EJERCICIOS
+		PANEL_REGISTRO, REGISTRAR_USUARIO, PANEL_LOGIN, INICIAR_SESION, PANEL_WORKOUTS, PANEL_EJERCICIOS,
+		PANEL_HISTORICO, PLAY, PAUSE, NEXT_EJERCICIO, CERRAR_PROGRAMA, PANEL_WORKOUTS_FROM_HISTORICO
 	}
 
 	private JPanel panelContenedor;
@@ -22,6 +22,7 @@ public class Principal extends JFrame {
 	private PanelLogin panelLogin;
 	private PanelWorkouts panelWorkouts;
 	private PanelEjercicios panelEjercicios;
+	private PanelHistorico panelHistorico;
 
 	public Principal() {
 
@@ -30,6 +31,7 @@ public class Principal extends JFrame {
 		crearPanelRegistro();
 		crearPanelWorkouts();
 		crearPanelEjercicios();
+		crearPanelHistorico();
 
 		// Mostrar el panel de login al inicio.
 		visualizarPaneles(enumAcciones.PANEL_LOGIN);
@@ -70,12 +72,19 @@ public class Principal extends JFrame {
 		panelEjercicios.setVisible(false);
 	}
 
+	private void crearPanelHistorico() {
+		panelHistorico = new PanelHistorico();
+		panelContenedor.add(panelHistorico);
+		panelHistorico.setVisible(false);
+	}
+
 	public void visualizarPaneles(enumAcciones panel) {
 		// Ocultar ambos paneles primero.
 		panelLogin.setVisible(false);
 		panelRegistro.setVisible(false);
 		panelWorkouts.setVisible(false);
 		panelEjercicios.setVisible(false);
+		panelHistorico.setVisible(false);
 
 		switch (panel) {
 		case PANEL_LOGIN:
@@ -87,10 +96,13 @@ public class Principal extends JFrame {
 			break;
 		case PANEL_WORKOUTS:
 			panelWorkouts.setVisible(true);
+			break;
 		case PANEL_EJERCICIOS:
 			panelEjercicios.setVisible(true);
-			// colocarImg(getPanelEjercicios().getLblImgEjer(), "media/cej1.jpg",
-			// panelEjercicios);
+			break;
+		case PANEL_HISTORICO:
+			panelHistorico.setVisible(true);
+			break;
 		default:
 			break;
 
@@ -112,6 +124,10 @@ public class Principal extends JFrame {
 
 	public PanelEjercicios getPanelEjercicios() {
 		return panelEjercicios;
+	}
+
+	public PanelHistorico getPanelHistorico() {
+		return panelHistorico;
 	}
 
 	public void colocarImg(JLabel lbl, String imgPath, JPanel panel) {

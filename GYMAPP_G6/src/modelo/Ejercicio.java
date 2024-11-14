@@ -1,10 +1,14 @@
 package modelo;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
@@ -14,8 +18,9 @@ import conexion.Conexion;
 public class Ejercicio implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private String nombre, descripcion, foto;
-	private long numReps, numSeries, tiempoDescanso;
+	private String nombre, descripcion, foto, id;
+	private long numReps, tiempoDescanso;
+	private ArrayList<Serie> listaSeries = new ArrayList<>();
 
 	// NOMBRE DE LOS CAMPOS
 	private static String ejersCollection = "Ejercicios";
@@ -23,23 +28,29 @@ public class Ejercicio implements Serializable {
 	private static String fieldDescripcion = "descripcion";
 	private static String fieldFoto = "foto";
 	private static String fieldnumReps = "numRepeticiones";
-	private static String fieldNumSeries = "numSeries";
 	private static String fieldTiempoDescanso = "tiempoDescanso";
 
 	public Ejercicio() {
-
 	}
 
-	public Ejercicio(String nombre, String descripcion, String foto, int numReps, int numSeries, int tiempoDescanso) {
+	public Ejercicio(String nombre, String descripcion, String foto, int numReps, int numSeries, int tiempoDescanso,
+			String workoutId) {
 		this.nombre = nombre;
 		this.descripcion = descripcion;
 		this.foto = foto;
 		this.numReps = numReps;
-		this.numSeries = numSeries;
 		this.tiempoDescanso = tiempoDescanso;
 	}
 
 	// Getters y setters
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -73,11 +84,11 @@ public class Ejercicio implements Serializable {
 	}
 
 	public long getNumSeries() {
-		return numSeries;
+		return listaSeries.size();
 	}
 
 	public void setNumSeries(long numSeries) {
-		this.numSeries = numSeries;
+		listaSeries.size();
 	}
 
 	public long getTiempoDescanso() {
@@ -87,55 +98,84 @@ public class Ejercicio implements Serializable {
 	public void setTiempoDescanso(long tiempoDescanso) {
 		this.tiempoDescanso = tiempoDescanso;
 	}
+	
+	public ArrayList<Serie> getListaSeries() {
+		return listaSeries;
+	}
 
-	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId) {
-		Firestore fs = null;
+	public void setListaSeries(ArrayList<Serie> listaSeries) {
+		this.listaSeries = listaSeries;
+	}
+	
+	
+
+	// Método para obtener ejercicios asociados a un Workout
+	public ArrayList<Ejercicio> obtenerEjercicios(String workoutId, boolean online) {
 		ArrayList<Ejercicio> listaEjercicios = new ArrayList<Ejercicio>();
 
-		try {
-			// Conectar a Firestore
-			fs = Conexion.conectar();
+		if (!online) {
 
-			// Acceder a la subcolección Ejercicios dentro del documento de Workouts con
-			// workoutId
-			ApiFuture<QuerySnapshot> query = fs.collection("Workouts") // Colección Workouts
-					.document(workoutId) // Documento específico de Workouts
-					.collection(ejersCollection) // Subcolección Ejercicios
-					.get();
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
 
-			QuerySnapshot querySnapshot = query.get();
-			List<QueryDocumentSnapshot> ejercicios = querySnapshot.getDocuments();
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Workout workout = (Workout) ois.readObject();
 
-			for (QueryDocumentSnapshot ejercicioDoc : ejercicios) {
-				Ejercicio e = new Ejercicio();
-				e.setNombre(ejercicioDoc.getString(fieldNombre));
-				e.setDescripcion(ejercicioDoc.getString(fieldDescripcion));
-				e.setFoto(ejercicioDoc.getString(fieldFoto));
-
-				Long numReps = ejercicioDoc.getLong(fieldnumReps);
-				Long numSeries = ejercicioDoc.getLong(fieldNumSeries);
-				Long tiempoDescanso = ejercicioDoc.getLong(fieldTiempoDescanso);
-
-				// Si no es null, convertir Long a int
-				if (numReps != null) {
-					e.setNumReps(numReps.intValue());
+					// Verifica si el workout tiene el id que estamos buscando
+					if (workout.getId().equals(workoutId)) {
+						listaEjercicios = workout.getListaEjercicios(); // Obtiene los ejercicios asociados
+						break;
+					}
 				}
-				if (numSeries != null) {
-					e.setNumSeries(numSeries.intValue());
-				}
-				if (tiempoDescanso != null) {
-					e.setTiempoDescanso(tiempoDescanso.intValue());
-				}
-
-				// Agregar el ejercicio a la lista
-				listaEjercicios.add(e);
-
-				fs.close();
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		} else {
+			Firestore fs = null;
+
+			try {
+				// Conectar a Firestore
+				fs = Conexion.conectar();
+
+				DocumentReference workoutDoc =fs.collection("Workouts").document(workoutId);
+				ApiFuture<QuerySnapshot> ejersQuery = workoutDoc.collection(ejersCollection).get();
+				QuerySnapshot ejersSnapshot = ejersQuery.get();
+				List<QueryDocumentSnapshot> ejercicios = ejersSnapshot.getDocuments();
+
+				for (QueryDocumentSnapshot ejercicio : ejercicios) {
+					Ejercicio e = new Ejercicio();
+					e.setId(ejercicio.getId());
+					e.setNombre(ejercicio.getString(fieldNombre));
+					e.setDescripcion(ejercicio.getString(fieldDescripcion));
+					e.setFoto(ejercicio.getString(fieldFoto));
+
+					Long numReps = ejercicio.getLong(fieldnumReps);
+					Long tiempoDescanso = ejercicio.getLong(fieldTiempoDescanso);
+
+					// Si no es null, convertir Long a int
+					if (numReps != null) {
+						e.setNumReps(numReps);
+					}
+					if (tiempoDescanso != null) {
+						e.setTiempoDescanso(tiempoDescanso);
+					}
+					e.setListaSeries(new Serie().obtenerSeries(ejersCollection, e.getId(), workoutId, online));
+					// Agregar el ejercicio a la lista
+					listaEjercicios.add(e);
+				}
+
+				// Cierra la conexión a Firestore después del bucle
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 
 		return listaEjercicios;
+	}
+
+	@Override
+	public String toString() {
+		return nombre;
 	}
 }

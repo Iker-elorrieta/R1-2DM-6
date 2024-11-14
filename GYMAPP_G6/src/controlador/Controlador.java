@@ -3,20 +3,35 @@ package controlador;
 import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
-import java.nio.file.spi.FileSystemProvider;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
+
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import modelo.Backup;
+import modelo.ControlCronometro;
+import modelo.Cronometro;
+import modelo.CronometroRegresivo;
 import modelo.Ejercicio;
 import modelo.Usuario;
 import modelo.Usuario.IdiomaPreferido;
 import modelo.Usuario.TemaPreferido;
 import modelo.Workout;
+import vista.PanelEjercicios;
 import vista.Principal;
 
 public class Controlador implements ActionListener {
@@ -24,12 +39,38 @@ public class Controlador implements ActionListener {
 	// Constantes para mensajes de error e información
 	private static final String ERROR_TITLE = "Error";
 	private static final String INFO_TITLE = "Información";
+	private static final String WARNING_TITLE = "Warning";
 	private static final String EMPTY_FIELDS_MESSAGE = "Todos los campos son obligatorios.";
 	private static final String INVALID_EMAIL_FORMAT_MESSAGE = "Formato de email incorrecto.";
 	private static final String USER_EXISTS_MESSAGE = "El usuario ya existe.";
 	private static final String USER_NOT_FOUND_MESSAGE = "El usuario no existe.";
 	private static final String LOGIN_SUCCESS_MESSAGE = "Inicio de sesión correcto. \nBienvenid@ ";
 	private static final String INCORRECT_PASSWORD_MESSAGE = "Contraseña incorrecta.";
+	private static final String OFFLINE_MESSAGE = "No dispone de conexión a internet.";
+	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
+	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
+
+	public Usuario usuarioLogeado;
+	private ArrayList<Workout> listaWorkouts;
+	private Workout selectedWorkout;
+	private Cronometro cPrincipal;
+	private CronometroRegresivo cronDescanso;
+	private Cronometro cronEjercicio;
+	private CronometroRegresivo cronSerie;
+	private ControlCronometro controlCronometro;
+
+	// Rutas
+	private String backupsUsuario = "backups/usuario.dat";
+	private String backupsWorkouts = "backups/workouts.dat";
+
+	// Variables
+	private boolean online = true;
+	private static final String isConnectedCommand = "ping";
+	private static final String isConnectedVerifyingWebSite = "google.com";
+
+	private static final String javaCommand = "java";
+	private static final String jarFlag = "-jar";
+	private static final String backupJarFile = "backupgym.jar";
 
 	// Referencias a las vistas
 	private vista.Principal vistaPrincipal;
@@ -37,6 +78,7 @@ public class Controlador implements ActionListener {
 	private vista.PanelRegistro vistaRegistro;
 	private vista.PanelWorkouts vistaWorkouts;
 	private vista.PanelEjercicios vistaEjercicios;
+	private vista.PanelHistorico vistaHistorico;
 
 	/**
 	 * Constructor del controlador, inicializa las vistas y el controlador
@@ -46,14 +88,17 @@ public class Controlador implements ActionListener {
 	 * @param vistaRegistro   vista del panel de Registro
 	 * @param vistaWorkouts   vista del panel de Workouts
 	 * @param vistaEjercicios vista del panel de Ejercicios
+	 * @param vistaHistorico  vista del panel de Historico
 	 */
 	public Controlador(vista.Principal vistaPrincipal, vista.PanelLogin vistaLogin, vista.PanelRegistro vistaRegistro,
-			vista.PanelWorkouts vistaWorkouts, vista.PanelEjercicios vistaEjercicios) {
+			vista.PanelWorkouts vistaWorkouts, vista.PanelEjercicios vistaEjercicios,
+			vista.PanelHistorico vistaHistorico) {
 		this.vistaPrincipal = vistaPrincipal;
 		this.vistaLogin = vistaLogin;
 		this.vistaRegistro = vistaRegistro;
 		this.vistaWorkouts = vistaWorkouts;
 		this.vistaEjercicios = vistaEjercicios;
+		this.vistaHistorico = vistaHistorico;
 
 		this.inicializarControlador();
 	}
@@ -62,21 +107,28 @@ public class Controlador implements ActionListener {
 	 * Acciones de los componentes de las vistas
 	 */
 	private void inicializarControlador() {
-
 		accionesVistaLogin();
 		accionesVistaRegistro();
 		accionesVistaWorkouts();
+		accionesVistaEjercicios();
+		accionesVistaHistorico();
 	}
 
 	/**
 	 * Acciones del panel del Login
 	 */
 	private void accionesVistaLogin() {
-		this.vistaLogin.getBtnSignUp().addActionListener(this);
-		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
 
 		this.vistaLogin.getBtnLogin().addActionListener(this);
 		this.vistaLogin.getBtnLogin().setActionCommand(Principal.enumAcciones.INICIAR_SESION.toString());
+
+		this.vistaLogin.getBtnSignUp().addActionListener(this);
+		this.vistaLogin.getBtnSignUp().setActionCommand(Principal.enumAcciones.PANEL_REGISTRO.toString());
+		this.vistaLogin.getBtnSignUp().setEnabled(false);
+
+		verifyConnection();
+		if (online)
+			this.vistaLogin.getBtnSignUp().setEnabled(true);
 	}
 
 	/**
@@ -112,6 +164,39 @@ public class Controlador implements ActionListener {
 		this.vistaWorkouts.getBtnStartWorkout().addActionListener(this);
 		this.vistaWorkouts.getBtnStartWorkout().setActionCommand(Principal.enumAcciones.PANEL_EJERCICIOS.toString());
 
+		// Listerner para mostrar el panel de histórico
+		this.vistaWorkouts.getBtnHistorico().addActionListener(this);
+		this.vistaWorkouts.getBtnHistorico().setActionCommand(Principal.enumAcciones.PANEL_HISTORICO.toString());
+
+	}
+
+	/**
+	 * Acciones del panel de Workouts
+	 */
+	private void accionesVistaEjercicios() {
+		this.vistaEjercicios.getBtnReturn().addActionListener(this);
+		this.vistaEjercicios.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
+
+		this.vistaEjercicios.getBtnExit().addActionListener(this);
+		this.vistaEjercicios.getBtnExit().setActionCommand(Principal.enumAcciones.CERRAR_PROGRAMA.toString());
+
+		this.vistaEjercicios.getBtnStart().addActionListener(this);
+		this.vistaEjercicios.getBtnStart().setActionCommand(Principal.enumAcciones.PLAY.toString());
+
+		this.vistaEjercicios.getBtnPause().addActionListener(this);
+		this.vistaEjercicios.getBtnPause().setActionCommand(Principal.enumAcciones.PAUSE.toString());
+
+		this.vistaEjercicios.getBtnNext().addActionListener(this);
+		this.vistaEjercicios.getBtnNext().setActionCommand(Principal.enumAcciones.NEXT_EJERCICIO.toString());
+	}
+
+	/**
+	 * Acciones del panel de Histórico
+	 */
+	private void accionesVistaHistorico() {
+		this.vistaHistorico.getBtnReturn().addActionListener(this);
+		this.vistaHistorico.getBtnReturn()
+				.setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS_FROM_HISTORICO.toString());
 	}
 
 	/**
@@ -134,12 +219,63 @@ public class Controlador implements ActionListener {
 			login();
 			break;
 		case PANEL_WORKOUTS:
+			if (listaWorkouts == null) {
+				listaWorkouts = new Workout().obtenerWorkouts(usuarioLogeado.getNivelUsuario(), online);
+			}
+			controlCronometro.finalizarProceso();
 			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
+
+			break;
+		case PANEL_WORKOUTS_FROM_HISTORICO:
+			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
+
 			break;
 		case PANEL_EJERCICIOS:
-			mostrarEjercicioSeleccionado();
-			visualizarPanel(Principal.enumAcciones.PANEL_EJERCICIOS);
+			if (selectedWorkout != null) {
+				PanelEjercicios vistaEjercicios = this.vistaPrincipal.getPanelEjercicios();
+
+				vistaEjercicios.setSelectedWorkout(selectedWorkout);
+				vistaEjercicios.cambiarVentana(selectedWorkout.getListaEjercicios().get(0));
+
+				cPrincipal = new Cronometro(vistaEjercicios.getLblCWorkout());
+				cronEjercicio = new Cronometro(vistaEjercicios.getLblCTiempoE());
+				cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0),
+						selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getTiempo());
+				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblCDescanso(),
+						selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso());
+				controlCronometro = new ControlCronometro(vistaEjercicios, this, usuarioLogeado, selectedWorkout,
+						cPrincipal, cronDescanso, cronEjercicio, cronSerie);
+
+				this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(),
+						selectedWorkout.getListaEjercicios().get(0).getFoto(), vistaEjercicios);
+
+				vistaEjercicios.getLblNombreSerie()
+						.setText(selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getNombreSerie());
+				// vistaEjercicios.getLblSerieCount().setText((String.format("%02d:%02d", ((int)
+				// listaEjercicios.get(0).getListaSeries().get(0).getTiempo() / 60), ((int)
+				// listaEjercicios.get(0).getListaSeries().get(0).getTiempo() % 60))));
+
+				this.vistaPrincipal.visualizarPaneles(accion);
+
+			} else {
+				JOptionPane.showMessageDialog(null, "Elige una opción");
+			}
 			break;
+		case PANEL_HISTORICO:
+			visualizarPanel(Principal.enumAcciones.PANEL_HISTORICO);
+			break;
+		case PLAY:
+			controlCronometro.play();
+			break;
+		case PAUSE:
+			controlCronometro.pausar();
+			break;
+		case NEXT_EJERCICIO:
+			controlCronometro.next();
+			// cambiarAlSiguienteEjercicio();
+			break;
+		case CERRAR_PROGRAMA:
+			System.exit(0);
 		default:
 			break;
 		}
@@ -150,8 +286,44 @@ public class Controlador implements ActionListener {
 	 *
 	 * @param panel variable para indicar el panel que se visualiza
 	 */
-	private void visualizarPanel(Principal.enumAcciones panel) {
+	public void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
+	}
+
+	public boolean isConnected() throws InterruptedException, IOException {
+		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
+		Process process = pb.start();
+		return process.waitFor() == 0;
+	}
+
+	public void verifyConnection() {
+		try {
+			ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
+			Process process = pb.start();
+			online = process.waitFor() == 0;
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+			mostrarErrorDialog(CONNECTION_VERIFYING_ERROR_MESSAGE);
+			System.exit(0);
+		}
+
+		if (online)
+			return;
+
+		mostrarWarningDialog(OFFLINE_MESSAGE);
+
+		if (!backupsFilesExists()) {
+			mostrarErrorDialog(COULDNT_FIND_BACKUPS_MESSAGE);
+			return;
+		}
+	}
+
+	public boolean backupsFilesExists() {
+		File archivoUsuarios = new File(backupsUsuario);
+		File archivoWorkouts = new File(backupsWorkouts);
+
+		return archivoUsuarios.exists() && archivoUsuarios.length() > 0 && archivoWorkouts.exists()
+				&& archivoWorkouts.length() > 0;
 	}
 
 	/**
@@ -161,27 +333,25 @@ public class Controlador implements ActionListener {
 		String usuario = this.vistaLogin.gettFUsuario().getText();
 		String password = new String(this.vistaLogin.gettFContrasena().getPassword());
 
-		// Comprueba que los campos no están vacíos
 		if (usuario.isEmpty() || password.isEmpty()) {
 			mostrarErrorDialog(EMPTY_FIELDS_MESSAGE);
 			return;
 		}
 
 		// Obtiene el usuario y comprueba la contraseña
-		Usuario user = new Usuario().obtenerUsuario(usuario);
+		Usuario user = new Usuario().obtenerUsuario(usuario, online);
 
 		if (user == null) {
-			JOptionPane.showMessageDialog(null, USER_NOT_FOUND_MESSAGE, "Error", JOptionPane.ERROR_MESSAGE);
+			mostrarErrorDialog(USER_NOT_FOUND_MESSAGE);
 			return;
 		}
 
 		if (!user.getPassword().equals(password)) {
-			JOptionPane.showMessageDialog(null, INCORRECT_PASSWORD_MESSAGE, "Error", JOptionPane.ERROR_MESSAGE);
+			mostrarErrorDialog(INCORRECT_PASSWORD_MESSAGE);
 			return;
 		}
 
-		JOptionPane.showMessageDialog(null, LOGIN_SUCCESS_MESSAGE + user.getUsuario(), "Información",
-				JOptionPane.INFORMATION_MESSAGE);
+		mostrarInfoDialog(LOGIN_SUCCESS_MESSAGE + user.getUsuario());
 
 		limpiarCamposLogin();
 
@@ -191,15 +361,17 @@ public class Controlador implements ActionListener {
 		this.vistaLogin.gettFUsuario().setText("");
 		this.vistaLogin.gettFContrasena().setText("");
 
+		if (!online)
+			return;
+
 		try {
-			ProcessBuilder pb = new ProcessBuilder("java", "-jar", "backupgym.jar");
+			ProcessBuilder pb = new ProcessBuilder(javaCommand, jarFlag, backupJarFile);
 			pb.inheritIO();
-			Process process = pb.start();
-			System.out.println(process.isAlive());
+			pb.start();
+
 		} catch (Exception e1) {
 			e1.printStackTrace();
 		}
-
 	}
 
 	/**
@@ -245,7 +417,7 @@ public class Controlador implements ActionListener {
 		}
 
 		// COMPROBACIÓN DE USUARIO EXISTENTE
-		if (nuevoUsuario.obtenerUsuario(user) != null) {
+		if (nuevoUsuario.obtenerUsuario(user, online) != null) {
 			mostrarErrorDialog(USER_EXISTS_MESSAGE);
 			return;
 		}
@@ -261,68 +433,33 @@ public class Controlador implements ActionListener {
 
 	}
 
-	/**
-	 * Comprueba si los datos del registro están vacíos
-	 *
-	 * @param nombre          texto del textField del nombre
-	 * @param email           texto del textField del email
-	 * @param user            texto del textField del usuario
-	 * @param password        texto del textField de la contraseña
-	 * @param fechaNacimiento fecha del textField de fecha de nacimiento
-	 * @return devuelve un booleano de si están vacíos o no
-	 */
 	private boolean camposRegistroVacios(String nombre, String email, String user, String password,
 			Date fechaNacimiento) {
 		return nombre.isEmpty() || email.isEmpty() || user.isEmpty() || password.isEmpty() || fechaNacimiento == null;
 	}
 
-	/**
-	 * Comprueba si el formato del email es correcto
-	 *
-	 * @param email texto del textField del email
-	 * @return devuelve un booleano para indicar si es correcto o no
-	 */
 	private boolean esEmailValido(String email) {
 		return email.contains("@") && email.contains(".");
 	}
 
-	/**
-	 * Muestra un cuadro de diálogo de error
-	 *
-	 * @param mensaje mensaje a mostrar
-	 */
 	private void mostrarErrorDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 	}
 
-	/**
-	 * Muestra un cuadro de diálogo de información
-	 *
-	 * @param mensaje mensaje a mostrar
-	 */
 	private void mostrarInfoDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	/**
-	 * Llena un nuevo usuario con los datos obtenidos de la vista
-	 *
-	 * @param nuevoUsuario    nuevo usuario a llenar
-	 * @param nombre          texto del textField del nombre
-	 * @param apellido        texto del textField del apellido
-	 * @param email           texto del textField del email
-	 * @param user            texto del textField del usuario
-	 * @param password        texto del textField de la contraseña
-	 * @param idioma          idioma preferido del ComboBox
-	 * @param tema            tema preferido del ComboBox
-	 * @param fechaNacimiento fecha de nacimiento
-	 */
+	private void mostrarWarningDialog(String mensaje) {
+		JOptionPane.showMessageDialog(null, mensaje, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
+	}
+
 	private void llenarUsuario(Usuario nuevoUsuario, String nombre, String apellido, String email, String user,
 			String password, IdiomaPreferido idioma, TemaPreferido tema, Date fechaNacimiento, int nivelUsuario) {
 		nuevoUsuario.setNombre(nombre);
 		nuevoUsuario.setApellido(apellido);
 		nuevoUsuario.setEmail(email);
-		nuevoUsuario.setUser(user);
+		nuevoUsuario.setUsuario(user);
 		nuevoUsuario.setPassword(password);
 		nuevoUsuario.setIdiomaPreferido(idioma);
 		nuevoUsuario.setTemaPreferido(tema);
@@ -331,9 +468,21 @@ public class Controlador implements ActionListener {
 
 	}
 
+	/**
+	 * Vacía los campos del formulario del registro
+	 */
+	private void limpiarCamposRegistro() {
+		this.vistaRegistro.gettFRegistroNombre().setText("");
+		this.vistaRegistro.gettFRegistroApellido().setText("");
+		this.vistaRegistro.gettFRegistroEmail().setText("");
+		this.vistaRegistro.gettFRegistroUser().setText("");
+		this.vistaRegistro.getpFRegistroPassword().setText("");
+		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
+	}
+
 	// Método para obtener ejercicios
 	private void obtenerEjercicios() {
-		Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
+		selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
 
 		if (selectedWorkout == null) {
 			vistaWorkouts.getEjersListModel().clear();
@@ -345,49 +494,68 @@ public class Controlador implements ActionListener {
 		vistaWorkouts.getEjersListModel().clear();
 
 		Ejercicio ejercicioModel = new Ejercicio();
-		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId);
+		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
 
 		// Bucle para añadir todos los ejercicios
 		for (Ejercicio ejercicio : listaEjercicios) {
-			vistaWorkouts.getEjersListModel().addElement(ejercicio.getNombre());
+			vistaWorkouts.getEjersListModel().addElement(ejercicio);
 		}
 
 		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
 	}
 
 	// Método para mostrar el ejercicio seleccionado
-	private void mostrarEjercicioSeleccionado() {
-
-		Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
-		if (selectedWorkout == null)
-			return;
-
-		String nombreWorkout = selectedWorkout.getNombre();
-		this.vistaEjercicios.getLblWorkout().setText(nombreWorkout);
-
-		// Musetra el primer ejercicio de la lista de ejercicios del workout
-		// seleccionado
-
-		if (vistaWorkouts.getEjersListModel().isEmpty())
-			return;
-		Ejercicio primerEjercicio = new Ejercicio();
-		ArrayList<Ejercicio> ejercicios = primerEjercicio.obtenerEjercicios(selectedWorkout.getId());
-		primerEjercicio = ejercicios.getFirst();
-		this.vistaEjercicios.getLblEjercicio().setText(primerEjercicio.getNombre());
-		this.vistaEjercicios.getTxtAreaDescripcion().setText(primerEjercicio.getDescripcion());
-		this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), primerEjercicio.getFoto(), vistaEjercicios);
-
-	}
-
-	/**
-	 * Carga los workouts del usuario y los muestra en la lista del panelWorkouts
+	/*
+	 * private void mostrarEjercicioSeleccionado() { Workout selectedWorkout =
+	 * this.vistaWorkouts.getWorkoutList().getSelectedValue(); if (selectedWorkout
+	 * == null) return;
 	 * 
-	 * @param usuario usuario que tiene la sesión iniciada
-	 * @param accion  panel al que se le atribuye la acción
+	 * this.vistaEjercicios.getLblWorkout().setText(selectedWorkout.getNombre());
+	 * 
+	 * if (vistaWorkouts.getEjersListModel().isEmpty()) return;
+	 * 
+	 * ArrayList<Ejercicio> ejercicios = new
+	 * Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online); if
+	 * (ejercicios.isEmpty()) return;
+	 * 
+	 * this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
+	 * this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
+	 * ArrayList<Serie>listaSeries = new
+	 * Serie().obtenerSeries(ejercicioActual.getId(), online);
+	 * 
+	 * this.vistaEjercicios.cambiarVentana(ejercicioActual);
+	 * 
+	 * //
+	 * this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+	 * // this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.
+	 * getDescripcion()); //
+	 * this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " +
+	 * ejercicioActual.getNumReps());
+	 * this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(),
+	 * ejercicioActual.getFoto(), vistaEjercicios); }
 	 */
+
+	/*
+	 * private void cambiarAlSiguienteEjercicio() { if (this.listaEjercicios == null
+	 * || this.listaEjercicios.isEmpty()) return;
+	 * 
+	 * int indiceActual = listaEjercicios.indexOf(this.ejercicioActual); int
+	 * siguienteIndice = (indiceActual + 1) % listaEjercicios.size();
+	 * 
+	 * this.ejercicioActual = listaEjercicios.get(siguienteIndice);
+	 * 
+	 * this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+	 * this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.
+	 * getDescripcion());
+	 * this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " +
+	 * ejercicioActual.getNumReps());
+	 * this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(),
+	 * ejercicioActual.getFoto(), vistaEjercicios); }
+	 */
+
 	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
 		Workout workouts = new Workout();
-		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario());
+		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
 		vistaWorkouts.getWorkoutListModel().clear();
 
 		// Bucle para añadir cada workout a la JList
@@ -398,10 +566,6 @@ public class Controlador implements ActionListener {
 		}
 	}
 
-	/**
-	 * Obtiene todos los ejercicios del wrokout seleccionado y los muesta en la
-	 * JList de ejercicios en el panelWorkouts
-	 */
 	private void cargarInfoWorkout() {
 		Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
 
@@ -456,9 +620,9 @@ public class Controlador implements ActionListener {
 			while (i > 0 && resultado.charAt(i - 1) != ' ') {
 				i--;
 			}
-			if (i > 0 && i < resultado.length()) {
+			if (i > 0 && i < resultado.length())
 				resultado.replace(i, i, "\n");
-			}
+
 		}
 
 		String a = resultado.toString();
@@ -467,15 +631,81 @@ public class Controlador implements ActionListener {
 		});
 	}
 
-	/**
-	 * Vacía los campos del formulario del registro
-	 */
-	private void limpiarCamposRegistro() {
-		this.vistaRegistro.gettFRegistroNombre().setText("");
-		this.vistaRegistro.gettFRegistroApellido().setText("");
-		this.vistaRegistro.gettFRegistroEmail().setText("");
-		this.vistaRegistro.gettFRegistroUser().setText("");
-		this.vistaRegistro.getpFRegistroPassword().setText("");
-		this.vistaRegistro.getFechaNacimientoCalendar().setDate(new Date());
+	public static void cargarDatosDesdeXML(DefaultTableModel tableModel) {
+		try {
+
+			File archivoXML = new File(Backup.FILE_HISTORICO_XML);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(archivoXML);
+			doc.getDocumentElement().normalize();
+
+			NodeList usuarios = doc.getElementsByTagName("usuario");
+
+			for (int i = 0; i < usuarios.getLength(); i++) {
+				Element usuarioElement = (Element) usuarios.item(i);
+				/*
+				 * String idUsuario = usuarioElement.getAttribute("id"); // Obtener el atributo
+				 * "id" del usuario
+				 * 
+				 * System.out.println(u.getId());
+				 * 
+				 * if (!idUsuario.equals(u.getId())) { continue; }
+				 */
+
+				// Obtener los registros del usuario activo
+				NodeList registros = usuarioElement.getElementsByTagName("registro");
+				for (int j = 0; j < registros.getLength(); j++) {
+					Element registro = (Element) registros.item(j);
+					String nombre = registro.getElementsByTagName("nombre").item(0).getTextContent();
+					String nivel = registro.getElementsByTagName("nivel").item(0).getTextContent();
+					String tiempoPrevisto = registro.getElementsByTagName("tiempoPrevisto").item(0).getTextContent();
+					String tiempoTotal = registro.getElementsByTagName("tiempoTotal").item(0).getTextContent();
+					String fecha = registro.getElementsByTagName("fecha").item(0).getTextContent();
+					String fechaFormateada = formatearFecha(fecha);
+					String porcentajeCompletado = registro.getElementsByTagName("porcentajeCompletado").item(0)
+							.getTextContent() + "%";
+
+					tableModel.addRow(new Object[] { nombre, nivel, tiempoPrevisto, tiempoTotal, fechaFormateada,
+							porcentajeCompletado });
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
+
+	public static String formatearFecha(String fecha) {
+		try {
+			// Specify the locale to ensure correct parsing of month and day abbreviations
+			SimpleDateFormat formatoOriginal = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+
+			Date fechaFormateada = formatoOriginal.parse(fecha);
+
+			// Format the date to the desired output format
+			SimpleDateFormat formatoNuevo = new SimpleDateFormat("yyyy-MM-dd");
+
+			return formatoNuevo.format(fechaFormateada);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/*
+	 * private void obtenerSeries() { Workout selectedWorkout =
+	 * vistaWorkouts.getWorkoutList().getSelectedValue(); if (selectedWorkout ==
+	 * null) return;
+	 * 
+	 * String workoutId = selectedWorkout.getId(); Ejercicio ejercicioModel = new
+	 * Ejercicio(); Serie serieModel = new Serie();
+	 * 
+	 * ArrayList<Ejercicio> listaEjercicios =
+	 * ejercicioModel.obtenerEjercicios(workoutId, online);
+	 * 
+	 * for (Ejercicio ejercicio : listaEjercicios) { ArrayList<Serie> listaSeries =
+	 * serieModel.obtenerSeries(ejercicio.getId(), online); for (Serie serie :
+	 * listaSeries) { System.out.println(serie.getNombreSerie()); } } }
+	 */
+
 }

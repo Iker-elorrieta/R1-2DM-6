@@ -1,6 +1,8 @@
 package modelo;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +27,6 @@ public class Usuario implements Serializable {
 	private String nombre;
 	private String apellido;
 	private String email;
-	private String user;
 	private String password;
 	private String usuario;
 	private Long nivelUsuario;
@@ -71,7 +72,6 @@ public class Usuario implements Serializable {
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.email = email;
-		this.user = user;
 		this.password = password;
 		this.usuario = usuario;
 		this.nivelUsuario = (long) nivelUsuario;
@@ -113,14 +113,6 @@ public class Usuario implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getUser() {
-		return user;
-	}
-
-	public void setUser(String user) {
-		this.user = user;
 	}
 
 	public String getPassword() {
@@ -179,9 +171,31 @@ public class Usuario implements Serializable {
 		this.nivelUsuario = nivelUsuario;
 	}
 
+	public String getUsersCollection() {
+		return usersCollection;
+	}
+
 	// *** MÉTODOS CRUD ***
 
-	public Usuario obtenerUsuario(String userName) {
+	public Usuario obtenerUsuario(String userName, boolean online) {
+
+		if (!online) {
+			try {
+				FileInputStream fic = new FileInputStream(Backup.FILE_USERS);
+				ObjectInputStream ois = new ObjectInputStream(fic);
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Usuario usuario = (Usuario) ois.readObject();
+					if (usuario.getUsuario().equals(userName)) {
+						ois.close();
+						return usuario;
+					}
+				}
+				ois.close();
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		}
+
 		Firestore fs = null;
 		Usuario userExists = null;
 
@@ -218,37 +232,50 @@ public class Usuario implements Serializable {
 		return userExists;
 	}
 
-	public ArrayList<Usuario> obtenerMultiplesUsuarios() {
-		Firestore fs = null;
+	public ArrayList<Usuario> obtenerMultiplesUsuarios(boolean online) {
 
 		ArrayList<Usuario> listaUsers = new ArrayList<Usuario>();
+		Firestore fs = null;
 
-		try {
-			fs = Conexion.conectar();
+		if (!online) {
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_USERS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
 
-			ApiFuture<QuerySnapshot> query = fs.collection(usersCollection).get();
-
-			QuerySnapshot querySnapshot = query.get();
-			List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
-			for (QueryDocumentSnapshot usuario : usuarios) {
-
-				Usuario u = new Usuario();
-				u.setId(usuario.getId());
-				u.setNombre(usuario.getString(fieldNombre));
-				u.setApellido(usuario.getString(fieldApellido));
-				u.setEmail(usuario.getString(fieldEmail));
-				u.setUsuario(usuario.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
-				u.setPassword(usuario.getString(fieldPassword));
-				u.setFechaNacimiento(usuario.getDate(fieldFecNac));
-				u.setNivelUsuario(usuario.getLong(fieldNivel));
-
-				listaUsers.add(u);
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Usuario usuario = (Usuario) ois.readObject();
+					listaUsers.add(usuario);
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
 			}
-			fs.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		} else {
+			try {
+				fs = Conexion.conectar();
 
+				ApiFuture<QuerySnapshot> query = fs.collection(usersCollection).get();
+
+				QuerySnapshot querySnapshot = query.get();
+				List<QueryDocumentSnapshot> usuarios = querySnapshot.getDocuments();
+				for (QueryDocumentSnapshot usuario : usuarios) {
+
+					Usuario u = new Usuario();
+					u.setId(usuario.getId());
+					u.setNombre(usuario.getString(fieldNombre));
+					u.setApellido(usuario.getString(fieldApellido));
+					u.setEmail(usuario.getString(fieldEmail));
+					u.setUsuario(usuario.getString(fieldUsuario)); // Asegúrate de que este campo esté correcto
+					u.setPassword(usuario.getString(fieldPassword));
+					u.setFechaNacimiento(usuario.getDate(fieldFecNac));
+					u.setNivelUsuario(usuario.getLong(fieldNivel));
+
+					listaUsers.add(u);
+				}
+				fs.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		}
 		return listaUsers;
 	}
 
@@ -266,7 +293,7 @@ public class Usuario implements Serializable {
 			userData.put(fieldFecNac, this.fechaNacimiento);
 			userData.put(fieldIdioma, this.idiomaPreferido != null ? this.idiomaPreferido.name() : null);
 			userData.put(fieldTema, this.temaPreferido != null ? this.temaPreferido.name() : null);
-			userData.put(fieldUsuario, this.user);
+			userData.put(fieldUsuario, this.usuario);
 			userData.put(fieldPassword, this.password);
 			userData.put(fieldTipoUsuario, TipoUsuario.CLIENTE);
 			userData.put(fieldNivel, this.nivelUsuario);
@@ -283,6 +310,11 @@ public class Usuario implements Serializable {
 			JOptionPane.showMessageDialog(null, "No se ha podido registrar el usuario.", "Error",
 					JOptionPane.ERROR_MESSAGE);
 		}
+
+	}
+
+	public void insertarNuevoItemHistorial(Historial historial) {
+		// TODO Auto-generated method stub
 
 	}
 
