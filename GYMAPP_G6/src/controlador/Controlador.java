@@ -6,13 +6,23 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Locale;
 
 import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
+import modelo.Backup;
 import modelo.ControlCronometro;
 import modelo.Cronometro;
 import modelo.CronometroRegresivo;
@@ -40,7 +50,7 @@ public class Controlador implements ActionListener {
 	private static final String COULDNT_FIND_BACKUPS_MESSAGE = "No se han encontrado backups.";
 	private static final String CONNECTION_VERIFYING_ERROR_MESSAGE = "Error al verificar la conexión.";
 
-	private Usuario usuarioLogeado;
+	public Usuario usuarioLogeado;
 	private ArrayList<Workout> listaWorkouts;
 	private Workout selectedWorkout;
 	private Cronometro cPrincipal;
@@ -166,7 +176,7 @@ public class Controlador implements ActionListener {
 	private void accionesVistaEjercicios() {
 		this.vistaEjercicios.getBtnReturn().addActionListener(this);
 		this.vistaEjercicios.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
-		
+
 		this.vistaEjercicios.getBtnExit().addActionListener(this);
 		this.vistaEjercicios.getBtnExit().setActionCommand(Principal.enumAcciones.CERRAR_PROGRAMA.toString());
 
@@ -185,7 +195,8 @@ public class Controlador implements ActionListener {
 	 */
 	private void accionesVistaHistorico() {
 		this.vistaHistorico.getBtnReturn().addActionListener(this);
-		this.vistaHistorico.getBtnReturn().setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS.toString());
+		this.vistaHistorico.getBtnReturn()
+				.setActionCommand(Principal.enumAcciones.PANEL_WORKOUTS_FROM_HISTORICO.toString());
 	}
 
 	/**
@@ -208,36 +219,44 @@ public class Controlador implements ActionListener {
 			login();
 			break;
 		case PANEL_WORKOUTS:
-			if(listaWorkouts == null) {
+			if (listaWorkouts == null) {
 				listaWorkouts = new Workout().obtenerWorkouts(usuarioLogeado.getNivelUsuario(), online);
 			}
 			controlCronometro.finalizarProceso();
 			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
+
+			break;
+		case PANEL_WORKOUTS_FROM_HISTORICO:
+			visualizarPanel(Principal.enumAcciones.PANEL_WORKOUTS);
+
 			break;
 		case PANEL_EJERCICIOS:
-			if(selectedWorkout != null) {
+			if (selectedWorkout != null) {
 				PanelEjercicios vistaEjercicios = this.vistaPrincipal.getPanelEjercicios();
-				
+
 				vistaEjercicios.setSelectedWorkout(selectedWorkout);
 				vistaEjercicios.cambiarVentana(selectedWorkout.getListaEjercicios().get(0));
-				
+
 				cPrincipal = new Cronometro(vistaEjercicios.getLblCWorkout());
 				cronEjercicio = new Cronometro(vistaEjercicios.getLblCTiempoE());
-				cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0), 
+				cronSerie = new CronometroRegresivo(vistaEjercicios.getGrupoCronometros().get(0),
 						selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getTiempo());
-				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblCDescanso(), 
+				cronDescanso = new CronometroRegresivo(vistaEjercicios.getLblCDescanso(),
 						selectedWorkout.getListaEjercicios().get(0).getTiempoDescanso());
-				controlCronometro = new ControlCronometro(vistaEjercicios, this, usuarioLogeado, 
-						selectedWorkout, cPrincipal, cronDescanso, cronEjercicio, cronSerie);
-				
-				this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), selectedWorkout.getListaEjercicios().get(0).getFoto() , vistaEjercicios);
-				
-				
-				vistaEjercicios.getLblNombreSerie().setText(selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getNombreSerie());
-				//vistaEjercicios.getLblSerieCount().setText((String.format("%02d:%02d", ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() / 60), ((int) listaEjercicios.get(0).getListaSeries().get(0).getTiempo() % 60))));
+				controlCronometro = new ControlCronometro(vistaEjercicios, this, usuarioLogeado, selectedWorkout,
+						cPrincipal, cronDescanso, cronEjercicio, cronSerie);
+
+				this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(),
+						selectedWorkout.getListaEjercicios().get(0).getFoto(), vistaEjercicios);
+
+				vistaEjercicios.getLblNombreSerie()
+						.setText(selectedWorkout.getListaEjercicios().get(0).getListaSeries().get(0).getNombreSerie());
+				// vistaEjercicios.getLblSerieCount().setText((String.format("%02d:%02d", ((int)
+				// listaEjercicios.get(0).getListaSeries().get(0).getTiempo() / 60), ((int)
+				// listaEjercicios.get(0).getListaSeries().get(0).getTiempo() % 60))));
 
 				this.vistaPrincipal.visualizarPaneles(accion);
-				
+
 			} else {
 				JOptionPane.showMessageDialog(null, "Elige una opción");
 			}
@@ -253,7 +272,7 @@ public class Controlador implements ActionListener {
 			break;
 		case NEXT_EJERCICIO:
 			controlCronometro.next();
-			//cambiarAlSiguienteEjercicio();
+			// cambiarAlSiguienteEjercicio();
 			break;
 		case CERRAR_PROGRAMA:
 			System.exit(0);
@@ -270,11 +289,6 @@ public class Controlador implements ActionListener {
 	public void visualizarPanel(Principal.enumAcciones panel) {
 		this.vistaPrincipal.visualizarPaneles(panel);
 	}
-	
-	
-	
-	
-
 
 	public boolean isConnected() throws InterruptedException, IOException {
 		ProcessBuilder pb = new ProcessBuilder(isConnectedCommand, isConnectedVerifyingWebSite);
@@ -419,13 +433,11 @@ public class Controlador implements ActionListener {
 
 	}
 
-
 	private boolean camposRegistroVacios(String nombre, String email, String user, String password,
 			Date fechaNacimiento) {
 		return nombre.isEmpty() || email.isEmpty() || user.isEmpty() || password.isEmpty() || fechaNacimiento == null;
 	}
 
-	
 	private boolean esEmailValido(String email) {
 		return email.contains("@") && email.contains(".");
 	}
@@ -434,7 +446,6 @@ public class Controlador implements ActionListener {
 		JOptionPane.showMessageDialog(null, mensaje, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 	}
 
-
 	private void mostrarInfoDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, INFO_TITLE, JOptionPane.INFORMATION_MESSAGE);
 	}
@@ -442,7 +453,6 @@ public class Controlador implements ActionListener {
 	private void mostrarWarningDialog(String mensaje) {
 		JOptionPane.showMessageDialog(null, mensaje, WARNING_TITLE, JOptionPane.WARNING_MESSAGE);
 	}
-
 
 	private void llenarUsuario(Usuario nuevoUsuario, String nombre, String apellido, String email, String user,
 			String password, IdiomaPreferido idioma, TemaPreferido tema, Date fechaNacimiento, int nivelUsuario) {
@@ -458,9 +468,6 @@ public class Controlador implements ActionListener {
 
 	}
 
-
-
-
 	/**
 	 * Vacía los campos del formulario del registro
 	 */
@@ -474,166 +481,231 @@ public class Controlador implements ActionListener {
 	}
 
 	// Método para obtener ejercicios
-		private void obtenerEjercicios() {
-			selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
+	private void obtenerEjercicios() {
+		selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
 
-			if (selectedWorkout == null) {
-				vistaWorkouts.getEjersListModel().clear();
-				vistaWorkouts.getBtnStartWorkout().setEnabled(false);
-				return;
-			}
-
-			String workoutId = selectedWorkout.getId();
+		if (selectedWorkout == null) {
 			vistaWorkouts.getEjersListModel().clear();
-
-			Ejercicio ejercicioModel = new Ejercicio();
-			ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
-			
-
-			// Bucle para añadir todos los ejercicios
-			for (Ejercicio ejercicio : listaEjercicios) {
-				vistaWorkouts.getEjersListModel().addElement(ejercicio);
-			}
-
-			vistaWorkouts.getBtnStartWorkout().setEnabled(true);
+			vistaWorkouts.getBtnStartWorkout().setEnabled(false);
+			return;
 		}
 
-		// Método para mostrar el ejercicio seleccionado
-		/*private void mostrarEjercicioSeleccionado() {
-		    Workout selectedWorkout = this.vistaWorkouts.getWorkoutList().getSelectedValue();
-		    if (selectedWorkout == null) return;
+		String workoutId = selectedWorkout.getId();
+		vistaWorkouts.getEjersListModel().clear();
 
-		    this.vistaEjercicios.getLblWorkout().setText(selectedWorkout.getNombre());
+		Ejercicio ejercicioModel = new Ejercicio();
+		ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
 
-		    if (vistaWorkouts.getEjersListModel().isEmpty()) return;
-
-		    ArrayList<Ejercicio> ejercicios = new Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online);
-		    if (ejercicios.isEmpty()) return;
-
-		    this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
-		    this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
-		    ArrayList<Serie>listaSeries = new Serie().obtenerSeries(ejercicioActual.getId(), online);
-
-		    this.vistaEjercicios.cambiarVentana(ejercicioActual);
-		    
-//		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
-//		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
-//		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
-		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
-		}*/
-		
-		/*private void cambiarAlSiguienteEjercicio() {
-		    if (this.listaEjercicios == null || this.listaEjercicios.isEmpty()) return;
-
-		    int indiceActual = listaEjercicios.indexOf(this.ejercicioActual);
-		    int siguienteIndice = (indiceActual + 1) % listaEjercicios.size();
-
-		    this.ejercicioActual = listaEjercicios.get(siguienteIndice);
-
-		    this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
-		    this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.getDescripcion());
-		    this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " + ejercicioActual.getNumReps());
-		    this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(), ejercicioActual.getFoto(), vistaEjercicios);
-		}*/
-
-
-		private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
-			Workout workouts = new Workout();
-			ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
-			vistaWorkouts.getWorkoutListModel().clear();
-
-			// Bucle para añadir cada workout a la JList
-			for (Workout workout : listaWorkouts) {
-				String url = workout.getVideoUrl();
-				String descripcion = workout.getDescripcion();
-				vistaWorkouts.addWorkout(workout, url, descripcion);
-			}
+		// Bucle para añadir todos los ejercicios
+		for (Ejercicio ejercicio : listaEjercicios) {
+			vistaWorkouts.getEjersListModel().addElement(ejercicio);
 		}
 
+		vistaWorkouts.getBtnStartWorkout().setEnabled(true);
+	}
 
-		private void cargarInfoWorkout() {
-			Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+	// Método para mostrar el ejercicio seleccionado
+	/*
+	 * private void mostrarEjercicioSeleccionado() { Workout selectedWorkout =
+	 * this.vistaWorkouts.getWorkoutList().getSelectedValue(); if (selectedWorkout
+	 * == null) return;
+	 * 
+	 * this.vistaEjercicios.getLblWorkout().setText(selectedWorkout.getNombre());
+	 * 
+	 * if (vistaWorkouts.getEjersListModel().isEmpty()) return;
+	 * 
+	 * ArrayList<Ejercicio> ejercicios = new
+	 * Ejercicio().obtenerEjercicios(selectedWorkout.getId(), online); if
+	 * (ejercicios.isEmpty()) return;
+	 * 
+	 * this.ejercicioActual = ejercicios.get(0); // Guardamos el primer ejercicio
+	 * this.listaEjercicios = ejercicios; // Guardamos la lista de ejercicios
+	 * ArrayList<Serie>listaSeries = new
+	 * Serie().obtenerSeries(ejercicioActual.getId(), online);
+	 * 
+	 * this.vistaEjercicios.cambiarVentana(ejercicioActual);
+	 * 
+	 * //
+	 * this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+	 * // this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.
+	 * getDescripcion()); //
+	 * this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " +
+	 * ejercicioActual.getNumReps());
+	 * this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(),
+	 * ejercicioActual.getFoto(), vistaEjercicios); }
+	 */
 
-			if (workoutSeleccionado == null) {
-				vistaWorkouts.getBtnDescripcion().setEnabled(false);
-				vistaWorkouts.getBtnVideo().setEnabled(false);
-				// en vez de hacer esto igual se puede vaciar el objeto
-				return;
+	/*
+	 * private void cambiarAlSiguienteEjercicio() { if (this.listaEjercicios == null
+	 * || this.listaEjercicios.isEmpty()) return;
+	 * 
+	 * int indiceActual = listaEjercicios.indexOf(this.ejercicioActual); int
+	 * siguienteIndice = (indiceActual + 1) % listaEjercicios.size();
+	 * 
+	 * this.ejercicioActual = listaEjercicios.get(siguienteIndice);
+	 * 
+	 * this.vistaEjercicios.getLblEjercicio().setText(ejercicioActual.getNombre());
+	 * this.vistaEjercicios.getTxtAreaDescripcion().setText(ejercicioActual.
+	 * getDescripcion());
+	 * this.vistaEjercicios.getLblRepeticiones().setText("Repeticiones: " +
+	 * ejercicioActual.getNumReps());
+	 * this.vistaPrincipal.colocarImg(vistaEjercicios.getLblImgEjer(),
+	 * ejercicioActual.getFoto(), vistaEjercicios); }
+	 */
+
+	private void cargarWorkouts(Usuario usuario, Principal.enumAcciones accion) {
+		Workout workouts = new Workout();
+		ArrayList<Workout> listaWorkouts = workouts.obtenerWorkouts((long) usuario.getNivelUsuario(), online);
+		vistaWorkouts.getWorkoutListModel().clear();
+
+		// Bucle para añadir cada workout a la JList
+		for (Workout workout : listaWorkouts) {
+			String url = workout.getVideoUrl();
+			String descripcion = workout.getDescripcion();
+			vistaWorkouts.addWorkout(workout, url, descripcion);
+		}
+	}
+
+	private void cargarInfoWorkout() {
+		Workout workoutSeleccionado = vistaWorkouts.getWorkoutList().getSelectedValue();
+
+		if (workoutSeleccionado == null) {
+			vistaWorkouts.getBtnDescripcion().setEnabled(false);
+			vistaWorkouts.getBtnVideo().setEnabled(false);
+			// en vez de hacer esto igual se puede vaciar el objeto
+			return;
+		}
+
+		String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
+		String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
+
+		// CARGAR URL
+		if (urlWorkout == null || urlWorkout.isEmpty()) {
+			vistaWorkouts.getBtnVideo().setEnabled(false);
+			return;
+		}
+
+		for (ActionListener al : vistaWorkouts.getBtnVideo().getActionListeners()) {
+			vistaWorkouts.getBtnVideo().removeActionListener(al);
+		}
+
+		vistaWorkouts.getBtnVideo().setEnabled(true);
+		vistaWorkouts.getBtnVideo().addActionListener(event -> {
+			try {
+				Desktop.getDesktop().browse(new URI(urlWorkout));
+			} catch (Exception ex) {
+				ex.printStackTrace();
 			}
+		});
 
-			String urlWorkout = vistaWorkouts.getWorkoutUrl(workoutSeleccionado.getVideoUrl());
-			String descripcionWorkout = vistaWorkouts.getWorkoutDescripcion(workoutSeleccionado.getDescripcion());
+		// CARGAR DESCRIPCIÓN
+		if (descripcionWorkout == null || descripcionWorkout.isEmpty()) {
+			vistaWorkouts.getBtnDescripcion().setEnabled(false);
+			return;
+		}
 
-			// CARGAR URL
-			if (urlWorkout == null || urlWorkout.isEmpty()) {
-				vistaWorkouts.getBtnVideo().setEnabled(false);
-				return;
+		for (ActionListener al : vistaWorkouts.getBtnDescripcion().getActionListeners()) {
+			vistaWorkouts.getBtnDescripcion().removeActionListener(al);
+		}
+
+		vistaWorkouts.getBtnDescripcion().setEnabled(true);
+
+		int max = 50;
+		StringBuilder resultado = new StringBuilder(descripcionWorkout);
+
+		if (max > resultado.length())
+			max = resultado.length();
+
+		for (int i = max; i < resultado.length(); i += max) {
+			while (i > 0 && resultado.charAt(i - 1) != ' ') {
+				i--;
 			}
+			if (i > 0 && i < resultado.length())
+				resultado.replace(i, i, "\n");
 
-			for (ActionListener al : vistaWorkouts.getBtnVideo().getActionListeners()) {
-				vistaWorkouts.getBtnVideo().removeActionListener(al);
-			}
+		}
 
-			vistaWorkouts.getBtnVideo().setEnabled(true);
-			vistaWorkouts.getBtnVideo().addActionListener(event -> {
-				try {
-					Desktop.getDesktop().browse(new URI(urlWorkout));
-				} catch (Exception ex) {
-					ex.printStackTrace();
+		String a = resultado.toString();
+		vistaWorkouts.getBtnDescripcion().addActionListener(event -> {
+			JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
+		});
+	}
+
+	public static void cargarDatosDesdeXML(DefaultTableModel tableModel) {
+		try {
+
+			File archivoXML = new File(Backup.FILE_HISTORICO_XML);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(archivoXML);
+			doc.getDocumentElement().normalize();
+
+			NodeList usuarios = doc.getElementsByTagName("usuario");
+
+			for (int i = 0; i < usuarios.getLength(); i++) {
+				Element usuarioElement = (Element) usuarios.item(i);
+				/*
+				 * String idUsuario = usuarioElement.getAttribute("id"); // Obtener el atributo
+				 * "id" del usuario
+				 * 
+				 * System.out.println(u.getId());
+				 * 
+				 * if (!idUsuario.equals(u.getId())) { continue; }
+				 */
+
+				// Obtener los registros del usuario activo
+				NodeList registros = usuarioElement.getElementsByTagName("registro");
+				for (int j = 0; j < registros.getLength(); j++) {
+					Element registro = (Element) registros.item(j);
+					String nombre = registro.getElementsByTagName("nombre").item(0).getTextContent();
+					String nivel = registro.getElementsByTagName("nivel").item(0).getTextContent();
+					String tiempoPrevisto = registro.getElementsByTagName("tiempoPrevisto").item(0).getTextContent();
+					String tiempoTotal = registro.getElementsByTagName("tiempoTotal").item(0).getTextContent();
+					String fecha = registro.getElementsByTagName("fecha").item(0).getTextContent();
+					String fechaFormateada = formatearFecha(fecha);
+					String porcentajeCompletado = registro.getElementsByTagName("porcentajeCompletado").item(0)
+							.getTextContent() + "%";
+
+					tableModel.addRow(new Object[] { nombre, nivel, tiempoPrevisto, tiempoTotal, fechaFormateada,
+							porcentajeCompletado });
 				}
-			});
-
-			// CARGAR DESCRIPCIÓN
-			if (descripcionWorkout == null || descripcionWorkout.isEmpty()) {
-				vistaWorkouts.getBtnDescripcion().setEnabled(false);
-				return;
 			}
-
-			for (ActionListener al : vistaWorkouts.getBtnDescripcion().getActionListeners()) {
-				vistaWorkouts.getBtnDescripcion().removeActionListener(al);
-			}
-
-			vistaWorkouts.getBtnDescripcion().setEnabled(true);
-
-			int max = 50;
-			StringBuilder resultado = new StringBuilder(descripcionWorkout);
-
-			if (max > resultado.length())
-				max = resultado.length();
-
-			for (int i = max; i < resultado.length(); i += max) {
-				while (i > 0 && resultado.charAt(i - 1) != ' ') {
-					i--;
-				}
-				if (i > 0 && i < resultado.length())
-					resultado.replace(i, i, "\n");
-
-			}
-
-			String a = resultado.toString();
-			vistaWorkouts.getBtnDescripcion().addActionListener(event -> {
-				JOptionPane.showMessageDialog(null, a, "Descripción", JOptionPane.INFORMATION_MESSAGE);
-			});
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		
-		
-		/*private void obtenerSeries() {
-		    Workout selectedWorkout = vistaWorkouts.getWorkoutList().getSelectedValue();
-		    if (selectedWorkout == null) return;
+	}
 
-		    String workoutId = selectedWorkout.getId();
-		    Ejercicio ejercicioModel = new Ejercicio();
-		    Serie serieModel = new Serie();
+	public static String formatearFecha(String fecha) {
+		try {
+			// Specify the locale to ensure correct parsing of month and day abbreviations
+			SimpleDateFormat formatoOriginal = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
 
-		    ArrayList<Ejercicio> listaEjercicios = ejercicioModel.obtenerEjercicios(workoutId, online);
+			Date fechaFormateada = formatoOriginal.parse(fecha);
 
-		    for (Ejercicio ejercicio : listaEjercicios) {
-		        ArrayList<Serie> listaSeries = serieModel.obtenerSeries(ejercicio.getId(), online);
-		        for (Serie serie : listaSeries) {
-		            System.out.println(serie.getNombreSerie());
-		        }
-		    }
-		}*/
+			// Format the date to the desired output format
+			SimpleDateFormat formatoNuevo = new SimpleDateFormat("yyyy-MM-dd");
 
+			return formatoNuevo.format(fechaFormateada);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/*
+	 * private void obtenerSeries() { Workout selectedWorkout =
+	 * vistaWorkouts.getWorkoutList().getSelectedValue(); if (selectedWorkout ==
+	 * null) return;
+	 * 
+	 * String workoutId = selectedWorkout.getId(); Ejercicio ejercicioModel = new
+	 * Ejercicio(); Serie serieModel = new Serie();
+	 * 
+	 * ArrayList<Ejercicio> listaEjercicios =
+	 * ejercicioModel.obtenerEjercicios(workoutId, online);
+	 * 
+	 * for (Ejercicio ejercicio : listaEjercicios) { ArrayList<Serie> listaSeries =
+	 * serieModel.obtenerSeries(ejercicio.getId(), online); for (Serie serie :
+	 * listaSeries) { System.out.println(serie.getNombreSerie()); } } }
+	 */
 
 }

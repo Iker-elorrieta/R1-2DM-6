@@ -3,6 +3,7 @@ package modelo;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,9 @@ import com.google.cloud.firestore.QuerySnapshot;
 
 import conexion.Conexion;
 
-public class Serie {
+public class Serie implements Serializable {
+	private static final long serialVersionUID = 1L;
+
 	private String nombreSerie;
 	private long numReps, tiempo;
 
@@ -59,71 +62,70 @@ public class Serie {
 		this.tiempo = tiempo;
 	}
 
-	
-	public ArrayList<Serie> obtenerSeries(String ejersCollection, String ejercicioId, String workoutId, boolean online) {
-	    ArrayList<Serie> listaSeries = new ArrayList<>();
-	    
-	    if (!online) {
-	        try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
-	             ObjectInputStream ois = new ObjectInputStream(fic)) {
+	public ArrayList<Serie> obtenerSeries(String ejersCollection, String ejercicioId, String workoutId,
+			boolean online) {
+		ArrayList<Serie> listaSeries = new ArrayList<>();
 
-	            while (fic.getChannel().position() < fic.getChannel().size()) {
-	                Ejercicio ejercicio = (Ejercicio) ois.readObject();
+		if (!online) {
+			try (FileInputStream fic = new FileInputStream(Backup.FILE_WORKOUTS);
+					ObjectInputStream ois = new ObjectInputStream(fic)) {
 
-	                // Verifica si el workout tiene el id que estamos buscando
-	                if (ejercicio.getId().equals(ejercicioId)) {
-	                    listaSeries = ejercicio.getListaSeries(); // Obtiene los ejercicios asociados
-	                    break;
-	                }
-	            }
-	        } catch (ClassNotFoundException | IOException e) {
-	            e.printStackTrace();
-	        }
-	    } else {
-	        Firestore fs = null;
+				while (fic.getChannel().position() < fic.getChannel().size()) {
+					Ejercicio ejercicio = (Ejercicio) ois.readObject();
 
-	        try {
-	            // Conectar a Firestore
-	            fs = Conexion.conectar();
+					// Verifica si el workout tiene el id que estamos buscando
+					if (ejercicio.getId().equals(ejercicioId)) {
+						listaSeries = ejercicio.getListaSeries(); // Obtiene los ejercicios asociados
+						break;
+					}
+				}
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			Firestore fs = null;
 
-	            DocumentReference workoutDoc = fs.collection("Workouts").document(workoutId);
-	            DocumentReference ejerDoc = workoutDoc.collection(ejersCollection).document(ejercicioId);
-	            
-	            ApiFuture<QuerySnapshot> seriesQuery = ejerDoc.collection(seriesCollection).get();
-	            QuerySnapshot seriesSnapshot = seriesQuery.get();
-	            List<QueryDocumentSnapshot> series = seriesSnapshot.getDocuments();
+			try {
+				// Conectar a Firestore
+				fs = Conexion.conectar();
 
-	            for (QueryDocumentSnapshot serieDoc : series) {
-	                Serie s = new Serie();
-	                
-	                s.setNombreSerie(serieDoc.getString(fieldNombre));
-	                Long numReps = serieDoc.getLong(fieldNumReps);
-	                Long tiempo = serieDoc.getLong(fieldTiempo);
+				DocumentReference workoutDoc = fs.collection("Workouts").document(workoutId);
+				DocumentReference ejerDoc = workoutDoc.collection(ejersCollection).document(ejercicioId);
 
-	                if (numReps != null) {
-	                    s.setNumReps(numReps.intValue());
-	                }
-	                if (tiempo != null) {
-	                    s.setTiempo(tiempo.intValue());
-	                }
+				ApiFuture<QuerySnapshot> seriesQuery = ejerDoc.collection(seriesCollection).get();
+				QuerySnapshot seriesSnapshot = seriesQuery.get();
+				List<QueryDocumentSnapshot> series = seriesSnapshot.getDocuments();
 
-	                listaSeries.add(s);
-	            }
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        } finally {
-	            if (fs != null) {
-	                try {
-	                    fs.close();
-	                } catch (Exception e) {
-	                    e.printStackTrace();
-	                }
-	            }
-	        }
-	    }
+				for (QueryDocumentSnapshot serieDoc : series) {
+					Serie s = new Serie();
 
-	    return listaSeries;
+					s.setNombreSerie(serieDoc.getString(fieldNombre));
+					Long numReps = serieDoc.getLong(fieldNumReps);
+					Long tiempo = serieDoc.getLong(fieldTiempo);
+
+					if (numReps != null) {
+						s.setNumReps(numReps.intValue());
+					}
+					if (tiempo != null) {
+						s.setTiempo(tiempo.intValue());
+					}
+
+					listaSeries.add(s);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (fs != null) {
+					try {
+						fs.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		return listaSeries;
 	}
-
 
 }

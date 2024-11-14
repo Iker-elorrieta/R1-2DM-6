@@ -171,6 +171,10 @@ public class Usuario implements Serializable {
 		this.nivelUsuario = nivelUsuario;
 	}
 
+	public String getUsersCollection() {
+		return usersCollection;
+	}
+
 	// *** MÉTODOS CRUD ***
 
 	public Usuario obtenerUsuario(String userName, boolean online) {
@@ -311,7 +315,7 @@ public class Usuario implements Serializable {
 
 	public void insertarNuevoItemHistorial(Historial historial) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

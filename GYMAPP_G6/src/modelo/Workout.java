@@ -22,6 +22,7 @@ public class Workout implements Serializable {
 	private String nombre, videoUrl, id, descripcion;
 	private int nivel, numEjers;
 	private ArrayList<Ejercicio> listaEjercicios = new ArrayList<>();
+	private double tiempoPrevisto;
 
 	// Nombres de los campos en Firestore
 	private static String workoutsCollection = "Workouts";
@@ -102,6 +103,14 @@ public class Workout implements Serializable {
 		this.listaEjercicios = listaEjercicios;
 	}
 
+	public double getTiempoPrevisto() {
+		return tiempoPrevisto;
+	}
+
+	public void setTiempoPrevisto(double tiempoPrevisto) {
+		this.tiempoPrevisto = tiempoPrevisto;
+	}
+
 	public ArrayList<Workout> obtenerWorkouts(Long nivelUsuario, boolean online) {
 		ArrayList<Workout> listaWorkouts = new ArrayList<Workout>();
 
@@ -114,8 +123,9 @@ public class Workout implements Serializable {
 
 					// Filtro por nivel
 					if (workout.getNivel() <= nivelUsuario) {
-						workout.setListaEjercicios(new Ejercicio().obtenerEjercicios(workout.getId().toString(), online)); // Cargar
-																												// ejercicios
+						workout.setListaEjercicios(
+								new Ejercicio().obtenerEjercicios(workout.getId().toString(), online)); // Cargar
+						// ejercicios
 						listaWorkouts.add(workout);
 					}
 				}
@@ -151,11 +161,9 @@ public class Workout implements Serializable {
 
 					w.setVideoUrl(workout.getString(fieldVideoUrl));
 					w.setDescripcion(workout.getString(fieldDescripcion));
-					
+
 					w.setListaEjercicios(new Ejercicio().obtenerEjercicios(w.getId(), online));
 					listaWorkouts.add(w);
-
-					
 
 				}
 				fs.close();
